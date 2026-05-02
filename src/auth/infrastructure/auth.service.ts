@@ -21,6 +21,8 @@ export class AuthInfrastructureService {
   proxyRequest(method: string, path: string, data?: any, headers?: any): Observable<any> {
     const url = `${this.baseUrl}${path}`;
     
+    console.log(`Proxying ${method} request to: ${url}`);
+    
     return this.httpService.request({
       method,
       url,
@@ -29,8 +31,23 @@ export class AuthInfrastructureService {
     }).pipe(
       map((response: AxiosResponse) => response.data),
       catchError((error: AxiosError) => {
+        console.error('Proxy error:', {
+          url,
+          method,
+          message: error.message,
+          code: error.code,
+          response: error.response?.data,
+        });
+        
+        if (error.code === 'ECONNREFUSED' || error.code === 'ENOTFOUND') {
+          throw new HttpException(
+            `Auth service no disponible en ${this.baseUrl}`,
+            HttpStatus.BAD_GATEWAY,
+          );
+        }
+        
         throw new HttpException(
-          error.response?.data || 'Service error',
+          error.response?.data || `Service error: ${error.message}`,
           error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR,
         );
       }),
