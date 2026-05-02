@@ -1,0 +1,76 @@
+name: Deploy NestJS Docker
+
+on:
+  push:
+    branches: [ "develop", "feat/config-deploy" ]
+  pull_request:
+    branches: [ "main", "develop" ]
+
+permissions:
+  packages: write
+  contents: read
+
+jobs:
+  deploy-docker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set repository name to lowercase
+        run: echo "REPO_LC=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
+      - name: Tailscale
+        uses: tailscale/github-action@v2
+        with:
+          authkey: ${{ secrets.TAILSCALE_AUTHKEY }}
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            ghcr.io/${{ env.REPO_LC }}:latest
+            ghcr.io/${{ env.REPO_LC }}:${{ github.sha }}
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.REMOTE_PORT }}
+          script: |
+            # Iniciar sesión en GHCR desde el servidor
+            echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+            # Descargar la última imagen
+            docker pull ghcr.io/${{ env.REPO_LC }}:latest
+
+            # Detener y eliminar contenedor existente
+            docker stop api-gateway || true
+            docker rm api-gateway || true
+
+            # Iniciar nuevo contenedor
+            docker run -d \
+              --name api-gateway \
+              -p ${{ secrets.PORT }}:${{ secrets.PORT }} \
+              -e PORT="${{ secrets.PORT }}" \
+              -e AUTH_SERVICE_BASE_URL="${{ secrets.AUTH_SERVICE_BASE_UR }}" \
+              -e API_KEY="${{ secrets.API_KEY }}" \
+              -e API_KEY_FRONT="${{ secrets.API_KEY_FRONT }}" \
+              -e SWAGGER_USER="${{ secrets.SWAGGER_USER }}" \
+              -e SWAGGER_PASS="${{ secrets.SWAGGER_PASS }}" \
+              --restart unless-stopped \
+              ghcr.io/${{ env.REPO_LC }}:latest
+
+            # Limpiar imágenes antiguas
+            docker image prune -f
