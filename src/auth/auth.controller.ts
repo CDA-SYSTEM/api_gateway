@@ -1,7 +1,5 @@
 import { Controller, Post, Get, Patch, Delete, Body, Query, Param, UseGuards, ValidationPipe, UsePipes, Req } from '@nestjs/common';
-import type { Request } from 'express';
-import { ApiKeyGuard } from '../common/guards/api-key.guard';
-import { ApiTags, ApiOperation, ApiBody, ApiResponse, ApiHeader, ApiQuery, ApiSecurity, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBody, ApiResponse, ApiQuery, ApiSecurity, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthApplicationService } from './application/auth.service';
 import { LoginDto } from './application/dtos/login.dto';
 import { RegisterDto } from './application/dtos/register.dto';
@@ -9,16 +7,19 @@ import { UpdateUserDto } from './application/dtos/update-user.dto';
 import { ValidateTokenDto } from './application/dtos/validate-token.dto';
 import { RefreshTokenDto } from './application/dtos/refresh-token.dto';
 import { LogoutDto } from './application/dtos/logout.dto';
+import { Public } from '../common/decorators/public.decorator';
+import { Roles } from '../common/decorators/roles.decorator';
+import { Roles as RoleConst } from '../common/constants/roles.constant';
 
 @ApiTags('auth')
 @Controller('auth')
-@UseGuards(ApiKeyGuard)
 @UsePipes(new ValidationPipe({ transform: true }))
 @ApiSecurity('x-api-key')
 @ApiBearerAuth()
 export class AuthController {
   constructor(private readonly authService: AuthApplicationService) {}
 
+  @Public()
   @Post('login')
   @ApiOperation({ summary: 'Login de usuario' })
   @ApiBody({ type: LoginDto })
@@ -27,6 +28,7 @@ export class AuthController {
     return this.authService.login(body);
   }
 
+  @Roles(RoleConst.ADMIN, RoleConst.MANAGER)
   @Post('register')
   @ApiOperation({ summary: 'Registro de usuario (requiere token admin/manager)' })
   @ApiBody({ type: RegisterDto })
@@ -36,6 +38,7 @@ export class AuthController {
     return this.authService.register(body, token);
   }
 
+  @Roles(RoleConst.ADMIN, RoleConst.MANAGER)
   @Get('users')
   @ApiOperation({ summary: 'Listar usuarios por rol' })
   @ApiQuery({ name: 'role', required: true, description: 'Rol del usuario' })
@@ -45,6 +48,7 @@ export class AuthController {
     return this.authService.getUsers(role, token);
   }
 
+  @Roles(RoleConst.ADMIN, RoleConst.MANAGER)
   @Get('users/:id')
   @ApiOperation({ summary: 'Obtener usuario por ID' })
   @ApiResponse({ status: 200, description: 'Usuario encontrado' })
@@ -53,6 +57,7 @@ export class AuthController {
     return this.authService.getUserById(id, token);
   }
 
+  @Roles(RoleConst.ADMIN)
   @Patch('users/:id')
   @ApiOperation({ summary: 'Actualizar usuario' })
   @ApiBody({ type: UpdateUserDto })
@@ -62,6 +67,7 @@ export class AuthController {
     return this.authService.updateUser(id, body, token);
   }
 
+  @Public()
   @Post('validate-token')
   @ApiOperation({ summary: 'Validar token JWT' })
   @ApiBody({ type: ValidateTokenDto })
@@ -70,6 +76,7 @@ export class AuthController {
     return this.authService.validateToken(body.token);
   }
 
+  @Public()
   @Post('refresh')
   @ApiOperation({ summary: 'Refrescar token' })
   @ApiBody({ type: RefreshTokenDto })
@@ -78,6 +85,7 @@ export class AuthController {
     return this.authService.refreshToken(body.refreshToken);
   }
 
+  @Roles(RoleConst.ADMIN, RoleConst.MANAGER)
   @Get('users/search')
   @ApiOperation({ summary: 'Buscar usuarios' })
   @ApiQuery({ name: 'q', required: true, description: 'Término de búsqueda' })
@@ -87,6 +95,7 @@ export class AuthController {
     return this.authService.searchUsers(query, token);
   }
 
+  @Roles(RoleConst.ADMIN, RoleConst.MANAGER, RoleConst.INSPECTOR, RoleConst.OPERARIO)
   @Get('modules/:module')
   @ApiOperation({ summary: 'Verificar acceso a módulo' })
   @ApiResponse({ status: 200, description: 'Acceso verificado' })
@@ -95,6 +104,7 @@ export class AuthController {
     return this.authService.checkModuleAccess(module, token);
   }
 
+  @Roles(RoleConst.ADMIN, RoleConst.MANAGER)
   @Patch('users/:id/inactivate')
   @ApiOperation({ summary: 'Inactivar usuario' })
   @ApiResponse({ status: 200, description: 'Usuario inactivado' })
@@ -103,6 +113,7 @@ export class AuthController {
     return this.authService.inactivateUser(id, token);
   }
 
+  @Roles(RoleConst.ADMIN)
   @Delete('users/:id')
   @ApiOperation({ summary: 'Eliminar usuario' })
   @ApiResponse({ status: 200, description: 'Usuario eliminado' })
@@ -111,6 +122,7 @@ export class AuthController {
     return this.authService.deleteUser(id, token);
   }
 
+  @Roles(RoleConst.ADMIN, RoleConst.MANAGER)
   @Get('users/inspectors')
   @ApiOperation({ summary: 'Listar inspectores para dropdown' })
   @ApiResponse({ status: 200, description: 'Lista de inspectores' })
@@ -119,6 +131,7 @@ export class AuthController {
     return this.authService.getInspectors(token);
   }
 
+  @Roles(RoleConst.ADMIN, RoleConst.MANAGER)
   @Get('users/operarios')
   @ApiOperation({ summary: 'Listar operarios para dropdown' })
   @ApiResponse({ status: 200, description: 'Lista de operarios' })
@@ -127,6 +140,7 @@ export class AuthController {
     return this.authService.getOperarios(token);
   }
 
+  @Public()
   @Post('logout')
   @ApiOperation({ summary: 'Logout de usuario' })
   @ApiBody({ type: LogoutDto })
