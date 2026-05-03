@@ -171,4 +171,47 @@ export class VehicleController {
     const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
     return this.vehicleService.deleteLinea(id, token);
   }
+
+  // Colores
+  @Post('color')
+  @ApiOperation({ summary: 'Crear color' })
+  @ApiBody({ type: CreateCatalogoDto })
+  @ApiResponse({ status: 201, description: 'Color creado' })
+  async createColor(@Body() body: CreateCatalogoDto, @Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.vehicleService.createColor(body, token);
+  }
+
+  @Get('color')
+  @ApiOperation({ summary: 'Listar colores' })
+  @ApiResponse({ status: 200, description: 'Lista de colores' })
+  async listColores(@Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.vehicleService.listColores(token);
+  }
+
+  @Get('color/:id')
+  @ApiOperation({ summary: 'Obtener color por ID' })
+  @ApiResponse({ status: 200, description: 'Color encontrado' })
+  async getColorById(@Param('id') id: string, @Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.vehicleService.getColorById(id, token);
+  }
+
+  @Put('color/:id')
+  @ApiOperation({ summary: 'Actualizar color' })
+  @ApiBody({ type: UpdateCatalogoDto })
+  @ApiResponse({ status: 200, description: 'Color actualizado' })
+  async updateColor(@Param('id') id: string, @Body() body: UpdateCatalogoDto, @Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.vehicleService.updateColor(id, body, token);
+  }
+
+  @Delete('color/:id')
+  @ApiOperation({ summary: 'Eliminar color' })
+  @ApiResponse({ status: 200, description: 'Color eliminado' })
+  async deleteColor(@Param('id') id: string, @Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.vehicleService.deleteColor(id, token);
+  }
 }

@@ -126,4 +126,37 @@ export class VehicleService {
       Authorization: `Bearer ${token}`,
     });
   }
+
+  // Colores
+  createColor(data: CreateCatalogoDto, token: string): Observable<any> {
+    return this.vehicleInfrastructureService.proxyRequest('POST', '/color', data, {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    });
+  }
+
+  listColores(token: string): Observable<any> {
+    return this.vehicleInfrastructureService.proxyRequest('GET', '/color', null, {
+      Authorization: `Bearer ${token}`,
+    });
+  }
+
+  getColorById(id: string, token: string): Observable<any> {
+    return this.vehicleInfrastructureService.proxyRequest('GET', `/color/${id}`, null, {
+      Authorization: `Bearer ${token}`,
+    });
+  }
+
+  updateColor(id: string, data: UpdateCatalogoDto, token: string): Observable<any> {
+    return this.vehicleInfrastructureService.proxyRequest('PUT', `/color/${id}`, data, {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    });
+  }
+
+  deleteColor(id: string, token: string): Observable<any> {
+    return this.vehicleInfrastructureService.proxyRequest('DELETE', `/color/${id}`, null, {
+      Authorization: `Bearer ${token}`,
+    });
+  }
 }
