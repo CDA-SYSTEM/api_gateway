@@ -1,5 +1,5 @@
-import { Controller, Get, Put, Post, Delete, Body, Param, Req, UsePipes, ValidationPipe } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiBody, ApiResponse, ApiSecurity, ApiBearerAuth } from '@nestjs/swagger';
+import { Controller, Get, Put, Post, Delete, Body, Param, Req, Query, UsePipes, ValidationPipe } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiBody, ApiResponse, ApiSecurity, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { VehicleService } from './application/vehicle.service';
 import { CreateCatalogoDto } from './application/dtos/create-catalogo.dto';
 import { UpdateCatalogoDto } from './application/dtos/update-catalogo.dto';
@@ -357,9 +357,11 @@ export class VehicleController {
 
   @Get('vehiculo')
   @ApiOperation({ summary: 'Listar vehículos' })
+  @ApiQuery({ name: 'page', required: false, description: 'Número de página', type: Number })
+  @ApiQuery({ name: 'size', required: false, description: 'Tamaño de página', type: Number })
   @ApiResponse({ status: 200, description: 'Lista de vehículos' })
-  async listVehicles(@Req() req: Request) {
+  async listVehicles(@Query('page') page: number, @Query('size') size: number, @Req() req: Request) {
     const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
-    return this.vehicleService.listVehicles(token);
+    return this.vehicleService.listVehicles(page, size, token);
   }
 }

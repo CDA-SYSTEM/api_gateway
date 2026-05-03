@@ -24,8 +24,15 @@ export class VehicleService {
     });
   }
 
-  listVehicles(token: string): Observable<any> {
-    return this.vehicleInfrastructureService.proxyRequest('GET', '/vehiculo', null, {
+  listVehicles(page?: number, size?: number, token?: string): Observable<any> {
+    const queryParams = new URLSearchParams();
+    if (page !== undefined) queryParams.append('page', page.toString());
+    if (size !== undefined) queryParams.append('size', size.toString());
+    
+    const queryString = queryParams.toString();
+    const url = `/vehiculo${queryString ? '?' + queryString : ''}`;
+    
+    return this.vehicleInfrastructureService.proxyRequest('GET', url, null, {
       Authorization: `Bearer ${token}`,
     });
   }
