@@ -68,6 +68,7 @@ jobs:
               -e API_KEY="${{ secrets.API_KEY }}" \
               -e API_KEY_FRONT="${{ secrets.API_KEY_FRONT }}" \
               -e SWAGGER_USER="${{ secrets.SWAGGER_USER }}" \
+              -e VEHICLE_SERVICE_BASE_URL="${{ secrets.VEHICLE_SERVICE_BASE_URL }}" \
               -e SWAGGER_PASS="${{ secrets.SWAGGER_PASS }}" \
               --restart unless-stopped \
               ghcr.io/${{ env.REPO_LC }}:latest
