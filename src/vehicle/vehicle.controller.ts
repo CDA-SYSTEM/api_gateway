@@ -3,6 +3,7 @@ import { ApiTags, ApiOperation, ApiBody, ApiResponse, ApiSecurity, ApiBearerAuth
 import { VehicleService } from './application/vehicle.service';
 import { CreateCatalogoDto } from './application/dtos/create-catalogo.dto';
 import { UpdateCatalogoDto } from './application/dtos/update-catalogo.dto';
+import { CreateVehicleDto } from './application/dtos/create-vehicle.dto';
 import { UpdateVehicleDto } from './application/dtos/update-vehicle.dto';
 import type { Request } from 'express';
 
@@ -256,5 +257,109 @@ export class VehicleController {
   async deleteTipoVehiculo(@Param('id') id: string, @Req() req: Request) {
     const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
     return this.vehicleService.deleteTipoVehiculo(id, token);
+  }
+
+  // Tipos de Combustible
+  @Post('tipo-combustible')
+  @ApiOperation({ summary: 'Crear tipo de combustible' })
+  @ApiBody({ type: CreateCatalogoDto })
+  @ApiResponse({ status: 201, description: 'Tipo de combustible creado' })
+  async createTipoCombustible(@Body() body: CreateCatalogoDto, @Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.vehicleService.createTipoCombustible(body, token);
+  }
+
+  @Get('tipo-combustible')
+  @ApiOperation({ summary: 'Listar tipos de combustible' })
+  @ApiResponse({ status: 200, description: 'Lista de tipos de combustible' })
+  async listTiposCombustible(@Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.vehicleService.listTiposCombustible(token);
+  }
+
+  @Get('tipo-combustible/:id')
+  @ApiOperation({ summary: 'Obtener tipo de combustible por ID' })
+  @ApiResponse({ status: 200, description: 'Tipo de combustible encontrado' })
+  async getTipoCombustibleById(@Param('id') id: string, @Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.vehicleService.getTipoCombustibleById(id, token);
+  }
+
+  @Put('tipo-combustible/:id')
+  @ApiOperation({ summary: 'Actualizar tipo de combustible' })
+  @ApiBody({ type: UpdateCatalogoDto })
+  @ApiResponse({ status: 200, description: 'Tipo de combustible actualizado' })
+  async updateTipoCombustible(@Param('id') id: string, @Body() body: UpdateCatalogoDto, @Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.vehicleService.updateTipoCombustible(id, body, token);
+  }
+
+  @Delete('tipo-combustible/:id')
+  @ApiOperation({ summary: 'Eliminar tipo de combustible' })
+  @ApiResponse({ status: 200, description: 'Tipo de combustible eliminado' })
+  async deleteTipoCombustible(@Param('id') id: string, @Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.vehicleService.deleteTipoCombustible(id, token);
+  }
+
+  // Tipos de Servicio
+  @Post('tipo-servicio')
+  @ApiOperation({ summary: 'Crear tipo de servicio' })
+  @ApiBody({ type: CreateCatalogoDto })
+  @ApiResponse({ status: 201, description: 'Tipo de servicio creado' })
+  async createTipoServicio(@Body() body: CreateCatalogoDto, @Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.vehicleService.createTipoServicio(body, token);
+  }
+
+  @Get('tipo-servicio')
+  @ApiOperation({ summary: 'Listar tipos de servicio' })
+  @ApiResponse({ status: 200, description: 'Lista de tipos de servicio' })
+  async listTiposServicio(@Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.vehicleService.listTiposServicio(token);
+  }
+
+  @Get('tipo-servicio/:id')
+  @ApiOperation({ summary: 'Obtener tipo de servicio por ID' })
+  @ApiResponse({ status: 200, description: 'Tipo de servicio encontrado' })
+  async getTipoServicioById(@Param('id') id: string, @Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.vehicleService.getTipoServicioById(id, token);
+  }
+
+  @Put('tipo-servicio/:id')
+  @ApiOperation({ summary: 'Actualizar tipo de servicio' })
+  @ApiBody({ type: UpdateCatalogoDto })
+  @ApiResponse({ status: 200, description: 'Tipo de servicio actualizado' })
+  async updateTipoServicio(@Param('id') id: string, @Body() body: UpdateCatalogoDto, @Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.vehicleService.updateTipoServicio(id, body, token);
+  }
+
+  @Delete('tipo-servicio/:id')
+  @ApiOperation({ summary: 'Eliminar tipo de servicio' })
+  @ApiResponse({ status: 200, description: 'Tipo de servicio eliminado' })
+  async deleteTipoServicio(@Param('id') id: string, @Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.vehicleService.deleteTipoServicio(id, token);
+  }
+
+  // Vehículos CRUD
+  @Post('vehiculo')
+  @ApiOperation({ summary: 'Crear vehículo' })
+  @ApiBody({ type: CreateVehicleDto })
+  @ApiResponse({ status: 201, description: 'Vehículo creado' })
+  async createVehicle(@Body() body: CreateVehicleDto, @Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.vehicleService.createVehicle(body, token);
+  }
+
+  @Get('vehiculo')
+  @ApiOperation({ summary: 'Listar vehículos' })
+  @ApiResponse({ status: 200, description: 'Lista de vehículos' })
+  async listVehicles(@Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.vehicleService.listVehicles(token);
   }
 }

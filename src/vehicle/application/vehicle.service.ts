@@ -3,6 +3,7 @@ import { Observable } from 'rxjs';
 import { VehicleInfrastructureService } from '../infrastructure/vehicle.service';
 import { CreateCatalogoDto } from './dtos/create-catalogo.dto';
 import { UpdateCatalogoDto } from './dtos/update-catalogo.dto';
+import { CreateVehicleDto } from './dtos/create-vehicle.dto';
 import { UpdateVehicleDto } from './dtos/update-vehicle.dto';
 
 @Injectable()
@@ -11,6 +12,20 @@ export class VehicleService {
 
   healthCheck(token: string): Observable<any> {
     return this.vehicleInfrastructureService.proxyRequest('GET', '/api/v1/health', null, {
+      Authorization: `Bearer ${token}`,
+    });
+  }
+
+  // Vehículos CRUD
+  createVehicle(data: CreateVehicleDto, token: string): Observable<any> {
+    return this.vehicleInfrastructureService.proxyRequest('POST', '/vehiculo', data, {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    });
+  }
+
+  listVehicles(token: string): Observable<any> {
+    return this.vehicleInfrastructureService.proxyRequest('GET', '/vehiculo', null, {
       Authorization: `Bearer ${token}`,
     });
   }
@@ -189,6 +204,72 @@ export class VehicleService {
 
   deleteTipoVehiculo(id: string, token: string): Observable<any> {
     return this.vehicleInfrastructureService.proxyRequest('DELETE', `/tipo-vehiculo/${id}`, null, {
+      Authorization: `Bearer ${token}`,
+    });
+  }
+
+  // Tipos de Combustible
+  createTipoCombustible(data: CreateCatalogoDto, token: string): Observable<any> {
+    return this.vehicleInfrastructureService.proxyRequest('POST', '/tipo-combustible', data, {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    });
+  }
+
+  listTiposCombustible(token: string): Observable<any> {
+    return this.vehicleInfrastructureService.proxyRequest('GET', '/tipo-combustible', null, {
+      Authorization: `Bearer ${token}`,
+    });
+  }
+
+  getTipoCombustibleById(id: string, token: string): Observable<any> {
+    return this.vehicleInfrastructureService.proxyRequest('GET', `/tipo-combustible/${id}`, null, {
+      Authorization: `Bearer ${token}`,
+    });
+  }
+
+  updateTipoCombustible(id: string, data: UpdateCatalogoDto, token: string): Observable<any> {
+    return this.vehicleInfrastructureService.proxyRequest('PUT', `/tipo-combustible/${id}`, data, {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    });
+  }
+
+  deleteTipoCombustible(id: string, token: string): Observable<any> {
+    return this.vehicleInfrastructureService.proxyRequest('DELETE', `/tipo-combustible/${id}`, null, {
+      Authorization: `Bearer ${token}`,
+    });
+  }
+
+  // Tipos de Servicio
+  createTipoServicio(data: CreateCatalogoDto, token: string): Observable<any> {
+    return this.vehicleInfrastructureService.proxyRequest('POST', '/tipo-servicio', data, {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    });
+  }
+
+  listTiposServicio(token: string): Observable<any> {
+    return this.vehicleInfrastructureService.proxyRequest('GET', '/tipo-servicio', null, {
+      Authorization: `Bearer ${token}`,
+    });
+  }
+
+  getTipoServicioById(id: string, token: string): Observable<any> {
+    return this.vehicleInfrastructureService.proxyRequest('GET', `/tipo-servicio/${id}`, null, {
+      Authorization: `Bearer ${token}`,
+    });
+  }
+
+  updateTipoServicio(id: string, data: UpdateCatalogoDto, token: string): Observable<any> {
+    return this.vehicleInfrastructureService.proxyRequest('PUT', `/tipo-servicio/${id}`, data, {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    });
+  }
+
+  deleteTipoServicio(id: string, token: string): Observable<any> {
+    return this.vehicleInfrastructureService.proxyRequest('DELETE', `/tipo-servicio/${id}`, null, {
       Authorization: `Bearer ${token}`,
     });
   }
