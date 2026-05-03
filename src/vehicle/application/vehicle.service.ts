@@ -13,7 +13,7 @@ export class VehicleService {
   }
 
   getVehicleById(id: string, token: string): Observable<any> {
-    return this.vehicleInfrastructureService.proxyRequest('GET', `/api/v1/vehiculo/${id}`, null, {
+    return this.vehicleInfrastructureService.proxyRequest('GET', `/vehiculo/${id}`, null, {
       Authorization: `Bearer ${token}`,
     });
   }
