@@ -1,6 +1,7 @@
-import { Controller, Get, Req, UsePipes, ValidationPipe, Param } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiSecurity, ApiBearerAuth } from '@nestjs/swagger';
+import { Controller, Get, Put, Body, Param, Req, UsePipes, ValidationPipe } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiBody, ApiResponse, ApiSecurity, ApiBearerAuth } from '@nestjs/swagger';
 import { VehicleService } from './application/vehicle.service';
+import { UpdateVehicleDto } from './application/dtos/update-vehicle.dto';
 import type { Request } from 'express';
 
 @ApiTags('vehicle')
@@ -25,5 +26,18 @@ export class VehicleController {
   async getVehicleById(@Param('id') id: string, @Req() req: Request) {
     const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
     return this.vehicleService.getVehicleById(id, token);
+  }
+
+  @Put('vehiculo/:id')
+  @ApiOperation({ summary: 'Actualizar vehículo' })
+  @ApiBody({ type: UpdateVehicleDto })
+  @ApiResponse({ status: 200, description: 'Vehículo actualizado' })
+  async updateVehicle(
+    @Param('id') id: string,
+    @Body() body: UpdateVehicleDto,
+    @Req() req: Request,
+  ) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.vehicleService.updateVehicle(id, body, token);
   }
 }

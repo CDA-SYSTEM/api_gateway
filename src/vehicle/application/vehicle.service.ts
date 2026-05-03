@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { VehicleInfrastructureService } from '../infrastructure/vehicle.service';
+import { UpdateVehicleDto } from './dtos/update-vehicle.dto';
 
 @Injectable()
 export class VehicleService {
@@ -13,8 +14,15 @@ export class VehicleService {
   }
 
   getVehicleById(id: string, token: string): Observable<any> {
-    return this.vehicleInfrastructureService.proxyRequest('GET', `/vehiculo/${id}`, null, {
+    return this.vehicleInfrastructureService.proxyRequest('GET', `/api/v1/vehiculo/${id}`, null, {
       Authorization: `Bearer ${token}`,
+    });
+  }
+
+  updateVehicle(id: string, data: UpdateVehicleDto, token: string): Observable<any> {
+    return this.vehicleInfrastructureService.proxyRequest('PUT', `/api/v1/vehiculo/${id}`, data, {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
     });
   }
 }
