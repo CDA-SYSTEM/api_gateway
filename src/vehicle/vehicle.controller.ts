@@ -128,4 +128,47 @@ export class VehicleController {
     const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
     return this.vehicleService.deleteClase(id, token);
   }
+
+  // Líneas
+  @Post('linea')
+  @ApiOperation({ summary: 'Crear línea' })
+  @ApiBody({ type: CreateCatalogoDto })
+  @ApiResponse({ status: 201, description: 'Línea creada' })
+  async createLinea(@Body() body: CreateCatalogoDto, @Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.vehicleService.createLinea(body, token);
+  }
+
+  @Get('linea')
+  @ApiOperation({ summary: 'Listar líneas' })
+  @ApiResponse({ status: 200, description: 'Lista de líneas' })
+  async listLineas(@Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.vehicleService.listLineas(token);
+  }
+
+  @Get('linea/:id')
+  @ApiOperation({ summary: 'Obtener línea por ID' })
+  @ApiResponse({ status: 200, description: 'Línea encontrada' })
+  async getLineaById(@Param('id') id: string, @Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.vehicleService.getLineaById(id, token);
+  }
+
+  @Put('linea/:id')
+  @ApiOperation({ summary: 'Actualizar línea' })
+  @ApiBody({ type: UpdateCatalogoDto })
+  @ApiResponse({ status: 200, description: 'Línea actualizada' })
+  async updateLinea(@Param('id') id: string, @Body() body: UpdateCatalogoDto, @Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.vehicleService.updateLinea(id, body, token);
+  }
+
+  @Delete('linea/:id')
+  @ApiOperation({ summary: 'Eliminar línea' })
+  @ApiResponse({ status: 200, description: 'Línea eliminada' })
+  async deleteLinea(@Param('id') id: string, @Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.vehicleService.deleteLinea(id, token);
+  }
 }

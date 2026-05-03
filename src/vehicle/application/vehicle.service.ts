@@ -93,4 +93,37 @@ export class VehicleService {
       Authorization: `Bearer ${token}`,
     });
   }
+
+  // Líneas
+  createLinea(data: CreateCatalogoDto, token: string): Observable<any> {
+    return this.vehicleInfrastructureService.proxyRequest('POST', '/linea', data, {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    });
+  }
+
+  listLineas(token: string): Observable<any> {
+    return this.vehicleInfrastructureService.proxyRequest('GET', '/linea', null, {
+      Authorization: `Bearer ${token}`,
+    });
+  }
+
+  getLineaById(id: string, token: string): Observable<any> {
+    return this.vehicleInfrastructureService.proxyRequest('GET', `/linea/${id}`, null, {
+      Authorization: `Bearer ${token}`,
+    });
+  }
+
+  updateLinea(id: string, data: UpdateCatalogoDto, token: string): Observable<any> {
+    return this.vehicleInfrastructureService.proxyRequest('PUT', `/linea/${id}`, data, {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    });
+  }
+
+  deleteLinea(id: string, token: string): Observable<any> {
+    return this.vehicleInfrastructureService.proxyRequest('DELETE', `/linea/${id}`, null, {
+      Authorization: `Bearer ${token}`,
+    });
+  }
 }
