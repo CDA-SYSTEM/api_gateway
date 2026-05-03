@@ -60,4 +60,37 @@ export class VehicleService {
       Authorization: `Bearer ${token}`,
     });
   }
+
+  // Clases
+  createClase(data: CreateCatalogoDto, token: string): Observable<any> {
+    return this.vehicleInfrastructureService.proxyRequest('POST', '/clase', data, {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    });
+  }
+
+  listClases(token: string): Observable<any> {
+    return this.vehicleInfrastructureService.proxyRequest('GET', '/clase', null, {
+      Authorization: `Bearer ${token}`,
+    });
+  }
+
+  getClaseById(id: string, token: string): Observable<any> {
+    return this.vehicleInfrastructureService.proxyRequest('GET', `/clase/${id}`, null, {
+      Authorization: `Bearer ${token}`,
+    });
+  }
+
+  updateClase(id: string, data: UpdateCatalogoDto, token: string): Observable<any> {
+    return this.vehicleInfrastructureService.proxyRequest('PUT', `/clase/${id}`, data, {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    });
+  }
+
+  deleteClase(id: string, token: string): Observable<any> {
+    return this.vehicleInfrastructureService.proxyRequest('DELETE', `/clase/${id}`, null, {
+      Authorization: `Bearer ${token}`,
+    });
+  }
 }

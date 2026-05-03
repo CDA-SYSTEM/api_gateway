@@ -85,4 +85,47 @@ export class VehicleController {
     const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
     return this.vehicleService.deleteMarca(id, token);
   }
+
+  // Clases
+  @Post('clase')
+  @ApiOperation({ summary: 'Crear clase' })
+  @ApiBody({ type: CreateCatalogoDto })
+  @ApiResponse({ status: 201, description: 'Clase creada' })
+  async createClase(@Body() body: CreateCatalogoDto, @Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.vehicleService.createClase(body, token);
+  }
+
+  @Get('clase')
+  @ApiOperation({ summary: 'Listar clases' })
+  @ApiResponse({ status: 200, description: 'Lista de clases' })
+  async listClases(@Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.vehicleService.listClases(token);
+  }
+
+  @Get('clase/:id')
+  @ApiOperation({ summary: 'Obtener clase por ID' })
+  @ApiResponse({ status: 200, description: 'Clase encontrada' })
+  async getClaseById(@Param('id') id: string, @Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.vehicleService.getClaseById(id, token);
+  }
+
+  @Put('clase/:id')
+  @ApiOperation({ summary: 'Actualizar clase' })
+  @ApiBody({ type: UpdateCatalogoDto })
+  @ApiResponse({ status: 200, description: 'Clase actualizada' })
+  async updateClase(@Param('id') id: string, @Body() body: UpdateCatalogoDto, @Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.vehicleService.updateClase(id, body, token);
+  }
+
+  @Delete('clase/:id')
+  @ApiOperation({ summary: 'Eliminar clase' })
+  @ApiResponse({ status: 200, description: 'Clase eliminada' })
+  async deleteClase(@Param('id') id: string, @Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.vehicleService.deleteClase(id, token);
+  }
 }
