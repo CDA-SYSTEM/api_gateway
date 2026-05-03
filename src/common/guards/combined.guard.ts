@@ -1,10 +1,10 @@
 import { Injectable, CanActivate, ExecutionContext, UnauthorizedException, ForbiddenException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Observable, from } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { switchMap, catchError } from 'rxjs/operators';
 import { ConfigService } from '@nestjs/config';
 import { HttpService } from '@nestjs/axios';
-import { AxiosResponse } from 'axios';
+import { AxiosResponse, AxiosError } from 'axios';
 import { PUBLIC_KEY } from '../decorators/public.decorator';
 import { ROLES_KEY } from '../decorators/roles.decorator';
 import { Roles } from '../constants/roles.constant';
@@ -78,6 +78,25 @@ export class CombinedGuard implements CanActivate {
           }
 
           return [true];
+        }),
+        catchError((error: AxiosError) => {
+          console.error('Token validation error:', {
+            message: error.message,
+            code: error.code,
+            response: error.response?.data,
+          });
+
+          if (error.response?.status === 401) {
+            throw new UnauthorizedException(
+              error.response?.data || 'Token inválido o expirado',
+            );
+          }
+
+          if (error.code === 'ECONNREFUSED' || error.code === 'ENOTFOUND') {
+            throw new UnauthorizedException('Servicio de autenticación no disponible');
+          }
+
+          throw new UnauthorizedException('Error validando token');
         })
       )
     );
