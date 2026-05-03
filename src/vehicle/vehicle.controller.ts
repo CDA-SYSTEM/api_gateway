@@ -1,6 +1,8 @@
-import { Controller, Get, Put, Body, Param, Req, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Controller, Get, Put, Post, Delete, Body, Param, Req, UsePipes, ValidationPipe } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBody, ApiResponse, ApiSecurity, ApiBearerAuth } from '@nestjs/swagger';
 import { VehicleService } from './application/vehicle.service';
+import { CreateCatalogoDto } from './application/dtos/create-catalogo.dto';
+import { UpdateCatalogoDto } from './application/dtos/update-catalogo.dto';
 import { UpdateVehicleDto } from './application/dtos/update-vehicle.dto';
 import type { Request } from 'express';
 
@@ -39,5 +41,48 @@ export class VehicleController {
   ) {
     const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
     return this.vehicleService.updateVehicle(id, body, token);
+  }
+
+  // Marcas
+  @Post('marca')
+  @ApiOperation({ summary: 'Crear marca' })
+  @ApiBody({ type: CreateCatalogoDto })
+  @ApiResponse({ status: 201, description: 'Marca creada' })
+  async createMarca(@Body() body: CreateCatalogoDto, @Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.vehicleService.createMarca(body, token);
+  }
+
+  @Get('marca')
+  @ApiOperation({ summary: 'Listar marcas' })
+  @ApiResponse({ status: 200, description: 'Lista de marcas' })
+  async listMarcas(@Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.vehicleService.listMarcas(token);
+  }
+
+  @Get('marca/:id')
+  @ApiOperation({ summary: 'Obtener marca por ID' })
+  @ApiResponse({ status: 200, description: 'Marca encontrada' })
+  async getMarcaById(@Param('id') id: string, @Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.vehicleService.getMarcaById(id, token);
+  }
+
+  @Put('marca/:id')
+  @ApiOperation({ summary: 'Actualizar marca' })
+  @ApiBody({ type: UpdateCatalogoDto })
+  @ApiResponse({ status: 200, description: 'Marca actualizada' })
+  async updateMarca(@Param('id') id: string, @Body() body: UpdateCatalogoDto, @Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.vehicleService.updateMarca(id, body, token);
+  }
+
+  @Delete('marca/:id')
+  @ApiOperation({ summary: 'Eliminar marca' })
+  @ApiResponse({ status: 200, description: 'Marca eliminada' })
+  async deleteMarca(@Param('id') id: string, @Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.vehicleService.deleteMarca(id, token);
   }
 }
