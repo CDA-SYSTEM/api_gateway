@@ -159,4 +159,37 @@ export class VehicleService {
       Authorization: `Bearer ${token}`,
     });
   }
+
+  // Tipos de Vehículo
+  createTipoVehiculo(data: CreateCatalogoDto, token: string): Observable<any> {
+    return this.vehicleInfrastructureService.proxyRequest('POST', '/tipo-vehiculo', data, {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    });
+  }
+
+  listTiposVehiculo(token: string): Observable<any> {
+    return this.vehicleInfrastructureService.proxyRequest('GET', '/tipo-vehiculo', null, {
+      Authorization: `Bearer ${token}`,
+    });
+  }
+
+  getTipoVehiculoById(id: string, token: string): Observable<any> {
+    return this.vehicleInfrastructureService.proxyRequest('GET', `/tipo-vehiculo/${id}`, null, {
+      Authorization: `Bearer ${token}`,
+    });
+  }
+
+  updateTipoVehiculo(id: string, data: UpdateCatalogoDto, token: string): Observable<any> {
+    return this.vehicleInfrastructureService.proxyRequest('PUT', `/tipo-vehiculo/${id}`, data, {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    });
+  }
+
+  deleteTipoVehiculo(id: string, token: string): Observable<any> {
+    return this.vehicleInfrastructureService.proxyRequest('DELETE', `/tipo-vehiculo/${id}`, null, {
+      Authorization: `Bearer ${token}`,
+    });
+  }
 }

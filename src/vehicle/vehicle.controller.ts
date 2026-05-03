@@ -214,4 +214,47 @@ export class VehicleController {
     const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
     return this.vehicleService.deleteColor(id, token);
   }
+
+  // Tipos de Vehículo
+  @Post('tipo-vehiculo')
+  @ApiOperation({ summary: 'Crear tipo de vehículo' })
+  @ApiBody({ type: CreateCatalogoDto })
+  @ApiResponse({ status: 201, description: 'Tipo de vehículo creado' })
+  async createTipoVehiculo(@Body() body: CreateCatalogoDto, @Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.vehicleService.createTipoVehiculo(body, token);
+  }
+
+  @Get('tipo-vehiculo')
+  @ApiOperation({ summary: 'Listar tipos de vehículo' })
+  @ApiResponse({ status: 200, description: 'Lista de tipos de vehículo' })
+  async listTiposVehiculo(@Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.vehicleService.listTiposVehiculo(token);
+  }
+
+  @Get('tipo-vehiculo/:id')
+  @ApiOperation({ summary: 'Obtener tipo de vehículo por ID' })
+  @ApiResponse({ status: 200, description: 'Tipo de vehículo encontrado' })
+  async getTipoVehiculoById(@Param('id') id: string, @Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.vehicleService.getTipoVehiculoById(id, token);
+  }
+
+  @Put('tipo-vehiculo/:id')
+  @ApiOperation({ summary: 'Actualizar tipo de vehículo' })
+  @ApiBody({ type: UpdateCatalogoDto })
+  @ApiResponse({ status: 200, description: 'Tipo de vehículo actualizado' })
+  async updateTipoVehiculo(@Param('id') id: string, @Body() body: UpdateCatalogoDto, @Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.vehicleService.updateTipoVehiculo(id, body, token);
+  }
+
+  @Delete('tipo-vehiculo/:id')
+  @ApiOperation({ summary: 'Eliminar tipo de vehículo' })
+  @ApiResponse({ status: 200, description: 'Tipo de vehículo eliminado' })
+  async deleteTipoVehiculo(@Param('id') id: string, @Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.vehicleService.deleteTipoVehiculo(id, token);
+  }
 }
