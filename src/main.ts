@@ -11,6 +11,12 @@ async function bootstrap() {
   const swaggerUser = configService.get<string>('SWAGGER_USER');
   const swaggerPass = configService.get<string>('SWAGGER_PASS');
 
+  app.enableCors({
+    origin: '*',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    allowedHeaders: 'Content-Type, Authorization, x-api-key',
+  });
+
   if (swaggerUser && swaggerPass) {
     app.use(
       '/api/docs',
