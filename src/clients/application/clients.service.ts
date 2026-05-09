@@ -25,4 +25,10 @@ export class ClientsApplicationService {
       'Content-Type': 'application/json',
     });
   }
+
+  deleteClient(id: string, token: string): Observable<any> {
+    return this.clientsInfrastructure.proxyRequest('DELETE', `/clients/${id}`, null, {
+      Authorization: `Bearer ${token}`,
+    });
+  }
 }
