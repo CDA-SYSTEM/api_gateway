@@ -28,6 +28,12 @@ export class ClientsApplicationService {
     });
   }
 
+  listAllClients(token: string): Observable<any> {
+    return this.clientsInfrastructure.proxyRequest('GET', '/clients/all', null, {
+      Authorization: `Bearer ${token}`,
+    });
+  }
+
   healthCheck(token: string): Observable<any> {
     return this.clientsInfrastructure.proxyRequest('GET', '/clients/health', null, {
       Authorization: `Bearer ${token}`,
