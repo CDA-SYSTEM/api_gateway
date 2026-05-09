@@ -7,6 +7,7 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { VehicleModule } from './vehicle/vehicle.module';
 import { ClientsModule } from './clients/clients.module';
+import { CommonModule } from './common/common.module';
 import { CombinedGuard } from './common/guards/combined.guard';
 
 @Module({
@@ -15,6 +16,7 @@ import { CombinedGuard } from './common/guards/combined.guard';
       isGlobal: true,
     }),
     HttpModule,
+    CommonModule,
     AuthModule,
     VehicleModule,
     ClientsModule,
