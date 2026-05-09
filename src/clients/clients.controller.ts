@@ -37,6 +37,14 @@ export class ClientsController {
     return this.clientsService.createClient(body, token);
   }
 
+  @Get('clients/all')
+  @ApiOperation({ summary: 'Listar todos los clientes (sin paginación)' })
+  @ApiResponse({ status: 200, description: 'Lista de todos los clientes' })
+  async listAllClients(@Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.clientsService.listAllClients(token);
+  }
+
   @Get('clients')
   @UsePipes(new ValidationPipe({ transform: true }))
   @ApiOperation({ summary: 'Listar clientes paginados y filtrados' })
