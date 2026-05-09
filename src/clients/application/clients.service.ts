@@ -11,4 +11,10 @@ export class ClientsApplicationService {
       Authorization: `Bearer ${token}`,
     });
   }
+
+  getClientById(id: string, token: string): Observable<any> {
+    return this.clientsInfrastructure.proxyRequest('GET', `/api/v1/clients/${id}`, null, {
+      Authorization: `Bearer ${token}`,
+    });
+  }
 }
