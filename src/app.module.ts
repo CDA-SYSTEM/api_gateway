@@ -6,6 +6,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { VehicleModule } from './vehicle/vehicle.module';
+import { ClientsModule } from './clients/clients.module';
 import { CombinedGuard } from './common/guards/combined.guard';
 
 @Module({
@@ -16,6 +17,7 @@ import { CombinedGuard } from './common/guards/combined.guard';
     HttpModule,
     AuthModule,
     VehicleModule,
+    ClientsModule,
   ],
   controllers: [AppController],
   providers: [
