@@ -3,7 +3,6 @@ import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { Observable, map, catchError } from 'rxjs';
 import { AxiosResponse, AxiosError } from 'axios';
-import { safeParse } from '../../common/utils/parse.util';
 
 @Injectable()
 export class AuthInfrastructureService {
@@ -30,7 +29,7 @@ export class AuthInfrastructureService {
       data,
       headers,
     }).pipe(
-      map((response: AxiosResponse) => safeParse(response.data)),
+      map((response: AxiosResponse) => response.data),
       catchError((error: AxiosError) => {
         console.error('Proxy error:', {
           url,
