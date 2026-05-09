@@ -16,17 +16,13 @@ export class ResponseInterceptor implements NestInterceptor {
     const request = ctx.getRequest();
 
     return next.handle().pipe(
-      map((raw) => {
-        const data = safeParse(raw);
-        console.log('[ResponseInterceptor] data type:', typeof data, '- is string?', typeof data === 'string');
-        return {
-          statusCode: response.statusCode,
-          message: 'Success',
-          data: data ?? null,
-          timestamp: new Date().toISOString(),
-          path: request.url,
-        };
-      }),
+      map((raw) => ({
+        statusCode: response.statusCode,
+        message: 'Success',
+        data: safeParse(raw) ?? null,
+        timestamp: new Date().toISOString(),
+        path: request.url,
+      })),
     );
   }
 }

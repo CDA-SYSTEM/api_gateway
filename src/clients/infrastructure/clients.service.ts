@@ -24,12 +24,7 @@ export class ClientsInfrastructureService {
     console.log(`[Clients] Proxying ${method} request to: ${url}`);
 
     return this.httpService.request({ method, url, data, headers }).pipe(
-      map((response: AxiosResponse) => {
-        console.log('[ClientsInfra] response.data type:', typeof response.data, '- isAxiosResponse:', !!response.data);
-        const parsed = safeParse(response.data);
-        console.log('[ClientsInfra] after safeParse type:', typeof parsed);
-        return parsed;
-      }),
+      map((response: AxiosResponse) => safeParse(response.data)),
       catchError((error: AxiosError) => {
         console.error('[Clients] Proxy error:', {
           url,
