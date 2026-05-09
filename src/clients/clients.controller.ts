@@ -64,6 +64,16 @@ export class ClientsController {
     return this.clientsService.getClientById(id, token);
   }
 
+  @Get('clients/:id/full')
+  @ApiOperation({ summary: 'Obtener cliente por ID (incluye soft delete)' })
+  @ApiParam({ name: 'id', description: 'ID del cliente' })
+  @ApiResponse({ status: 200, description: 'Cliente encontrado' })
+  @ApiResponse({ status: 404, description: 'Cliente no encontrado' })
+  async getClientFullById(@Param('id') id: string, @Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.clientsService.getClientFullById(id, token);
+  }
+
   @Delete('clients/:id')
   @Roles(RoleConstants.ADMIN)
   @ApiOperation({ summary: 'Eliminar cliente (soft delete)' })
