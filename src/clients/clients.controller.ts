@@ -1,7 +1,9 @@
-import { Controller, Get, Put, Body, Param, Req, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Controller, Get, Put, Delete, Body, Param, Req, UsePipes, ValidationPipe } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiParam, ApiBody, ApiResponse, ApiSecurity, ApiBearerAuth } from '@nestjs/swagger';
 import { ClientsApplicationService } from './application/clients.service';
 import { UpdateClientDto } from './application/dtos/update-client.dto';
+import { Roles } from '../../common/decorators/roles.decorator';
+import { Role } from '../../common/constants/roles.constant';
 import type { Request } from 'express';
 
 @ApiTags('clients')
@@ -39,5 +41,17 @@ export class ClientsController {
   async getClientById(@Param('id') id: string, @Req() req: Request) {
     const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
     return this.clientsService.getClientById(id, token);
+  }
+
+  @Delete('clients/:id')
+  @Roles(Role.ADMIN)
+  @ApiOperation({ summary: 'Eliminar cliente (soft delete)' })
+  @ApiParam({ name: 'id', description: 'ID del cliente' })
+  @ApiResponse({ status: 200, description: 'Cliente eliminado' })
+  @ApiResponse({ status: 404, description: 'Cliente no encontrado' })
+  @ApiResponse({ status: 403, description: 'No autorizado - se requiere rol ADMIN' })
+  async deleteClient(@Param('id') id: string, @Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.clientsService.deleteClient(id, token);
   }
 }
