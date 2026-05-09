@@ -7,13 +7,13 @@ export class ClientsApplicationService {
   constructor(private readonly clientsInfrastructure: ClientsInfrastructureService) {}
 
   healthCheck(token: string): Observable<any> {
-    return this.clientsInfrastructure.proxyRequest('GET', '/api/v1/health', null, {
+    return this.clientsInfrastructure.proxyRequest('GET', '/clients/health', null, {
       Authorization: `Bearer ${token}`,
     });
   }
 
   getClientById(id: string, token: string): Observable<any> {
-    return this.clientsInfrastructure.proxyRequest('GET', `/api/v1/clients/${id}`, null, {
+    return this.clientsInfrastructure.proxyRequest('GET', `/clients/${id}`, null, {
       Authorization: `Bearer ${token}`,
     });
   }
