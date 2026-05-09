@@ -54,4 +54,16 @@ export class ClientsController {
     const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
     return this.clientsService.deleteClient(id, token);
   }
+
+  @Put('clients/:id/activate')
+  @Roles(RoleConstants.ADMIN)
+  @ApiOperation({ summary: 'Activar cliente' })
+  @ApiParam({ name: 'id', description: 'ID del cliente' })
+  @ApiResponse({ status: 200, description: 'Cliente activado' })
+  @ApiResponse({ status: 404, description: 'Cliente no encontrado' })
+  @ApiResponse({ status: 403, description: 'No autorizado - se requiere rol ADMIN' })
+  async activateClient(@Param('id') id: string, @Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.clientsService.activateClient(id, token);
+  }
 }
