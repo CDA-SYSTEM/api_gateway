@@ -4,7 +4,7 @@ import { ClientsApplicationService } from './application/clients.service';
 import type { Request } from 'express';
 
 @ApiTags('clients')
-@Controller()
+@Controller('api/v1')
 @ApiSecurity('x-api-key')
 @ApiBearerAuth()
 export class ClientsController {
