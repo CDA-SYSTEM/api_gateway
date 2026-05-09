@@ -1,6 +1,7 @@
-import { Controller, Get, Put, Delete, Body, Param, Query, Req, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, Query, Req, UsePipes, ValidationPipe } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiParam, ApiBody, ApiQuery, ApiResponse, ApiSecurity, ApiBearerAuth } from '@nestjs/swagger';
 import { ClientsApplicationService } from './application/clients.service';
+import { CreateClientDto } from './application/dtos/create-client.dto';
 import { UpdateClientDto } from './application/dtos/update-client.dto';
 import { ListClientsQueryDto } from './application/dtos/list-clients-query.dto';
 import { Roles } from '../common/decorators/roles.decorator';
@@ -24,6 +25,16 @@ export class ClientsController {
   async updateClient(@Param('id') id: string, @Body() body: UpdateClientDto, @Req() req: Request) {
     const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
     return this.clientsService.updateClient(id, body, token);
+  }
+
+  @Post('clients')
+  @UsePipes(new ValidationPipe({ transform: true }))
+  @ApiOperation({ summary: 'Crear cliente' })
+  @ApiBody({ type: CreateClientDto })
+  @ApiResponse({ status: 201, description: 'Cliente creado' })
+  async createClient(@Body() body: CreateClientDto, @Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.clientsService.createClient(body, token);
   }
 
   @Get('clients')
