@@ -3,17 +3,7 @@ import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { Observable, map, catchError } from 'rxjs';
 import { AxiosResponse, AxiosError } from 'axios';
-
-function safeParse(data: any): any {
-  if (typeof data === 'string') {
-    try {
-      return JSON.parse(data);
-    } catch {
-      return data;
-    }
-  }
-  return data;
-}
+import { safeParse } from '../../common/utils/parse.util';
 
 @Injectable()
 export class ClientsInfrastructureService {
