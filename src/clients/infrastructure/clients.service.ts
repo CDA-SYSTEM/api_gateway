@@ -4,6 +4,17 @@ import { ConfigService } from '@nestjs/config';
 import { Observable, map, catchError } from 'rxjs';
 import { AxiosResponse, AxiosError } from 'axios';
 
+function safeParse(data: any): any {
+  if (typeof data === 'string') {
+    try {
+      return JSON.parse(data);
+    } catch {
+      return data;
+    }
+  }
+  return data;
+}
+
 @Injectable()
 export class ClientsInfrastructureService {
   private readonly baseUrl: string;
@@ -23,7 +34,7 @@ export class ClientsInfrastructureService {
     console.log(`[Clients] Proxying ${method} request to: ${url}`);
 
     return this.httpService.request({ method, url, data, headers }).pipe(
-      map((response: AxiosResponse) => response.data),
+      map((response: AxiosResponse) => safeParse(response.data)),
       catchError((error: AxiosError) => {
         console.error('[Clients] Proxy error:', {
           url,
