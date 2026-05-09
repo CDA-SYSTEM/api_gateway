@@ -1,7 +1,8 @@
-import { Controller, Get, Put, Delete, Body, Param, Req, UsePipes, ValidationPipe } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiParam, ApiBody, ApiResponse, ApiSecurity, ApiBearerAuth } from '@nestjs/swagger';
+import { Controller, Get, Put, Delete, Body, Param, Query, Req, UsePipes, ValidationPipe } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiParam, ApiBody, ApiQuery, ApiResponse, ApiSecurity, ApiBearerAuth } from '@nestjs/swagger';
 import { ClientsApplicationService } from './application/clients.service';
 import { UpdateClientDto } from './application/dtos/update-client.dto';
+import { ListClientsQueryDto } from './application/dtos/list-clients-query.dto';
 import { Roles } from '../common/decorators/roles.decorator';
 import { Roles as RoleConstants } from '../common/constants/roles.constant';
 import type { Request } from 'express';
@@ -23,6 +24,15 @@ export class ClientsController {
   async updateClient(@Param('id') id: string, @Body() body: UpdateClientDto, @Req() req: Request) {
     const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
     return this.clientsService.updateClient(id, body, token);
+  }
+
+  @Get('clients')
+  @UsePipes(new ValidationPipe({ transform: true }))
+  @ApiOperation({ summary: 'Listar clientes paginados y filtrados' })
+  @ApiResponse({ status: 200, description: 'Lista de clientes' })
+  async listClients(@Query() query: ListClientsQueryDto, @Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.clientsService.listClients(query, token);
   }
 
   @Get('clients/health')
