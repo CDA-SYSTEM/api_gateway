@@ -31,4 +31,10 @@ export class ClientsApplicationService {
       Authorization: `Bearer ${token}`,
     });
   }
+
+  activateClient(id: string, token: string): Observable<any> {
+    return this.clientsInfrastructure.proxyRequest('PUT', `/clients/${id}/activate`, null, {
+      Authorization: `Bearer ${token}`,
+    });
+  }
 }
