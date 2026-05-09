@@ -40,6 +40,12 @@ export class ClientsApplicationService {
     });
   }
 
+  getClientFullById(id: string, token: string): Observable<any> {
+    return this.clientsInfrastructure.proxyRequest('GET', `/clients/${id}/full`, null, {
+      Authorization: `Bearer ${token}`,
+    });
+  }
+
   updateClient(id: string, data: UpdateClientDto, token: string): Observable<any> {
     return this.clientsInfrastructure.proxyRequest('PUT', `/clients/${id}`, data, {
       Authorization: `Bearer ${token}`,
