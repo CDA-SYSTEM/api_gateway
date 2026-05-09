@@ -2,11 +2,19 @@ import { Injectable } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { ClientsInfrastructureService } from '../infrastructure/clients.service';
 import { UpdateClientDto } from './dtos/update-client.dto';
+import { CreateClientDto } from './dtos/create-client.dto';
 import { ListClientsQueryDto } from './dtos/list-clients-query.dto';
 
 @Injectable()
 export class ClientsApplicationService {
   constructor(private readonly clientsInfrastructure: ClientsInfrastructureService) {}
+
+  createClient(data: CreateClientDto, token: string): Observable<any> {
+    return this.clientsInfrastructure.proxyRequest('POST', '/clients', data, {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    });
+  }
 
   listClients(query: ListClientsQueryDto, token: string): Observable<any> {
     const params = new URLSearchParams();
