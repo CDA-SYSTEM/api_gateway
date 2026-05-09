@@ -3,7 +3,7 @@ import { ApiTags, ApiOperation, ApiParam, ApiBody, ApiResponse, ApiSecurity, Api
 import { ClientsApplicationService } from './application/clients.service';
 import { UpdateClientDto } from './application/dtos/update-client.dto';
 import { Roles } from '../common/decorators/roles.decorator';
-import { Role } from '../common/constants/roles.constant';
+import { Roles as RoleConstants } from '../common/constants/roles.constant';
 import type { Request } from 'express';
 
 @ApiTags('clients')
@@ -44,7 +44,7 @@ export class ClientsController {
   }
 
   @Delete('clients/:id')
-  @Roles(Role.ADMIN)
+  @Roles(RoleConstants.ADMIN)
   @ApiOperation({ summary: 'Eliminar cliente (soft delete)' })
   @ApiParam({ name: 'id', description: 'ID del cliente' })
   @ApiResponse({ status: 200, description: 'Cliente eliminado' })
