@@ -2,8 +2,8 @@ import { Controller, Get, Put, Delete, Body, Param, Req, UsePipes, ValidationPip
 import { ApiTags, ApiOperation, ApiParam, ApiBody, ApiResponse, ApiSecurity, ApiBearerAuth } from '@nestjs/swagger';
 import { ClientsApplicationService } from './application/clients.service';
 import { UpdateClientDto } from './application/dtos/update-client.dto';
-import { Roles } from '../../common/decorators/roles.decorator';
-import { Role } from '../../common/constants/roles.constant';
+import { Roles } from '../common/decorators/roles.decorator';
+import { Role } from '../common/constants/roles.constant';
 import type { Request } from 'express';
 
 @ApiTags('clients')
