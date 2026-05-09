@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { Observable, map } from 'rxjs';
 import { ApiResponse } from '../interfaces/api-response.interface';
+import { safeParse } from '../utils/parse.util';
 
 @Injectable()
 export class ResponseInterceptor implements NestInterceptor {
@@ -15,13 +16,17 @@ export class ResponseInterceptor implements NestInterceptor {
     const request = ctx.getRequest();
 
     return next.handle().pipe(
-      map((data) => ({
-        statusCode: response.statusCode,
-        message: 'Success',
-        data: data ?? null,
-        timestamp: new Date().toISOString(),
-        path: request.url,
-      })),
+      map((raw) => {
+        const data = safeParse(raw);
+        console.log('[ResponseInterceptor] data type:', typeof data, '- is string?', typeof data === 'string');
+        return {
+          statusCode: response.statusCode,
+          message: 'Success',
+          data: data ?? null,
+          timestamp: new Date().toISOString(),
+          path: request.url,
+        };
+      }),
     );
   }
 }
