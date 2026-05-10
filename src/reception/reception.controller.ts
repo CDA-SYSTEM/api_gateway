@@ -1,4 +1,4 @@
-import { Controller, Get, Query, Req, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Controller, Get, Param, Query, Req, UsePipes, ValidationPipe } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiQuery, ApiResponse, ApiSecurity, ApiBearerAuth } from '@nestjs/swagger';
 import { ReceptionService } from './application/reception.service';
 import type { Request } from 'express';
@@ -37,5 +37,13 @@ export class ReceptionController {
   ) {
     const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
     return this.receptionService.listInspections(token, includeDeleted, inspectionNumber, vehicleId, page, size);
+  }
+
+  @Get('inspections/:id')
+  @ApiOperation({ summary: 'Obtener inspección por ID con datos de cliente, vehículo y operador' })
+  @ApiResponse({ status: 200, description: 'Inspección encontrada' })
+  getInspectionById(@Param('id') id: string, @Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.receptionService.getInspectionById(id, token);
   }
 }
