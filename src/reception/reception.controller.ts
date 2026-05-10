@@ -1,5 +1,5 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, Req, UsePipes, ValidationPipe } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiBody, ApiParam, ApiResponse, ApiSecurity, ApiBearerAuth } from '@nestjs/swagger';
+import { Controller, Get, Post, Put, Delete, Body, Param, Query, Req, UsePipes, ValidationPipe } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiBody, ApiParam, ApiQuery, ApiResponse, ApiSecurity, ApiBearerAuth } from '@nestjs/swagger';
 import { ReceptionService } from './application/reception.service';
 import type { Request } from 'express';
 
@@ -10,6 +10,14 @@ import type { Request } from 'express';
 @ApiBearerAuth()
 export class ReceptionController {
   constructor(private readonly receptionService: ReceptionService) {}
+
+  @Get('reception/health')
+  @ApiOperation({ summary: 'Health check del servicio de recepción' })
+  @ApiResponse({ status: 200, description: 'Servicio disponible' })
+  healthCheck(@Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.receptionService.healthCheck(token);
+  }
 
   @Get('reception')
   @ApiOperation({ summary: 'Listar recepciones' })
