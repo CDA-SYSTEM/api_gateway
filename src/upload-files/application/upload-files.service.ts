@@ -16,7 +16,13 @@ export class UploadFilesService {
     return this.uploadFilesInfrastructure.proxyRequest('GET', `/storage/files?limit=${limit}`, null, {
       Authorization: `Bearer ${token}`,
     }).pipe(
-      map((response: any) => response),
+      map((response: any) => {
+        const items: any[] = response?.data ?? response ?? [];
+        return items.map((item: any) => ({
+          ...item,
+          url: `${process.env.UPLOAD_FILES_SERVICE_BASE_URL}/storage/files/${item.id}`,
+        }));
+      }),
     );
   }
 
