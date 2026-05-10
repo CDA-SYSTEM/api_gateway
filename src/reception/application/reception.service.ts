@@ -9,6 +9,7 @@ import { UploadFilesService } from '../../upload-files/application/upload-files.
 import { InspectionItem } from './dtos/inspection-item.interface';
 import { InspectionsResponse } from './dtos/inspections-response.interface';
 import { CreateInspectionDto } from './dtos/create-inspection.dto';
+import { UpdateInspectionDto } from './dtos/update-inspection.dto';
 import { mapInspectionItem, mapInspectionsResponse } from './mappers/inspection.mapper';
 
 @Injectable()
@@ -74,6 +75,81 @@ export class ReceptionService {
         };
 
         return this.infrastructure.proxyRequest('POST', '/api/inspections', payload, {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        });
+      }),
+    );
+  }
+
+  updateInspection(
+    id: string,
+    dto: UpdateInspectionDto,
+    signatureFile: Express.Multer.File | undefined,
+    photoFile: Express.Multer.File | undefined,
+    token: string,
+  ): Observable<any> {
+    const baseUrl = process.env.API_GATEWAY_BASE_URL || '';
+
+    const signatureUpload$ = signatureFile
+      ? this.uploadFilesService.uploadFile(signatureFile, token).pipe(
+          map(res => `${baseUrl}/api/v1/storage/files/${res.file.id}`),
+          catchError(() => of(null)),
+        )
+      : of(null);
+
+    const photoUpload$ = photoFile
+      ? this.uploadFilesService.uploadFile(photoFile, token).pipe(
+          map(res => `${baseUrl}/api/v1/storage/files/${res.file.id}`),
+          catchError(() => of(null)),
+        )
+      : of(null);
+
+    return forkJoin([signatureUpload$, photoUpload$]).pipe(
+      switchMap(([signatureUrl, photoUrl]) => {
+        const defined = (obj: Record<string, any>) =>
+          Object.entries(obj)
+            .filter(([_, v]) => v !== undefined)
+            .reduce((acc, [k, v]) => ({ ...acc, [k]: v }), {} as Record<string, any>);
+
+        const payload = defined({
+          mileage: dto.mileage,
+          client_id: dto.client_id,
+          vehicle_id: dto.vehicle_id,
+          vehicle_type: dto.vehicle_type,
+          fuel_type: dto.fuel_type,
+          fuel_certificate_number: dto.fuel_certificate_number,
+          service_type: dto.service_type,
+          customer_type: dto.customer_type,
+          revision_type: dto.revision_type,
+          tinted_windows: dto.tinted_windows,
+          armored_vehicle: dto.armored_vehicle,
+          brake_fluid_sight_glass: dto.brake_fluid_sight_glass,
+          observations: dto.observations,
+          checklist: dto.checklist,
+          axles: dto.axles,
+          tires: dto.tires,
+        });
+
+        if (dto.operator_id !== undefined) {
+          payload.operator_id = dto.operator_id;
+          payload.responsible_id = dto.operator_id;
+          payload.customer_id = dto.operator_id;
+        }
+
+        if (signatureUrl) {
+          payload.signature_url = signatureUrl;
+        } else if (dto.signature_url !== undefined) {
+          payload.signature_url = dto.signature_url;
+        }
+
+        if (photoUrl) {
+          payload.photo_reception_url = photoUrl;
+        } else if (dto.photo_reception_url !== undefined) {
+          payload.photo_reception_url = dto.photo_reception_url;
+        }
+
+        return this.infrastructure.proxyRequest('PATCH', `/api/inspections/${id}`, payload, {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         });
