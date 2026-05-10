@@ -1,12 +1,14 @@
-import { Injectable } from '@nestjs/common';
-import { Observable, forkJoin, of } from 'rxjs';
+import { Injectable, BadRequestException } from '@nestjs/common';
+import { Observable, forkJoin, of, throwError } from 'rxjs';
 import { map, switchMap, catchError } from 'rxjs';
 import { ReceptionInfrastructureService } from '../infrastructure/reception.service';
 import { ClientsApplicationService } from '../../clients/application/clients.service';
 import { VehicleService } from '../../vehicle/application/vehicle.service';
 import { AuthApplicationService } from '../../auth/application/auth.service';
+import { UploadFilesService } from '../../upload-files/application/upload-files.service';
 import { InspectionItem } from './dtos/inspection-item.interface';
 import { InspectionsResponse } from './dtos/inspections-response.interface';
+import { CreateInspectionDto } from './dtos/create-inspection.dto';
 import { mapInspectionItem, mapInspectionsResponse } from './mappers/inspection.mapper';
 
 @Injectable()
@@ -16,12 +18,51 @@ export class ReceptionService {
     private readonly clientService: ClientsApplicationService,
     private readonly vehicleService: VehicleService,
     private readonly authService: AuthApplicationService,
+    private readonly uploadFilesService: UploadFilesService,
   ) {}
 
   deleteInspectionById(id: string, token: string): Observable<any> {
     return this.infrastructure.proxyRequest('DELETE', `/api/inspections/${id}`, null, {
       Authorization: `Bearer ${token}`,
     });
+  }
+
+  createInspection(
+    dto: CreateInspectionDto,
+    signatureFile: Express.Multer.File | undefined,
+    photoFile: Express.Multer.File,
+    token: string,
+  ): Observable<any> {
+    const baseUrl = process.env.API_GATEWAY_BASE_URL || '';
+
+    const signatureUpload$ = signatureFile
+      ? this.uploadFilesService.uploadFile(signatureFile, token).pipe(
+          map(res => `${baseUrl}/storage/files/${res.file.id}`),
+          catchError(() => of(null)),
+        )
+      : of(null);
+
+    const photoUpload$ = this.uploadFilesService.uploadFile(photoFile, token).pipe(
+      map(res => `${baseUrl}/storage/files/${res.file.id}`),
+      catchError(() => throwError(() => new BadRequestException('Error al subir la foto de recepción'))),
+    );
+
+    return forkJoin([signatureUpload$, photoUpload$]).pipe(
+      switchMap(([signatureUrl, photoUrl]) => {
+        const payload = {
+          ...dto,
+          responsible_id: dto.operator_id,
+          customer_id: dto.operator_id,
+          signature_url: signatureUrl || dto.signature_url || '',
+          photo_reception_url: photoUrl || dto.photo_reception_url || '',
+        };
+
+        return this.infrastructure.proxyRequest('POST', '/api/inspections', payload, {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        });
+      }),
+    );
   }
 
   healthCheck(token: string): Observable<any> {
