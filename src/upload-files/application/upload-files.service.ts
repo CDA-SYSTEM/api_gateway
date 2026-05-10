@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { UploadFilesInfrastructureService } from '../infrastructure/upload-files.service';
 
 @Injectable()
@@ -15,7 +15,9 @@ export class UploadFilesService {
   listFiles(limit: number, token: string): Observable<any> {
     return this.uploadFilesInfrastructure.proxyRequest('GET', `/storage/files?limit=${limit}`, null, {
       Authorization: `Bearer ${token}`,
-    });
+    }).pipe(
+      map((response: any) => response),
+    );
   }
 
   getFileById(id: string, token: string): Observable<any> {
