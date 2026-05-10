@@ -43,4 +43,25 @@ export class ReceptionService {
       Authorization: `Bearer ${token}`,
     });
   }
+
+  listInspections(
+    token: string,
+    includeDeleted?: string,
+    inspectionNumber?: string,
+    vehicleId?: string,
+    page?: number,
+    size?: number,
+  ): Observable<any> {
+    const params = new URLSearchParams();
+    if (includeDeleted !== undefined) params.append('includeDeleted', includeDeleted);
+    if (inspectionNumber) params.append('inspection_number', inspectionNumber);
+    if (vehicleId) params.append('vehicle_id', vehicleId);
+    if (page !== undefined) params.append('page', page.toString());
+    if (size !== undefined) params.append('size', size.toString());
+    const queryString = params.toString();
+    const url = `/api/inspections${queryString ? '?' + queryString : ''}`;
+    return this.infrastructure.proxyRequest('GET', url, null, {
+      Authorization: `Bearer ${token}`,
+    });
+  }
 }
