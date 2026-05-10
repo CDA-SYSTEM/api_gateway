@@ -1,5 +1,6 @@
 import { ClientData } from '../dtos/client-data.interface';
 import { VehicleData } from '../dtos/vehicle-data.interface';
+import { UserData } from '../dtos/user-data.interface';
 import { InspectionItem } from '../dtos/inspection-item.interface';
 import { InspectionsResponse } from '../dtos/inspections-response.interface';
 
@@ -11,6 +12,12 @@ function mapClient(rawClient: any): ClientData | null {
 function mapVehicle(rawVehicle: any): VehicleData | null {
   if (!rawVehicle?.id) return null;
   return rawVehicle as VehicleData;
+}
+
+function mapOperator(rawUser: any): UserData | null {
+  if (!rawUser) return null;
+  const user = rawUser.data ?? rawUser;
+  return user?.id ? (user as UserData) : null;
 }
 
 export function mapInspectionsResponse(
