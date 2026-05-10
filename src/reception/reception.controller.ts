@@ -1,10 +1,11 @@
-import { Controller, Delete, Get, Param, Post, Query, Req, Body, UploadedFiles, UseInterceptors, UsePipes, ValidationPipe, BadRequestException } from '@nestjs/common';
+import { Controller, Delete, Get, Param, Patch, Post, Query, Req, Body, UploadedFiles, UseInterceptors, UsePipes, ValidationPipe, BadRequestException } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { ApiTags, ApiOperation, ApiQuery, ApiResponse, ApiConsumes, ApiBody, ApiSecurity, ApiBearerAuth } from '@nestjs/swagger';
 import { Roles } from '../common/decorators/roles.decorator';
 import { Roles as RoleConst } from '../common/constants/roles.constant';
 import { ReceptionService } from './application/reception.service';
 import { CreateInspectionDto } from './application/dtos/create-inspection.dto';
+import { UpdateInspectionDto } from './application/dtos/update-inspection.dto';
 import type { Request } from 'express';
 
 @ApiTags('reception')
@@ -116,5 +117,59 @@ export class ReceptionController {
 
     const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
     return this.receptionService.createInspection(dto, signatureFile, photoFile, token);
+  }
+
+  @Patch('inspections/:id')
+  @UseInterceptors(FileFieldsInterceptor([
+    { name: 'signature', maxCount: 1 },
+    { name: 'photo', maxCount: 1 },
+  ]))
+  @ApiOperation({ summary: 'Actualizar una inspección por ID con imágenes opcionales' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        data: {
+          type: 'string',
+          description: 'Datos parciales de la inspección en formato JSON (todos los campos son opcionales)',
+          example: '{"mileage":1200,"observations":"actualizado"}',
+        },
+        signature: {
+          type: 'string',
+          format: 'binary',
+          description: 'Archivo de firma (opcional)',
+        },
+        photo: {
+          type: 'string',
+          format: 'binary',
+          description: 'Archivo de foto de recepción (opcional)',
+        },
+      },
+    },
+  })
+  @ApiResponse({ status: 200, description: 'Inspección actualizada exitosamente' })
+  async updateInspection(
+    @Param('id') id: string,
+    @Body('data') data: string,
+    @UploadedFiles() files: { signature?: Express.Multer.File[]; photo?: Express.Multer.File[] },
+    @Req() req: Request,
+  ) {
+    if (!data) {
+      throw new BadRequestException('El campo data es requerido');
+    }
+
+    let dto: UpdateInspectionDto;
+    try {
+      dto = JSON.parse(data) as UpdateInspectionDto;
+    } catch {
+      throw new BadRequestException('El campo data debe ser un JSON válido');
+    }
+
+    const signatureFile = files?.signature?.[0];
+    const photoFile = files?.photo?.[0];
+
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.receptionService.updateInspection(id, dto, signatureFile, photoFile, token);
   }
 }
