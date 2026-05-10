@@ -19,10 +19,19 @@ export class UploadFilesInfrastructureService {
     }
   }
 
-  proxyRequest(method: string, path: string, data?: any, headers?: any): Observable<any> {
+  proxyRequest(method: string, path: string, data?: any, headers?: any, rawBuffer?: boolean): Observable<any> {
     const url = `${this.baseUrl}${path}`;
-    return this.httpService.request({ method, url, data, headers }).pipe(
-      map((response: AxiosResponse) => safeParse(response.data)),
+    const config: any = { method, url, data, headers };
+    if (rawBuffer) {
+      config.responseType = 'arraybuffer';
+    }
+    return this.httpService.request(config).pipe(
+      map((response: AxiosResponse) => {
+        if (rawBuffer) {
+          return { data: response.data, contentType: response.headers['content-type'] };
+        }
+        return safeParse(response.data);
+      }),
       catchError((error: AxiosError) => {
         if (error.code === 'ECONNREFUSED' || error.code === 'ENOTFOUND') {
           throw new HttpException('Upload files service no disponible', HttpStatus.BAD_GATEWAY);

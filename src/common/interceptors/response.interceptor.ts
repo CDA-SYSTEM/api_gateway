@@ -4,13 +4,26 @@ import {
   ExecutionContext,
   CallHandler,
 } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
 import { Observable, map } from 'rxjs';
 import { ApiResponse } from '../interfaces/api-response.interface';
+import { SKIP_RESPONSE_FORMAT_KEY } from '../decorators/skip-response-format.decorator';
 import { safeParse } from '../utils/parse.util';
 
 @Injectable()
 export class ResponseInterceptor implements NestInterceptor {
-  intercept(context: ExecutionContext, next: CallHandler): Observable<ApiResponse> {
+  constructor(private readonly reflector: Reflector) {}
+
+  intercept(context: ExecutionContext, next: CallHandler): Observable<ApiResponse | any> {
+    const skipFormat = this.reflector.getAllAndOverride<boolean>(SKIP_RESPONSE_FORMAT_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+
+    if (skipFormat) {
+      return next.handle();
+    }
+
     const ctx = context.switchToHttp();
     const response = ctx.getResponse();
     const request = ctx.getRequest();
