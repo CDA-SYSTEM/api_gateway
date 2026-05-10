@@ -4,6 +4,7 @@ import { map, switchMap, catchError } from 'rxjs';
 import { ReceptionInfrastructureService } from '../infrastructure/reception.service';
 import { ClientsApplicationService } from '../../clients/application/clients.service';
 import { VehicleService } from '../../vehicle/application/vehicle.service';
+import { AuthApplicationService } from '../../auth/application/auth.service';
 import { InspectionsResponse } from './dtos/inspections-response.interface';
 import { mapInspectionsResponse } from './mappers/inspection.mapper';
 
@@ -13,6 +14,7 @@ export class ReceptionService {
     private readonly infrastructure: ReceptionInfrastructureService,
     private readonly clientService: ClientsApplicationService,
     private readonly vehicleService: VehicleService,
+    private readonly authService: AuthApplicationService,
   ) {}
 
   healthCheck(token: string): Observable<any> {
@@ -47,6 +49,10 @@ export class ReceptionService {
 
         const clientIds = [...new Set(items.map(item => item.client_id).filter(Boolean))] as string[];
         const vehicleIds = [...new Set(items.map(item => item.vehicle_id).filter(Boolean))] as string[];
+        const operatorIds = [...new Set(
+          items.flatMap(item => [item.operator_id, item.responsible_id, item.customer_id])
+            .filter(Boolean),
+        )] as string[];
 
         const clientRequests = clientIds.map(clientId =>
           this.clientService.getClientById(clientId, token).pipe(
@@ -62,7 +68,14 @@ export class ReceptionService {
           ),
         );
 
-        const allRequests = [...clientRequests, ...vehicleRequests];
+        const operatorRequests = operatorIds.map(operatorId =>
+          this.authService.getUserById(operatorId, token).pipe(
+            catchError(() => of(null)),
+            map(userData => ({ operatorId, userData })),
+          ),
+        );
+
+        const allRequests = [...clientRequests, ...vehicleRequests, ...operatorRequests];
 
         if (!allRequests.length) {
           return of(mapInspectionsResponse(response, new Map()));
@@ -71,10 +84,12 @@ export class ReceptionService {
         return forkJoin(allRequests).pipe(
           map((results: any[]) => {
             const clientResults = results.slice(0, clientRequests.length).filter(r => r?.clientId);
-            const vehicleResults = results.slice(clientRequests.length).filter(r => r?.vehicleId);
+            const vehicleResults = results.slice(clientRequests.length, clientRequests.length + vehicleRequests.length).filter(r => r?.vehicleId);
+            const operatorResults = results.slice(clientRequests.length + vehicleRequests.length).filter(r => r?.operatorId);
             const clientMap = new Map(clientResults.map(r => [r.clientId, r.clientData]));
             const vehicleMap = new Map(vehicleResults.map(r => [r.vehicleId, r.vehicleData]));
-            return mapInspectionsResponse(response, clientMap, vehicleMap);
+            const operatorMap = new Map(operatorResults.map(r => [r.operatorId, r.userData]));
+            return mapInspectionsResponse(response, clientMap, vehicleMap, operatorMap);
           }),
         );
       }),
