@@ -14,7 +14,7 @@ export class UploadFilesService {
 
   uploadFile(file: Express.Multer.File, token: string): Observable<any> {
     const formData = new FormData();
-    const blob = new Blob([file.buffer], { type: file.mimetype });
+    const blob = new Blob([file.buffer as any], { type: file.mimetype });
     formData.append('file', blob, file.originalname);
 
     return this.uploadFilesInfrastructure.proxyRequest('POST', '/storage/upload', formData, {
