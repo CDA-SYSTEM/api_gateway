@@ -1,10 +1,15 @@
 import { Injectable } from '@nestjs/common';
-import { Observable } from 'rxjs';
+import { Observable, forkJoin, of } from 'rxjs';
+import { map, switchMap, catchError } from 'rxjs';
 import { ReceptionInfrastructureService } from '../infrastructure/reception.service';
+import { ClientsApplicationService } from '../../clients/application/clients.service';
 
 @Injectable()
 export class ReceptionService {
-  constructor(private readonly infrastructure: ReceptionInfrastructureService) {}
+  constructor(
+    private readonly infrastructure: ReceptionInfrastructureService,
+    private readonly clientService: ClientsApplicationService,
+  ) {}
 
   healthCheck(token: string): Observable<any> {
     return this.infrastructure.proxyRequest('GET', '/api', null, {
@@ -28,8 +33,12 @@ export class ReceptionService {
     if (size !== undefined) params.append('size', size.toString());
     const queryString = params.toString();
     const url = `/api/inspections${queryString ? '?' + queryString : ''}`;
-    return this.infrastructure.proxyRequest('GET', url, null, {
+    const response= this.infrastructure.proxyRequest('GET', url, null, {
       Authorization: `Bearer ${token}`,
     });
+    return response.map((data)=> {
+      ...data,
+      client: this.clientService.getClientById(data.client_id, token)
+    })
   }
 }
