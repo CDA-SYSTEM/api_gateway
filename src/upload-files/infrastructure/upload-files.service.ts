@@ -28,7 +28,11 @@ export class UploadFilesInfrastructureService {
     return this.httpService.request(config).pipe(
       map((response: AxiosResponse) => {
         if (rawBuffer) {
-          return { data: response.data, contentType: response.headers['content-type'] };
+          return {
+            data: Buffer.from(response.data),
+            contentType: response.headers['content-type'],
+            contentDisposition: response.headers['content-disposition'],
+          };
         }
         return safeParse(response.data);
       }),
