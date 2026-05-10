@@ -1,8 +1,10 @@
 import { Controller, Get } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { CatalogsService } from './application/catalogs.service';
+import { Public } from 'src/common/decorators/public.decorator';
 
 @ApiTags('reception')
+@Public()
 @Controller('api/v1/catalogs')
 export class CatalogsController {
   constructor(private readonly catalogsService: CatalogsService) {}
