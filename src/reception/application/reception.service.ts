@@ -5,8 +5,9 @@ import { ReceptionInfrastructureService } from '../infrastructure/reception.serv
 import { ClientsApplicationService } from '../../clients/application/clients.service';
 import { VehicleService } from '../../vehicle/application/vehicle.service';
 import { AuthApplicationService } from '../../auth/application/auth.service';
+import { InspectionItem } from './dtos/inspection-item.interface';
 import { InspectionsResponse } from './dtos/inspections-response.interface';
-import { mapInspectionsResponse } from './mappers/inspection.mapper';
+import { mapInspectionItem, mapInspectionsResponse } from './mappers/inspection.mapper';
 
 @Injectable()
 export class ReceptionService {
@@ -21,6 +22,35 @@ export class ReceptionService {
     return this.infrastructure.proxyRequest('GET', '/api', null, {
       Authorization: `Bearer ${token}`,
     });
+  }
+
+  getInspectionById(id: string, token: string): Observable<InspectionItem> {
+    return this.infrastructure.proxyRequest('GET', `/api/inspections/${id}`, null, {
+      Authorization: `Bearer ${token}`,
+    }).pipe(
+      switchMap((response: any) => {
+        const item = response?.data ?? response;
+
+        const clientRequest = item.client_id
+          ? this.clientService.getClientById(item.client_id, token).pipe(catchError(() => of(null)))
+          : of(null);
+
+        const vehicleRequest = item.vehicle_id
+          ? this.vehicleService.getVehicleById(item.vehicle_id, token).pipe(catchError(() => of(null)))
+          : of(null);
+
+        const operatorId = item.operator_id || item.responsible_id || item.customer_id;
+        const operatorRequest = operatorId
+          ? this.authService.getUserById(operatorId, token).pipe(catchError(() => of(null)))
+          : of(null);
+
+        return forkJoin([clientRequest, vehicleRequest, operatorRequest]).pipe(
+          map(([clientData, vehicleData, userData]) =>
+            mapInspectionItem(item, clientData, vehicleData, userData),
+          ),
+        );
+      }),
+    );
   }
 
   listInspections(
