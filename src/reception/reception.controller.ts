@@ -4,7 +4,7 @@ import { ReceptionService } from './application/reception.service';
 import type { Request } from 'express';
 
 @ApiTags('reception')
-@Controller('api/v1')
+@Controller('api')
 @UsePipes(new ValidationPipe({ transform: true }))
 @ApiSecurity('x-api-key')
 @ApiBearerAuth()
