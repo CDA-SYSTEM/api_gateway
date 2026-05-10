@@ -11,15 +11,6 @@ import type { Request } from 'express';
 export class ReceptionController {
   constructor(private readonly receptionService: ReceptionService) {}
 
-  @Post('reception')
-  @ApiOperation({ summary: 'Crear recepción' })
-  @ApiBody({ description: 'Datos de la recepción' })
-  @ApiResponse({ status: 201, description: 'Recepción creada' })
-  create(@Body() body: any, @Req() req: Request) {
-    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
-    return this.receptionService.create(body, token);
-  }
-
   @Put('reception/:id')
   @ApiOperation({ summary: 'Actualizar recepción' })
   @ApiParam({ name: 'id', required: true, type: String, description: 'ID de la recepción' })
