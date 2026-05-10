@@ -33,12 +33,10 @@ export class ReceptionService {
     if (size !== undefined) params.append('size', size.toString());
     const queryString = params.toString();
     const url = `/api/inspections${queryString ? '?' + queryString : ''}`;
-    const response= this.infrastructure.proxyRequest('GET', url, null, {
+    return this.infrastructure.proxyRequest('GET', url, null, {
       Authorization: `Bearer ${token}`,
-    });
-    return response.map((data)=> {
-      ...data,
-      client: this.clientService.getClientById(data.client_id, token)
-    })
+    }).pipe(
+      map((response: any) => response),
+    );
   }
 }
