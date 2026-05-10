@@ -1,6 +1,6 @@
-import { Controller, Get, Post, Query, Req, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Param, Post, Query, Req, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiTags, ApiOperation, ApiBody, ApiConsumes, ApiQuery, ApiResponse, ApiSecurity, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBody, ApiConsumes, ApiParam, ApiQuery, ApiResponse, ApiSecurity, ApiBearerAuth } from '@nestjs/swagger';
 import { UploadFilesService } from './application/upload-files.service';
 import type { Request } from 'express';
 
@@ -26,6 +26,15 @@ export class UploadFilesController {
   listFiles(@Query('limit') limit: number, @Req() req: Request) {
     const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
     return this.uploadFilesService.listFiles(limit, token);
+  }
+
+  @Get('storage/files/:id')
+  @ApiOperation({ summary: 'Recuperar stream de archivo por ID' })
+  @ApiParam({ name: 'id', required: true, type: String, description: 'ID del archivo' })
+  @ApiResponse({ status: 200, description: 'Stream del archivo' })
+  getFileById(@Param('id') id: string, @Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.uploadFilesService.getFileById(id, token);
   }
 
   @Post('storage/upload')
