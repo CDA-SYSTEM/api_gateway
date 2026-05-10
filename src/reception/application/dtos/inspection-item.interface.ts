@@ -1,4 +1,5 @@
 import { ClientData } from './client-data.interface';
+import { VehicleData } from './vehicle-data.interface';
 
 export interface InspectionItem {
   id: string;
@@ -28,4 +29,5 @@ export interface InspectionItem {
   tires: { position: string; code: string; tire_pressure: number }[];
   deletedAt: string | null;
   client: ClientData | null;
+  vehicle: VehicleData | null;
 }
