@@ -70,6 +70,7 @@ jobs:
               -e SWAGGER_USER="${{ secrets.SWAGGER_USER }}" \
               -e VEHICLE_SERVICE_BASE_URL="${{ secrets.VEHICLE_SERVICE_BASE_URL }}" \
               -e CLIENT_SERVICE_BASE_URL="${{ secrets.CLIENT_SERVICE_BASE_URL }}" \
+              -e UPLOAD_FILES_SERVICE_BASE_URL="${{ secrets.UPLOAD_FILES_SERVICE_BASE_URL }}" \
               -e SWAGGER_PASS="${{ secrets.SWAGGER_PASS }}" \
               --restart unless-stopped \
               ghcr.io/${{ env.REPO_LC }}:latest
