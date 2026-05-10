@@ -24,6 +24,20 @@ function resolveOperatorId(item: any): string {
   return item.operator_id || item.responsible_id || item.customer_id || '';
 }
 
+export function mapInspectionItem(
+  item: any,
+  clientData: any,
+  vehicleData: any,
+  userData: any,
+): InspectionItem {
+  return {
+    ...item,
+    client: mapClient(clientData),
+    vehicle: mapVehicle(vehicleData),
+    operator: mapOperator(userData),
+  } as InspectionItem;
+}
+
 export function mapInspectionsResponse(
   raw: any,
   clientMap: Map<string, any>,
