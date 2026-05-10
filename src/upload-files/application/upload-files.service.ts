@@ -12,6 +12,12 @@ export class UploadFilesService {
     });
   }
 
+  listFiles(limit: number, token: string): Observable<any> {
+    return this.uploadFilesInfrastructure.proxyRequest('GET', `/storage/files?limit=${limit}`, null, {
+      Authorization: `Bearer ${token}`,
+    });
+  }
+
   uploadFile(file: Express.Multer.File, token: string): Observable<any> {
     const formData = new FormData();
     const blob = new Blob([file.buffer as any], { type: file.mimetype });
