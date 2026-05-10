@@ -11,15 +11,6 @@ import type { Request } from 'express';
 export class ReceptionController {
   constructor(private readonly receptionService: ReceptionService) {}
 
-  @Delete('reception/:id')
-  @ApiOperation({ summary: 'Eliminar recepción' })
-  @ApiParam({ name: 'id', required: true, type: String, description: 'ID de la recepción' })
-  @ApiResponse({ status: 200, description: 'Recepción eliminada' })
-  delete(@Param('id') id: string, @Req() req: Request) {
-    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
-    return this.receptionService.delete(id, token);
-  }
-
   @Get('inspections')
   @ApiOperation({ summary: 'Listar inspecciones con filtros opcionales y paginación' })
   @ApiQuery({ name: 'includeDeleted', required: false, type: String, description: 'Incluye registros con soft delete' })
