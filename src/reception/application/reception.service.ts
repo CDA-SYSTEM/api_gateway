@@ -12,12 +12,6 @@ export class ReceptionService {
     });
   }
 
-  delete(id: string, token: string): Observable<any> {
-    return this.infrastructure.proxyRequest('DELETE', `/reception/${id}`, null, {
-      Authorization: `Bearer ${token}`,
-    });
-  }
-
   listInspections(
     token: string,
     includeDeleted?: string,
