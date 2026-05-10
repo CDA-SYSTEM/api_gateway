@@ -20,10 +20,15 @@ function mapOperator(rawUser: any): UserData | null {
   return user?.id ? (user as UserData) : null;
 }
 
+function resolveOperatorId(item: any): string | undefined {
+  return item.operator_id || item.responsible_id || item.customer_id || undefined;
+}
+
 export function mapInspectionsResponse(
   raw: any,
   clientMap: Map<string, any>,
   vehicleMap?: Map<string, any>,
+  operatorMap?: Map<string, any>,
 ): InspectionsResponse {
   const envelopeData = raw?.data ?? raw;
   const items: any[] = Array.isArray(envelopeData) ? envelopeData : (envelopeData?.data ?? []);
@@ -33,6 +38,7 @@ export function mapInspectionsResponse(
       ...item,
       client: mapClient(clientMap.get(item.client_id)),
       vehicle: vehicleMap ? mapVehicle(vehicleMap.get(item.vehicle_id)) : null,
+      operator: operatorMap ? mapOperator(operatorMap.get(resolveOperatorId(item))) : null,
     })) as InspectionItem[],
     total: envelopeData.total,
     page: envelopeData.page,
