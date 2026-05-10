@@ -3,12 +3,16 @@ import { Observable, forkJoin, of } from 'rxjs';
 import { map, switchMap, catchError } from 'rxjs';
 import { ReceptionInfrastructureService } from '../infrastructure/reception.service';
 import { ClientsApplicationService } from '../../clients/application/clients.service';
+import { VehicleService } from '../../vehicle/application/vehicle.service';
+import { InspectionsResponse } from './dtos/inspections-response.interface';
+import { mapInspectionsResponse } from './mappers/inspection.mapper';
 
 @Injectable()
 export class ReceptionService {
   constructor(
     private readonly infrastructure: ReceptionInfrastructureService,
     private readonly clientService: ClientsApplicationService,
+    private readonly vehicleService: VehicleService,
   ) {}
 
   healthCheck(token: string): Observable<any> {
@@ -24,7 +28,7 @@ export class ReceptionService {
     vehicleId?: string,
     page?: number,
     size?: number,
-  ): Observable<any> {
+  ): Observable<InspectionsResponse> {
     const params = new URLSearchParams();
     if (includeDeleted !== undefined) params.append('includeDeleted', includeDeleted);
     if (inspectionNumber) params.append('inspection_number', inspectionNumber);
@@ -37,22 +41,12 @@ export class ReceptionService {
       Authorization: `Bearer ${token}`,
     }).pipe(
       switchMap((response: any) => {
-        const envelopeData = response?.data ?? response;
-        const items: any[] = Array.isArray(envelopeData) ? envelopeData : (envelopeData?.data ?? []);
-        const pagination = envelopeData?.total !== undefined
-          ? { total: envelopeData.total, page: envelopeData.page, size: envelopeData.size, totalPages: envelopeData.totalPages }
-          : undefined;
-
-        if (!items.length) {
-          return of(pagination ? { data: [], ...pagination } : []);
-        }
+        const items: any[] = Array.isArray(response?.data)
+          ? response.data
+          : (response?.data?.data ?? []);
 
         const clientIds = [...new Set(items.map(item => item.client_id).filter(Boolean))] as string[];
-
-        if (!clientIds.length) {
-          const enriched = items.map(item => ({ ...item, client: null }));
-          return of(pagination ? { data: enriched, ...pagination } : enriched);
-        }
+        const vehicleIds = [...new Set(items.map(item => item.vehicle_id).filter(Boolean))] as string[];
 
         const clientRequests = clientIds.map(clientId =>
           this.clientService.getClientById(clientId, token).pipe(
@@ -61,14 +55,26 @@ export class ReceptionService {
           ),
         );
 
-        return forkJoin(clientRequests).pipe(
-          map((clientResults) => {
+        const vehicleRequests = vehicleIds.map(vehicleId =>
+          this.vehicleService.getVehicleById(vehicleId, token).pipe(
+            catchError(() => of(null)),
+            map(vehicleData => ({ vehicleId, vehicleData })),
+          ),
+        );
+
+        const allRequests = [...clientRequests, ...vehicleRequests];
+
+        if (!allRequests.length) {
+          return of(mapInspectionsResponse(response, new Map()));
+        }
+
+        return forkJoin(allRequests).pipe(
+          map((results: any[]) => {
+            const clientResults = results.slice(0, clientRequests.length).filter(r => r?.clientId);
+            const vehicleResults = results.slice(clientRequests.length).filter(r => r?.vehicleId);
             const clientMap = new Map(clientResults.map(r => [r.clientId, r.clientData]));
-            const enrichedItems = items.map(item => ({
-              ...item,
-              client: clientMap.get(item.client_id) ?? null,
-            }));
-            return pagination ? { data: enrichedItems, ...pagination } : enrichedItems;
+            const vehicleMap = new Map(vehicleResults.map(r => [r.vehicleId, r.vehicleData]));
+            return mapInspectionsResponse(response, clientMap, vehicleMap);
           }),
         );
       }),
