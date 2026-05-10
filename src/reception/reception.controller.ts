@@ -1,5 +1,7 @@
-import { Controller, Get, Param, Query, Req, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Controller, Delete, Get, Param, Query, Req, UsePipes, ValidationPipe } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiQuery, ApiResponse, ApiSecurity, ApiBearerAuth } from '@nestjs/swagger';
+import { Roles } from '../common/decorators/roles.decorator';
+import { Roles as RoleConst } from '../common/constants/roles.constant';
 import { ReceptionService } from './application/reception.service';
 import type { Request } from 'express';
 
@@ -45,5 +47,14 @@ export class ReceptionController {
   getInspectionById(@Param('id') id: string, @Req() req: Request) {
     const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
     return this.receptionService.getInspectionById(id, token);
+  }
+
+  @Roles(RoleConst.ADMIN)
+  @Delete('inspections/:id')
+  @ApiOperation({ summary: 'Eliminar (soft delete) inspección por ID (solo admin)' })
+  @ApiResponse({ status: 200, description: 'Inspección eliminada' })
+  deleteInspection(@Param('id') id: string, @Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.receptionService.deleteInspectionById(id, token);
   }
 }
