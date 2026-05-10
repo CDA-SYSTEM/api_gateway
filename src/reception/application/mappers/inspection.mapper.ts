@@ -16,6 +16,7 @@ function mapVehicle(rawVehicle: any): VehicleData | null {
 export function mapInspectionsResponse(
   raw: any,
   clientMap: Map<string, any>,
+  vehicleMap?: Map<string, any>,
 ): InspectionsResponse {
   const envelopeData = raw?.data ?? raw;
   const items: any[] = Array.isArray(envelopeData) ? envelopeData : (envelopeData?.data ?? []);
@@ -24,6 +25,7 @@ export function mapInspectionsResponse(
     data: items.map((item: any) => ({
       ...item,
       client: mapClient(clientMap.get(item.client_id)),
+      vehicle: vehicleMap ? mapVehicle(vehicleMap.get(item.vehicle_id)) : null,
     })) as InspectionItem[],
     total: envelopeData.total,
     page: envelopeData.page,
