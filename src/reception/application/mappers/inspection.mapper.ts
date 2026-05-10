@@ -1,10 +1,16 @@
 import { ClientData } from '../dtos/client-data.interface';
+import { VehicleData } from '../dtos/vehicle-data.interface';
 import { InspectionItem } from '../dtos/inspection-item.interface';
 import { InspectionsResponse } from '../dtos/inspections-response.interface';
 
 function mapClient(rawClient: any): ClientData | null {
   if (!rawClient?.success) return null;
   return (rawClient.data as ClientData) ?? null;
+}
+
+function mapVehicle(rawVehicle: any): VehicleData | null {
+  if (!rawVehicle?.id) return null;
+  return rawVehicle as VehicleData;
 }
 
 export function mapInspectionsResponse(
