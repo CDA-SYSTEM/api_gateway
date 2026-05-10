@@ -7,7 +7,7 @@ export class ReceptionService {
   constructor(private readonly infrastructure: ReceptionInfrastructureService) {}
 
   healthCheck(token: string): Observable<any> {
-    return this.infrastructure.proxyRequest('GET', '/api/v1/health', null, {
+    return this.infrastructure.proxyRequest('GET', '/api', null, {
       Authorization: `Bearer ${token}`,
     });
   }
