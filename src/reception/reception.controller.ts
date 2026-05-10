@@ -11,6 +11,14 @@ import type { Request } from 'express';
 export class ReceptionController {
   constructor(private readonly receptionService: ReceptionService) {}
 
+  @Get('/')
+  @ApiOperation({ summary: 'Health check del servicio de recepción' })
+  @ApiResponse({ status: 200, description: 'Servicio disponible' })
+  healthCheck(@Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.receptionService.healthCheck(token);
+  }
+
   @Get('inspections')
   @ApiOperation({ summary: 'Listar inspecciones con filtros opcionales y paginación' })
   @ApiQuery({ name: 'includeDeleted', required: false, type: String, description: 'Incluye registros con soft delete' })
