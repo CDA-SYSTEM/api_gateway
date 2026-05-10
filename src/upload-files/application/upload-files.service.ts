@@ -20,7 +20,7 @@ export class UploadFilesService {
         const items: any[] = response?.data ?? response ?? [];
         return items.map((item: any) => ({
           ...item,
-          url: `${process.env.UPLOAD_FILES_SERVICE_BASE_URL}/storage/files/${item.id}`,
+          url: `${process.env.API_GATEWAY_BASE_URL}/storage/files/${item.id}`,
         }));
       }),
     );

@@ -37,24 +37,40 @@ export class ReceptionService {
 
     const signatureUpload$ = signatureFile
       ? this.uploadFilesService.uploadFile(signatureFile, token).pipe(
-          map(res => `${baseUrl}/storage/files/${res.file.id}`),
+          map(res => `${baseUrl}/api/v1/storage/files/${res.file.id}`),
           catchError(() => of(null)),
         )
       : of(null);
 
     const photoUpload$ = this.uploadFilesService.uploadFile(photoFile, token).pipe(
-      map(res => `${baseUrl}/storage/files/${res.file.id}`),
+      map(res => `${baseUrl}/api/v1/storage/files/${res.file.id}`),
       catchError(() => throwError(() => new BadRequestException('Error al subir la foto de recepción'))),
     );
 
     return forkJoin([signatureUpload$, photoUpload$]).pipe(
       switchMap(([signatureUrl, photoUrl]) => {
         const payload = {
-          ...dto,
+          mileage: dto.mileage,
+          client_id: dto.client_id,
+          vehicle_id: dto.vehicle_id,
+          vehicle_type: dto.vehicle_type,
+          fuel_type: dto.fuel_type,
+          fuel_certificate_number: dto.fuel_certificate_number,
+          service_type: dto.service_type,
+          operator_id: dto.operator_id,
           responsible_id: dto.operator_id,
           customer_id: dto.operator_id,
+          customer_type: dto.customer_type,
+          revision_type: dto.revision_type,
+          tinted_windows: dto.tinted_windows,
+          armored_vehicle: dto.armored_vehicle,
+          brake_fluid_sight_glass: dto.brake_fluid_sight_glass,
+          observations: dto.observations,
           signature_url: signatureUrl || dto.signature_url || '',
           photo_reception_url: photoUrl || dto.photo_reception_url || '',
+          checklist: dto.checklist,
+          axles: dto.axles,
+          tires: dto.tires,
         };
 
         return this.infrastructure.proxyRequest('POST', '/api/inspections', payload, {

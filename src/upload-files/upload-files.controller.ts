@@ -2,6 +2,7 @@ import { Controller, Delete, Get, Param, Post, Query, Req, Res, UploadedFile, Us
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags, ApiOperation, ApiBody, ApiConsumes, ApiParam, ApiQuery, ApiResponse, ApiSecurity, ApiBearerAuth } from '@nestjs/swagger';
 import { UploadFilesService } from './application/upload-files.service';
+import { Public } from '../common/decorators/public.decorator';
 import { SkipResponseFormat } from '../common/decorators/skip-response-format.decorator';
 import { buildErrorResponse } from '../common/utils/error-response.util';
 import { lastValueFrom } from 'rxjs';
@@ -40,6 +41,7 @@ export class UploadFilesController {
     return this.uploadFilesService.deleteFileById(id, token);
   }
 
+  @Public()
   @SkipResponseFormat()
   @Get('storage/files/:id')
   @ApiOperation({ summary: 'Recuperar stream de archivo por ID' })
