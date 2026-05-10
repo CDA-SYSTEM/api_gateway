@@ -1,9 +1,9 @@
-import { Controller, Get, Param, Post, Query, Req, Res, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Controller, Delete, Get, Param, Post, Query, Req, Res, UploadedFile, UseInterceptors, HttpException } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags, ApiOperation, ApiBody, ApiConsumes, ApiParam, ApiQuery, ApiResponse, ApiSecurity, ApiBearerAuth } from '@nestjs/swagger';
 import { UploadFilesService } from './application/upload-files.service';
 import { SkipResponseFormat } from '../common/decorators/skip-response-format.decorator';
-import { tap, map } from 'rxjs';
+import { lastValueFrom } from 'rxjs';
 import type { Request, Response } from 'express';
 
 @ApiTags('upload-files')
@@ -30,17 +30,38 @@ export class UploadFilesController {
     return this.uploadFilesService.listFiles(limit, token);
   }
 
+  @Delete('storage/files/:id')
+  @ApiOperation({ summary: 'Soft delete de archivo (actualiza deleted_at)' })
+  @ApiParam({ name: 'id', required: true, type: String, description: 'ID del archivo' })
+  @ApiResponse({ status: 200, description: 'Archivo eliminado correctamente' })
+  deleteFileById(@Param('id') id: string, @Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.uploadFilesService.deleteFileById(id, token);
+  }
+
   @SkipResponseFormat()
   @Get('storage/files/:id')
   @ApiOperation({ summary: 'Recuperar stream de archivo por ID' })
   @ApiParam({ name: 'id', required: true, type: String, description: 'ID del archivo' })
   @ApiResponse({ status: 200, description: 'Stream del archivo' })
-  getFileById(@Param('id') id: string, @Req() req: Request, @Res({ passthrough: true }) res: Response) {
+  async getFileById(@Param('id') id: string, @Req() req: Request, @Res() res: Response) {
     const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
-    return this.uploadFilesService.getFileById(id, token).pipe(
-      tap(({ contentType }) => res.setHeader('Content-Type', contentType)),
-      map(({ data }) => data),
-    );
+    try {
+      const { data, contentType, contentDisposition } = await lastValueFrom(
+        this.uploadFilesService.getFileById(id, token),
+      );
+      res.setHeader('Content-Type', contentType);
+      if (contentDisposition) {
+        res.setHeader('Content-Disposition', contentDisposition);
+      }
+      res.send(data);
+    } catch (error) {
+      if (error instanceof HttpException) {
+        res.status(error.getStatus()).json(error.getResponse());
+      } else {
+        res.status(500).json({ statusCode: 500, message: 'Internal server error' });
+      }
+    }
   }
 
   @Post('storage/upload')
