@@ -1,5 +1,6 @@
 import { ClientData } from './client-data.interface';
 import { VehicleData } from './vehicle-data.interface';
+import { UserData } from './user-data.interface';
 
 export interface InspectionItem {
   id: string;
@@ -30,4 +31,5 @@ export interface InspectionItem {
   deletedAt: string | null;
   client: ClientData | null;
   vehicle: VehicleData | null;
+  operator: UserData | null;
 }
