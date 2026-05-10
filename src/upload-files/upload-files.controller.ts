@@ -1,6 +1,6 @@
-import { Controller, Get, Post, Req, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Post, Query, Req, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiTags, ApiOperation, ApiBody, ApiConsumes, ApiResponse, ApiSecurity, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBody, ApiConsumes, ApiQuery, ApiResponse, ApiSecurity, ApiBearerAuth } from '@nestjs/swagger';
 import { UploadFilesService } from './application/upload-files.service';
 import type { Request } from 'express';
 
@@ -17,6 +17,15 @@ export class UploadFilesController {
   healthCheck(@Req() req: Request) {
     const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
     return this.uploadFilesService.healthCheck(token);
+  }
+
+  @Get('storage/files')
+  @ApiOperation({ summary: 'Listar archivos activos (no eliminados)' })
+  @ApiQuery({ name: 'limit', required: true, type: Number, example: 10, description: 'Límite de archivos' })
+  @ApiResponse({ status: 200, description: 'Lista de archivos' })
+  listFiles(@Query('limit') limit: number, @Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.uploadFilesService.listFiles(limit, token);
   }
 
   @Post('storage/upload')
