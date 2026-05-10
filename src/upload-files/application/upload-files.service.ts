@@ -26,6 +26,12 @@ export class UploadFilesService {
     );
   }
 
+  deleteFileById(id: string, token: string): Observable<any> {
+    return this.uploadFilesInfrastructure.proxyRequest('DELETE', `/storage/files/${id}`, null, {
+      Authorization: `Bearer ${token}`,
+    });
+  }
+
   getFileById(id: string, token: string): Observable<any> {
     return this.uploadFilesInfrastructure.proxyRequest('GET', `/storage/files/${id}`, null, {
       Authorization: `Bearer ${token}`,
