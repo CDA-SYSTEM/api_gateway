@@ -18,6 +18,12 @@ export class ReceptionService {
     private readonly authService: AuthApplicationService,
   ) {}
 
+  deleteInspectionById(id: string, token: string): Observable<any> {
+    return this.infrastructure.proxyRequest('DELETE', `/api/inspections/${id}`, null, {
+      Authorization: `Bearer ${token}`,
+    });
+  }
+
   healthCheck(token: string): Observable<any> {
     return this.infrastructure.proxyRequest('GET', '/api', null, {
       Authorization: `Bearer ${token}`,
