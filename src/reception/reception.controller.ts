@@ -11,14 +11,6 @@ import type { Request } from 'express';
 export class ReceptionController {
   constructor(private readonly receptionService: ReceptionService) {}
 
-  @Get('reception/health')
-  @ApiOperation({ summary: 'Health check del servicio de recepción' })
-  @ApiResponse({ status: 200, description: 'Servicio disponible' })
-  healthCheck(@Req() req: Request) {
-    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
-    return this.receptionService.healthCheck(token);
-  }
-
   @Get('reception')
   @ApiOperation({ summary: 'Listar recepciones' })
   @ApiResponse({ status: 200, description: 'Lista de recepciones' })
