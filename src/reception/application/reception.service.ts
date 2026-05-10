@@ -12,13 +12,6 @@ export class ReceptionService {
     });
   }
 
-  create(data: any, token: string): Observable<any> {
-    return this.infrastructure.proxyRequest('POST', '/reception', data, {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    });
-  }
-
   update(id: string, data: any, token: string): Observable<any> {
     return this.infrastructure.proxyRequest('PUT', `/reception/${id}`, data, {
       Authorization: `Bearer ${token}`,
