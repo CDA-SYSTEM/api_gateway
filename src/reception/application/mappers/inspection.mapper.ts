@@ -20,8 +20,8 @@ function mapOperator(rawUser: any): UserData | null {
   return user?.id ? (user as UserData) : null;
 }
 
-function resolveOperatorId(item: any): string | undefined {
-  return item.operator_id || item.responsible_id || item.customer_id || undefined;
+function resolveOperatorId(item: any): string {
+  return item.operator_id || item.responsible_id || item.customer_id || '';
 }
 
 export function mapInspectionsResponse(
