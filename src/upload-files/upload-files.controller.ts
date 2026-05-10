@@ -1,8 +1,9 @@
-import { Controller, Delete, Get, Param, Post, Query, Req, Res, UploadedFile, UseInterceptors, HttpException, BadRequestException } from '@nestjs/common';
+import { Controller, Delete, Get, Param, Post, Query, Req, Res, UploadedFile, UseInterceptors, BadRequestException } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags, ApiOperation, ApiBody, ApiConsumes, ApiParam, ApiQuery, ApiResponse, ApiSecurity, ApiBearerAuth } from '@nestjs/swagger';
 import { UploadFilesService } from './application/upload-files.service';
 import { SkipResponseFormat } from '../common/decorators/skip-response-format.decorator';
+import { buildErrorResponse } from '../common/utils/error-response.util';
 import { lastValueFrom } from 'rxjs';
 import type { Request, Response } from 'express';
 
@@ -56,11 +57,8 @@ export class UploadFilesController {
       }
       res.send(data);
     } catch (error) {
-      if (error instanceof HttpException) {
-        res.status(error.getStatus()).json(error.getResponse());
-      } else {
-        res.status(500).json({ statusCode: 500, message: 'Internal server error' });
-      }
+      const errorBody = buildErrorResponse(error, req.url);
+      res.status(errorBody.statusCode).json(errorBody);
     }
   }
 
