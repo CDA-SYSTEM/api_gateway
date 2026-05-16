@@ -185,7 +185,7 @@ npm run test
 ## Construir Documentación Localmente
 
 ```bash
-pip install mkdocs mkdocs-material
+pip install mkdocs mkdocs-material mkdocs-static-i18n
 mkdocs serve
 # Abre en http://127.0.0.1:8000
 ```
