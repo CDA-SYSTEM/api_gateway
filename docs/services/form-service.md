@@ -1,0 +1,53 @@
+# Form Service
+
+**Port:** `7500`  
+**Tech:** NestJS 11 / TypeScript  
+**Database:** MongoDB  
+**Global Prefix:** `/api`  
+**API Docs:** `{RECEPTION_SERVICE_BASE_URL}/docs`
+
+## Purpose
+
+Vehicle reception form management. Creates, lists, updates, and soft-deletes vehicle inspections. Validates client and vehicle existence via RabbitMQ RPC before persisting. Enforces business rules per vehicle type.
+
+## Business Rules
+
+| Vehicle Type | Tires | Checklist |
+|-------------|-------|-----------|
+| `MOTOCICLETA_2_TIEMPOS` / `MOTOCICLETA_4_TIEMPOS` | 2 tires | Clean check only |
+| `LIVIANO` | 4 tires | Full checklist |
+| `PESADO` | Up to 12 tires | Full checklist |
+
+## Key Endpoints
+
+### Catalogs (Read-only enums)
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/api/catalogs/vehicle-types` | Vehicle types |
+| `GET` | `/api/catalogs/service-types` | Service types |
+| `GET` | `/api/catalogs/fuel-types` | Fuel types |
+| `GET` | `/api/catalogs/tire-positions` | Tire positions |
+| `GET` | `/api/catalogs/ternary-choices` | SI/NO/NO_APLICA |
+| `GET` | `/api/catalogs/revision-types` | Revision types |
+| `GET` | `/api/catalogs/customer-types` | Customer types |
+| `GET` | `/api/catalogs/brake-fluid-sight-glass` | Brake fluid states |
+
+### Inspections
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `POST` | `/api/inspections` | Create (validates client/vehicle via RabbitMQ) |
+| `GET` | `/api/inspections` | List with filters (includeDeleted, vehicle_id, page, size) |
+| `GET` | `/api/inspections/:id` | Get by ID |
+| `PATCH` | `/api/inspections/:id` | Update (re-validates vehicle type rules) |
+| `DELETE` | `/api/inspections/:id` | Soft delete |
+
+## Integration
+
+- **RabbitMQ RPC** — Validates `customer_id` against `client-service-queue` and `vehicle_id` against `vehicle-service-queue` before saving inspections
+- **Soft Delete** — Sets `deleted_at` timestamp instead of physical deletion
+
+## Architecture
+
+Modular with `CatalogsModule`, `InspectionModule`, and `RabbitMQModule`. Uses shared TypeScript enums for catalog values. Seed script available via `seed:inspection`.
