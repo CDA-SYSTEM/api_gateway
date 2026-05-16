@@ -3,15 +3,15 @@ import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 class InspectionItemResponseDto {
-  @ApiProperty({ example: 'section-code' })
+  @ApiProperty({ example: '6.1' })
   @IsString()
   section_code: string;
 
-  @ApiProperty({ example: 'subsection-code' })
+  @ApiProperty({ example: '6.1.1' })
   @IsString()
   subsection_code: string;
 
-  @ApiProperty({ example: 'item-code' })
+  @ApiProperty({ example: '6.1.1.1' })
   @IsString()
   item_code: string;
 
@@ -50,7 +50,7 @@ export class CreateInspectionChecklistDto {
   @IsIn(['MOTO', 'LIVIANO', 'PESADO'])
   vehicle_type: string;
 
-  @ApiPropertyOptional({ example: 'template-id' })
+  @ApiPropertyOptional({ example: '69f4fc2d4c2e0f7722a7e2ba' })
   @IsOptional()
   @IsString()
   template_id?: string;
@@ -60,7 +60,7 @@ export class CreateInspectionChecklistDto {
   @IsDateString()
   inspection_datetime?: string;
 
-  @ApiProperty({ example: 'user-id' })
+  @ApiProperty({ example: 'usr_001' })
   @IsString()
   inspector_id: string;
 

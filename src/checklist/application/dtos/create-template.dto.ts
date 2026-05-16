@@ -3,11 +3,11 @@ import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 class TemplateItemDto {
-  @ApiProperty({ example: 'item-code', maxLength: 100 })
+  @ApiProperty({ example: '6.1.1.1', maxLength: 100 })
   @IsString()
   code: string;
 
-  @ApiProperty({ example: 'Descripción del ítem' })
+  @ApiProperty({ example: 'Inexistencia o mal funcionamiento de los limpiaparabrisas delanteros.' })
   @IsString()
   description: string;
 
@@ -27,12 +27,12 @@ class TemplateItemDto {
 }
 
 class TemplateSubsectionDto {
-  @ApiPropertyOptional({ example: 'subsection-code' })
+  @ApiPropertyOptional({ example: '6.1.2' })
   @IsOptional()
   @IsString()
   code?: string;
 
-  @ApiPropertyOptional({ example: 'Título de subsección' })
+  @ApiPropertyOptional({ example: 'Limpiaparabrisas' })
   @IsOptional()
   @IsString()
   title?: string;
@@ -49,12 +49,12 @@ class TemplateSubsectionDto {
 }
 
 class TemplateSectionDto {
-  @ApiPropertyOptional({ example: 'section-code' })
+  @ApiPropertyOptional({ example: '6.1' })
   @IsOptional()
   @IsString()
   code?: string;
 
-  @ApiProperty({ example: 'Título de sección' })
+  @ApiProperty({ example: 'ACONDICIONAMIENTO EXTERIOR' })
   @IsString()
   title: string;
 
@@ -70,12 +70,12 @@ class TemplateSectionDto {
 }
 
 export class CreateTemplateDto {
-  @ApiProperty({ enum: ['MOTOS', 'LIVIANOS_PESADOS'], example: 'MOTOS' })
+  @ApiProperty({ enum: ['MOTOS', 'LIVIANOS_PESADOS'], example: 'LIVIANOS_PESADOS' })
   @IsString()
   @IsIn(['MOTOS', 'LIVIANOS_PESADOS'])
   code: string;
 
-  @ApiProperty({ example: 'Plantilla Motos 2024' })
+  @ApiProperty({ example: 'Plantilla Livianos y Pesados 2026' })
   @IsString()
   @Matches(/.*[a-zA-Z].*/, { message: 'El nombre debe contener al menos una letra' })
   name: string;
@@ -91,7 +91,7 @@ export class CreateTemplateDto {
   @IsBoolean()
   active?: boolean;
 
-  @ApiProperty({ example: ['MOTO'] })
+  @ApiProperty({ example: ['LIVIANO', 'PESADO'] })
   @IsArray()
   @IsString({ each: true })
   @IsIn(['MOTO', 'LIVIANO', 'PESADO'], { each: true })

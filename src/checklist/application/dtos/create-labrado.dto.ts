@@ -3,7 +3,7 @@ import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 
 class TireMeasurementDto {
-  @ApiProperty({ example: 'TIRE-001' })
+  @ApiProperty({ example: 'LLANTA001' })
   @IsString()
   tire_code: string;
 
@@ -24,7 +24,7 @@ class TireMeasurementDto {
 }
 
 class WheelMeasurementDto {
-  @ApiProperty({ example: 'WHEEL-001' })
+  @ApiProperty({ example: 'RUEDA001' })
   @IsString()
   wheel_code: string;
 
@@ -36,7 +36,7 @@ class WheelMeasurementDto {
 }
 
 class AxleMeasurementDto {
-  @ApiProperty({ example: 'AXLE-001' })
+  @ApiProperty({ example: 'EJE001' })
   @IsString()
   axle_code: string;
 
@@ -48,7 +48,7 @@ class AxleMeasurementDto {
 }
 
 export class CreateLabradoDto {
-  @ApiProperty({ example: 'inspection-id' })
+  @ApiProperty({ example: '672a1f2d4c2e0f7722a7e2ba' })
   @IsString()
   inspection_id: string;
 
