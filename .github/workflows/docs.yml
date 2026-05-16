@@ -1,0 +1,21 @@
+name: Deploy Docs
+
+on:
+  push:
+    branches: [main, feat/manage-docs-basic-python]
+  pull_request:
+    branches: [main, develop]
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+      - run: pip install mkdocs mkdocs-material mkdocs-static-i18n
+      - run: mkdocs gh-deploy --force

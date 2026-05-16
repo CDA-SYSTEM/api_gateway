@@ -3,6 +3,7 @@
 /node_modules
 /build
 /postman
+/site
 
 # Logs
 logs
