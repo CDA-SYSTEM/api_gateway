@@ -2,9 +2,9 @@ name: Deploy Docs
 
 on:
   push:
-    branches: [main]
+    branches: [main, feat/manage-docs-basic-python]
   pull_request:
-    branches: [main, develop, feat/manage-docs-basic-python]
+    branches: [main, develop]
 
 permissions:
   contents: write
