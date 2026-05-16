@@ -1,8 +1,8 @@
-# Curl Examples
+# Ejemplos con Curl
 
-## Authentication
+## Autenticación
 
-### Login
+### Iniciar sesión
 ```bash
 curl -s -X POST http://localhost:3600/api/v1/auth/login \
   -H 'Content-Type: application/json' \
@@ -13,16 +13,16 @@ curl -s -X POST http://localhost:3600/api/v1/auth/login \
   }'
 ```
 
-### Validate Token
+### Validar token
 ```bash
 curl -s -X POST http://localhost:3600/api/v1/auth/validate-token \
   -H 'x-api-key: your-frontend-api-key' \
   -H 'Authorization: Bearer <token>'
 ```
 
-## Inspections
+## Inspecciones
 
-### Create Inspection (with files)
+### Crear inspección (con archivos)
 ```bash
 curl -s -X POST http://localhost:3600/api/v1/inspections \
   -H 'x-api-key: your-frontend-api-key' \
@@ -48,7 +48,7 @@ curl -s -X POST http://localhost:3600/api/v1/inspections \
   -F 'signature=@/path/to/signature.png'
 ```
 
-### Update Inspection (partial)
+### Actualizar inspección (parcial)
 ```bash
 curl -s -X PATCH http://localhost:3600/api/v1/inspections/<id> \
   -H 'x-api-key: your-frontend-api-key' \
@@ -57,30 +57,30 @@ curl -s -X PATCH http://localhost:3600/api/v1/inspections/<id> \
   -F 'photo=@/path/to/new-photo.jpg'
 ```
 
-### List Inspections
+### Listar inspecciones
 ```bash
 curl -s 'http://localhost:3600/api/v1/inspections?page=1&size=10&vehicle_id=ABC123' \
   -H 'x-api-key: your-frontend-api-key' \
   -H 'Authorization: Bearer <token>'
 ```
 
-### Get Inspection by ID
+### Obtener inspección por ID
 ```bash
 curl -s http://localhost:3600/api/v1/inspections/<id> \
   -H 'x-api-key: your-frontend-api-key' \
   -H 'Authorization: Bearer <token>'
 ```
 
-### Delete Inspection (Admin)
+### Eliminar inspección (Admin)
 ```bash
 curl -s -X DELETE http://localhost:3600/api/v1/inspections/<id> \
   -H 'x-api-key: your-frontend-api-key' \
   -H 'Authorization: Bearer <token>'
 ```
 
-## Files
+## Archivos
 
-### Upload File
+### Subir archivo
 ```bash
 curl -s -X POST http://localhost:3600/api/v1/storage/upload \
   -H 'x-api-key: your-frontend-api-key' \
@@ -88,37 +88,37 @@ curl -s -X POST http://localhost:3600/api/v1/storage/upload \
   -F 'file=@/path/to/document.pdf'
 ```
 
-### Download File (Public)
+### Descargar archivo (público)
 ```bash
 curl -s -O http://localhost:3600/api/v1/storage/files/<uuid>
 ```
 
-### List Files
+### Listar archivos
 ```bash
 curl -s 'http://localhost:3600/api/v1/storage/files?limit=20' \
   -H 'x-api-key: your-frontend-api-key' \
   -H 'Authorization: Bearer <token>'
 ```
 
-## Catalogs (Read-only)
+## Catálogos (solo lectura)
 
-### List Vehicle Types
+### Listar tipos de vehículo
 ```bash
 curl -s http://localhost:3600/api/v1/catalogs/vehicle-types \
   -H 'x-api-key: your-frontend-api-key' \
   -H 'Authorization: Bearer <token>'
 ```
 
-### List Fuel Types
+### Listar tipos de combustible
 ```bash
 curl -s http://localhost:3600/api/v1/catalogs/fuel-types \
   -H 'x-api-key: your-frontend-api-key' \
   -H 'Authorization: Bearer <token>'
 ```
 
-## Unified Catalogs (CRUD)
+## Catálogos unificados (CRUD)
 
-### Create Catalog Item
+### Crear elemento de catálogo
 ```bash
 curl -s -X POST http://localhost:3600/api/v1/catalogs/marcas \
   -H 'x-api-key: your-frontend-api-key' \
@@ -127,21 +127,21 @@ curl -s -X POST http://localhost:3600/api/v1/catalogs/marcas \
   -d '{"nombre": "Toyota"}'
 ```
 
-### List Catalog Items
+### Listar elementos de catálogo
 ```bash
 curl -s http://localhost:3600/api/v1/catalogs/lineas \
   -H 'x-api-key: your-frontend-api-key' \
   -H 'Authorization: Bearer <token>'
 ```
 
-### Get Catalog Item by ID
+### Obtener elemento de catálogo por ID
 ```bash
 curl -s http://localhost:3600/api/v1/catalogs/colores/1 \
   -H 'x-api-key: your-frontend-api-key' \
   -H 'Authorization: Bearer <token>'
 ```
 
-### Update Catalog Item
+### Actualizar elemento de catálogo
 ```bash
 curl -s -X PUT http://localhost:3600/api/v1/catalogs/tipos-vehiculo/1 \
   -H 'x-api-key: your-frontend-api-key' \
@@ -150,16 +150,16 @@ curl -s -X PUT http://localhost:3600/api/v1/catalogs/tipos-vehiculo/1 \
   -d '{"nombre": "CAMIONETA"}'
 ```
 
-### Delete Catalog Item
+### Eliminar elemento de catálogo
 ```bash
 curl -s -X DELETE http://localhost:3600/api/v1/catalogs/tipos-combustible/1 \
   -H 'x-api-key: your-frontend-api-key' \
   -H 'Authorization: Bearer <token>'
 ```
 
-## Vehicles
+## Vehículos
 
-### Create Vehicle
+### Crear vehículo
 ```bash
 curl -s -X POST http://localhost:3600/api/v1/vehiculo \
   -H 'x-api-key: your-frontend-api-key' \
@@ -174,23 +174,23 @@ curl -s -X POST http://localhost:3600/api/v1/vehiculo \
   }'
 ```
 
-### List Vehicles
+### Listar vehículos
 ```bash
 curl -s 'http://localhost:3600/api/v1/vehiculo?page=1&size=10' \
   -H 'x-api-key: your-frontend-api-key' \
   -H 'Authorization: Bearer <token>'
 ```
 
-### List Vehicles by Client
+### Listar vehículos por cliente
 ```bash
 curl -s http://localhost:3600/api/v1/vehiculo/cliente/1 \
   -H 'x-api-key: your-frontend-api-key' \
   -H 'Authorization: Bearer <token>'
 ```
 
-## Clients
+## Clientes
 
-### Create Client
+### Crear cliente
 ```bash
 curl -s -X POST http://localhost:3600/api/v1/clients \
   -H 'x-api-key: your-frontend-api-key' \
@@ -211,9 +211,9 @@ curl -s http://localhost:3600/api/v1/health \
   -H 'Authorization: Bearer <token>'
 ```
 
-## Response Format
+## Formato de respuesta
 
-All successful responses follow this structure:
+Todas las respuestas exitosas siguen esta estructura:
 
 ```json
 {
@@ -225,7 +225,7 @@ All successful responses follow this structure:
 }
 ```
 
-Error responses:
+Respuestas de error:
 
 ```json
 {
@@ -237,5 +237,5 @@ Error responses:
 }
 ```
 
-!!! tip "Replace placeholders"
-    Replace `localhost:3600`, `<token>`, `<id>`, `<uuid>`, `your-frontend-api-key`, and file paths with your actual values.
+!!! tip "Reemplazar placeholders"
+    Reemplace `localhost:3600`, `<token>`, `<id>`, `<uuid>`, `your-frontend-api-key` y las rutas de archivo con sus valores reales.

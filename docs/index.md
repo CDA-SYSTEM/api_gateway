@@ -1,10 +1,10 @@
 # CDA System - API Gateway
 
-Welcome to the **API Gateway** documentation for the CDA vehicle inspection system.
+Bienvenido a la documentación del **API Gateway** del sistema de inspección vehicular CDA.
 
-## Architecture Overview
+## Descripción general de la arquitectura
 
-The system follows a **microservices architecture** where an **API Gateway** (NestJS) acts as the single entry point for all client requests. Each backend concern is delegated to a dedicated microservice:
+El sistema sigue una **arquitectura de microservicios** donde un **API Gateway** (NestJS) actúa como el punto de entrada único para todas las solicitudes de los clientes. Cada componente de backend se delega a un microservicio dedicado:
 
 ```mermaid
 graph TD
@@ -19,10 +19,10 @@ graph TD
     Checklist[Checklist Service :8000] -.-> Gateway
 ```
 
-## Service Matrix
+## Matriz de servicios
 
-| Service | Port | Tech | Database |
-|---------|------|------|----------|
+| Servicio | Puerto | Tecnología | Base de datos |
+|----------|--------|------------|---------------|
 | API Gateway | `3600` | NestJS 11 | - |
 | Auth Service | `3001` | NestJS 11 | PostgreSQL + Redis |
 | Clients Service | `8080` | Spring Boot 4 / Java 17 | PostgreSQL |
@@ -31,27 +31,27 @@ graph TD
 | Storage Service | `7000` | NestJS 11 | Apache Cassandra |
 | Checklist Service | `8000` | Django 6 / Python 3.12 | MongoDB |
 
-## Key Features
+## Características principales
 
-- **Centralized Authentication** — JWT access/refresh tokens with role-based access control
-- **File Upload & Storage** — Multi-part file uploads stored in Apache Cassandra with MinIO-style access
-- **Vehicle Inspection Flow** — End-to-end reception form with checklists, tire measurements, and photo evidence
-- **Unified Catalogs** — Dynamic CRUD for vehicle brands, lines, colors, types, and more
-- **Cross-Service Validation** — RabbitMQ RPC for validating client and vehicle existence before form submission
-- **API Key Security** — Internal microservice-to-microservice communication secured via shared API keys
+- **Autenticación centralizada** — Tokens JWT access/refresh con control de acceso basado en roles
+- **Carga y almacenamiento de archivos** — Cargas de archivos multiparte almacenadas en Apache Cassandra con acceso estilo MinIO
+- **Flujo de inspección vehicular** — Formulario de recepción de extremo a extremo con checklists, mediciones de neumáticos y evidencia fotográfica
+- **Catálogos unificados** — CRUD dinámico para marcas, líneas, colores, tipos de vehículo y más
+- **Validación entre servicios** — RabbitMQ RPC para validar la existencia del cliente y vehículo antes del envío del formulario
+- **Seguridad con API Key** — Comunicación interna entre microservicios asegurada mediante API keys compartidas
 
-## Swagger Documentation
+## Documentación Swagger
 
-Each service exposes its own Swagger UI:
+Cada servicio expone su propia interfaz Swagger UI:
 
-| Service | Swagger URL |
-|---------|-------------|
+| Servicio | URL de Swagger |
+|----------|----------------|
 | API Gateway | `{API_GATEWAY_BASE_URL}/docs` |
 | Form Service | `{RECEPTION_SERVICE_BASE_URL}/docs` |
 | Storage Service | `{UPLOAD_FILES_SERVICE_BASE_URL}/docs` |
-| Auth Service | `{AUTH_SERVICE_BASE_URL}/docs` _(if available)_ |
+| Auth Service | `{AUTH_SERVICE_BASE_URL}/docs` _(si está disponible)_ |
 | Clients Service | `{CLIENT_SERVICE_BASE_URL}/swagger-ui.html` |
-| Vehicles Service | `{VEHICLE_SERVICE_BASE_URL}/swagger-ui.html` _(if available)_ |
+| Vehicles Service | `{VEHICLE_SERVICE_BASE_URL}/swagger-ui.html` _(si está disponible)_ |
 
-!!! tip "Base URLs"
-    Replace the placeholders with the actual deployed URLs. In production, these are injected via environment variables.
+!!! tip "URLs base"
+    Reemplace los placeholders con las URLs reales desplegadas. En producción, estas se inyectan mediante variables de entorno.

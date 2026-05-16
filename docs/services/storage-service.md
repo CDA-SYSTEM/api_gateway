@@ -1,35 +1,35 @@
 # Storage Service
 
-**Port:** `7000`  
-**Tech:** NestJS 11 / TypeScript  
-**Database:** Apache Cassandra  
-**API Docs:** `{UPLOAD_FILES_SERVICE_BASE_URL}/docs`
+**Puerto:** `7000`  
+**Tecnología:** NestJS 11 / TypeScript  
+**Base de datos:** Apache Cassandra  
+**Documentación API:** `{UPLOAD_FILES_SERVICE_BASE_URL}/docs`
 
-## Purpose
+## Propósito
 
-File storage microservice using Apache Cassandra for binary persistence. Handles file upload, retrieval, listing, and soft-deletion. Designed for storing inspection photos, signature images, and other binary assets.
+Microservicio de almacenamiento de archivos usando Apache Cassandra para persistencia binaria. Maneja carga, recuperación, listado y eliminación suave de archivos. Diseñado para almacenar fotos de inspección, imágenes de firmas y otros activos binarios.
 
-## File Validation
+## Validación de Archivos
 
-| Rule | Setting |
-|------|---------|
-| MIME Types | Images (`image/*`), PDFs (`application/pdf`) |
-| Max Size | Configured via `ParseFilePipeBuilder` |
+| Regla | Configuración |
+|-------|---------------|
+| Tipos MIME | Imágenes (`image/*`), PDFs (`application/pdf`) |
+| Tamaño Máximo | Configurado via `ParseFilePipeBuilder` |
 
-## Key Endpoints
+## Endpoints Principales
 
-| Method | Path | Description |
+| Método | Ruta | Descripción |
 |--------|------|-------------|
-| `POST` | `/storage/upload` | Upload file (multipart/form-data) |
-| `GET` | `/storage/files` | List active files (optional `?limit=` parameter) |
-| `GET` | `/storage/files/:id` | Download/stream file by UUID |
-| `DELETE` | `/storage/files/:id` | Soft delete (sets `deleted_at`) |
-| `GET` | `/` | Health check |
+| `POST` | `/storage/upload` | Subir archivo (multipart/form-data) |
+| `GET` | `/storage/files` | Listar archivos activos (parámetro opcional `?limit=`) |
+| `GET` | `/storage/files/:id` | Descargar/transmitir archivo por UUID |
+| `DELETE` | `/storage/files/:id` | Eliminación suave (establece `deleted_at`) |
+| `GET` | `/` | Verificación de salud |
 
-## Architecture
+## Arquitectura
 
-Simple module structure with `StorageController`, `StorageService`, and `StorageRepository`. Repository pattern for Cassandra queries. UUID-based file naming. Stream-based file download.
+Estructura modular simple con `StorageController`, `StorageService` y `StorageRepository`. Patrón repositorio para consultas Cassandra. Nomenclatura de archivos basada en UUID. Descarga de archivos basada en streaming.
 
-## Migration Scripts
+## Scripts de Migración
 
-Database schema and migration scripts are located in `scripts/` and `db/` directories for Cassandra keyspace and table setup.
+Los scripts de esquema y migración de base de datos se encuentran en los directorios `scripts/` y `db/` para la configuración del keyspace y tablas de Cassandra.

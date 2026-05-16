@@ -1,8 +1,8 @@
-# Services
+# Servicios
 
-The gateway uses a **three-layer architecture**: Controller → Application Service → Infrastructure Service (HTTP proxy).
+El gateway utiliza una **Arquitectura de tres capas**: Controlador → Servicio de Aplicación → Servicio de Infraestructura (proxy HTTP).
 
-## Layer Architecture
+## Arquitectura de Capas
 
 ```mermaid
 graph LR
@@ -11,31 +11,31 @@ graph LR
     Infrastructure -->|HTTP| Microservice[Target Microservice]
 ```
 
-### Application Services
+### Servicios de Aplicación
 
-These contain business logic, orchestration, and data transformation. They are injected into controllers via NestJS dependency injection.
+Estos contienen lógica de negocio, orquestación y transformación de datos. Se inyectan en los controladores a través de la inyección de dependencias de NestJS.
 
-| Service | Module | Key Responsibilities |
-|---------|--------|---------------------|
-| `ReceptionService` | Reception | Create/update inspections with parallel file uploads, build payloads, list with data enrichment |
-| `UploadFilesService` | UploadFiles | Upload files via FormData, list with URL enrichment, stream downloads |
-| `VehicleService` | Vehicle | CRUD for vehicles and all catalog types |
-| `ClientsApplicationService` | Clients | CRUD for clients, document and person type catalogs |
-| `AuthApplicationService` | Auth | Login, register, token validation, user management |
-| `CatalogsService` | Catalogs | Read-only enum catalog proxying |
-| `CatalogsCrudService` | CatalogsCrud | Unified CRUD for vehicle catalogs |
+| Servicio | Módulo | Responsabilidades Clave |
+|----------|--------|-------------------------|
+| `ReceptionService` | Reception | Crear/actualizar inspecciones con cargas de archivos en paralelo, construir payloads, listar con enriquecimiento de datos |
+| `UploadFilesService` | UploadFiles | Subir archivos mediante FormData, listar con enriquecimiento de URLs, descargas en streaming |
+| `VehicleService` | Vehicle | CRUD para vehículos y todos los tipos de catálogo |
+| `ClientsApplicationService` | Clients | CRUD para clientes, catálogos de tipos de documento y persona |
+| `AuthApplicationService` | Auth | Inicio de sesión, registro, validación de token, gestión de usuarios |
+| `CatalogsService` | Catalogs | Proxy de catálogo enum de solo lectura |
+| `CatalogsCrudService` | CatalogsCrud | CRUD unificado para catálogos de vehículos |
 
-### Infrastructure Services
+### Servicios de Infraestructura
 
-These handle HTTP communication with downstream microservices via `HttpService` (Axios). Each one:
+Estos manejan la comunicación HTTP con los microservicios descendentes a través de `HttpService` (Axios). Cada uno:
 
-1. Reads the target service base URL from environment variables
-2. Provides a generic `proxyRequest(method, path, data?, headers?)` method
-3. Handles connection errors and throws appropriate HTTP exceptions
-4. Parses double-serialized JSON responses via `safeParse`
+1. Lee la URL base del servicio objetivo desde las variables de entorno
+2. Proporciona un método genérico `proxyRequest(method, path, data?, headers?)`
+3. Maneja errores de conexión y lanza excepciones HTTP apropiadas
+4. Analiza respuestas JSON doblemente serializadas a través de `safeParse`
 
-| Infrastructure | Target Env Var | Target Service |
-|----------------|----------------|----------------|
+| Infraestructura | Variable de Entorno Objetivo | Servicio Objetivo |
+|-----------------|------------------------------|-------------------|
 | `ReceptionInfrastructureService` | `RECEPTION_SERVICE_BASE_URL` | Form Service |
 | `UploadFilesInfrastructureService` | `UPLOAD_FILES_SERVICE_BASE_URL` | Storage Service |
 | `VehicleInfrastructureService` | `VEHICLE_SERVICE_BASE_URL` | Vehicles Service |
@@ -44,8 +44,8 @@ These handle HTTP communication with downstream microservices via `HttpService` 
 | `CatalogsInfrastructureService` | `RECEPTION_SERVICE_BASE_URL` | Form Service |
 | `CatalogsCrudInfrastructureService` | `VEHICLE_SERVICE_BASE_URL` | Vehicles Service |
 
-### Supporting Services
+### Servicios de Apoyo
 
-| Service | Module | Description |
-|---------|--------|-------------|
-| `TokenValidationService` | Common | Wraps auth token validation HTTP call with error handling |
+| Servicio | Módulo | Descripción |
+|----------|--------|-------------|
+| `TokenValidationService` | Common | Envuelve la llamada HTTP de validación de token de autenticación con manejo de errores |

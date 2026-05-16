@@ -1,8 +1,8 @@
-# Modules
+# Módulos
 
-The gateway follows NestJS modular architecture. All modules are registered through the root `AppModule`.
+El gateway sigue la arquitectura modular de NestJS. Todos los módulos se registran a través del `AppModule` raíz.
 
-## Module Dependency Graph
+## Grafo de Dependencias de Módulos
 
 ```mermaid
 graph TD
@@ -16,69 +16,69 @@ graph TD
     CommonModule --> CatalogsCrudModule
 ```
 
-## Module Registry
+## Registro de Módulos
 
-### AppModule (Root)
+### AppModule (Raíz)
 
-**File:** `src/app.module.ts`
+**Archivo:** `src/app.module.ts`
 
-The root module that bootstraps the application. Imports all feature modules and registers the global `CombinedGuard`. Also configures the Axios interceptor for internal API key injection.
+El módulo raíz que inicia la aplicación. Importa todos los módulos de funcionalidad y registra el `CombinedGuard` global. También configura el interceptor Axios para la inyección interna de API Key.
 
 ### CommonModule
 
-**File:** `src/common/common.module.ts`
+**Archivo:** `src/common/common.module.ts`
 
-Marked with `@Global()`, this module provides shared infrastructure across the application:
+Marcado con `@Global()`, este módulo proporciona infraestructura compartida en toda la aplicación:
 
-| Import | Description |
-|--------|-------------|
-| `HttpModule` | Axios-based HTTP client for proxying requests |
-| `ConfigModule` | Environment variable loading via `@nestjs/config` |
-| `UploadFilesModule` | File upload and download endpoints |
-| `ReceptionModule` | Vehicle inspection reception endpoints |
-| `CatalogsModule` | Read-only enum catalog endpoints (from form-service) |
-| `CatalogsCrudModule` | CRUD catalog endpoints (from vehicle service) |
+| Importación | Descripción |
+|-------------|-------------|
+| `HttpModule` | Cliente HTTP basado en Axios para proxy de solicitudes |
+| `ConfigModule` | Carga de variables de entorno a través de `@nestjs/config` |
+| `UploadFilesModule` | Endpoints de carga y descarga de archivos |
+| `ReceptionModule` | Endpoints de recepción de inspección de vehículos |
+| `CatalogsModule` | Endpoints de catálogo enum de solo lectura (desde form-service) |
+| `CatalogsCrudModule` | Endpoints de catálogo CRUD (desde vehicle service) |
 
 **Providers:** `TokenValidationService`
 
 ### AuthModule
 
-**File:** `src/auth/auth.module.ts`
+**Archivo:** `src/auth/auth.module.ts`
 
-Handles authentication proxying (login, register, validate-token, refresh, logout, user management).
+Maneja el proxy de autenticación (login, register, validate-token, refresh, logout, gestión de usuarios).
 
 ### VehicleModule
 
-**File:** `src/vehicle/vehicle.module.ts`
+**Archivo:** `src/vehicle/vehicle.module.ts`
 
-Vehicle CRUD operations and catalog management (brands, lines, colors, classes, types).
+Operaciones CRUD de vehículos y gestión de catálogos (marcas, líneas, colores, clases, tipos).
 
 ### ClientsModule
 
-**File:** `src/clients/clients.module.ts`
+**Archivo:** `src/clients/clients.module.ts`
 
-Client CRUD operations and document/person type catalogs.
+Operaciones CRUD de clientes y catálogos de tipos de documento/persona.
 
 ### UploadFilesModule
 
-**File:** `src/upload-files/upload-files.module.ts`
+**Archivo:** `src/upload-files/upload-files.module.ts`
 
-File upload, download, listing, and soft-deletion proxied to the storage service.
+Carga, descarga, listado y eliminación suave de archivos proxy al servicio de almacenamiento.
 
 ### ReceptionModule
 
-**File:** `src/reception/reception.module.ts`
+**Archivo:** `src/reception/reception.module.ts`
 
-Vehicle inspection form creation, listing, and management proxied to the form service.
+Creación, listado y gestión de formularios de inspección de vehículos proxy al form service.
 
 ### CatalogsModule
 
-**File:** `src/catalogs/catalogs.module.ts`
+**Archivo:** `src/catalogs/catalogs.module.ts`
 
-Read-only catalog endpoints for enum values (vehicle types, fuel types, etc.) proxied to the form service.
+Endpoints de catálogo de solo lectura para valores enum (tipos de vehículo, tipos de combustible, etc.) proxy al form service.
 
 ### CatalogsCrudModule
 
-**File:** `src/catalogs-crud/catalogs-crud.module.ts`
+**Archivo:** `src/catalogs-crud/catalogs-crud.module.ts`
 
-Unified CRUD for vehicle catalogs (marcas, clases, lineas, colores, tipos-*) proxied to the vehicle service.
+CRUD unificado para catálogos de vehículos (marcas, clases, lineas, colores, tipos-*) proxy al vehicle service.

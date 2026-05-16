@@ -1,8 +1,8 @@
-# Troubleshooting
+# Solución de Problemas
 
-## Common Errors
+## Errores Comunes
 
-### 502 Bad Gateway — Service Unavailable
+### 502 Bad Gateway — Servicio No Disponible
 
 **Error:**
 ```json
@@ -13,27 +13,27 @@
 }
 ```
 
-**Causes:**
-- The target microservice is not running
-- Network connectivity issue (Tailscale disconnected, wrong host/port)
-- Service crashed or restarting
+**Causas:**
+- El microservicio de destino no está ejecutándose
+- Problema de conectividad de red (Tailscale desconectado, host/puerto incorrecto)
+- El servicio se cayó o se está reiniciando
 
-**Solutions:**
+**Soluciones:**
 ```bash
-# Check if the service container is running
+# Verificar si el contenedor del servicio está ejecutándose
 docker ps | grep <service-name>
 
-# Check service logs
+# Verificar los registros del servicio
 docker logs <service-name> --tail 50
 
-# Verify Tailscale connectivity
+# Verificar la conectividad de Tailscale
 tailscale status
 
-# Test direct connectivity
+# Probar conectividad directa
 curl http://<service-host>:<port>/api/
 ```
 
-### 401 Unauthorized — Invalid or Missing Token
+### 401 No Autorizado — Token Inválido o Faltante
 
 **Error:**
 ```json
@@ -43,16 +43,16 @@ curl http://<service-host>:<port>/api/
 }
 ```
 
-**Solutions:**
+**Soluciones:**
 ```bash
-# Get a fresh token
+# Obtener un token nuevo
 curl -s -X POST http://localhost:3600/api/v1/auth/login \
   -H 'Content-Type: application/json' \
   -H 'x-api-key: your-api-key' \
   -d '{"email":"user@cda.com","password":"pass"}'
 ```
 
-### 403 Forbidden — Insufficient Role
+### 403 Prohibido — Rol Insuficiente
 
 **Error:**
 ```json
@@ -62,9 +62,9 @@ curl -s -X POST http://localhost:3600/api/v1/auth/login \
 }
 ```
 
-**Solution:** The authenticated user lacks the required role. Check the `@Roles()` decorator on the endpoint and ensure the user has the correct role.
+**Solución:** El usuario autenticado no tiene el rol requerido. Verifica el decorador `@Roles()` en el endpoint y asegúrate de que el usuario tenga el rol correcto.
 
-### 400 Bad Request — Validation Error
+### 400 Solicitud Incorrecta — Error de Validación
 
 **Error:**
 ```json
@@ -75,11 +75,11 @@ curl -s -X POST http://localhost:3600/api/v1/auth/login \
 }
 ```
 
-**Cause:** The payload contains a field not whitelisted in the DTO, or the `forbidNonWhitelisted` option is rejecting it.
+**Causa:** El payload contiene un campo no permitido en el DTO, o la opción `forbidNonWhitelisted` lo está rechazando.
 
-**Solution:** Only include fields that are explicitly defined in the DTO with class-validator decorators. The gateway now builds explicit payloads to prevent this.
+**Solución:** Solo incluye campos que estén explícitamente definidos en el DTO con decoradores class-validator. El gateway ahora construye payloads explícitos para evitar esto.
 
-### 404 Not Found — Route Not Found
+### 404 No Encontrado — Ruta No Encontrada
 
 **Error:**
 ```json
@@ -90,18 +90,18 @@ curl -s -X POST http://localhost:3600/api/v1/auth/login \
 }
 ```
 
-**Solutions:**
-- Check the route prefix: all endpoints are under `/api/v1/...`
-- Verify the controller is registered in a module that is imported
-- Check if the module is imported in `CommonModule` or `AppModule`
+**Soluciones:**
+- Verifica el prefijo de ruta: todos los endpoints están bajo `/api/v1/...`
+- Verifica que el controlador esté registrado en un módulo que sea importado
+- Verifica si el módulo está importado en `CommonModule` o `AppModule`
 
-### 413 Payload Too Large — File Too Big
+### 413 Payload Demasiado Grande — Archivo Muy Pesado
 
-**Error:** File upload fails with 413 status.
+**Error:** La carga del archivo falla con estado 413.
 
-**Solution:** Increase the file size limit in `main.ts` or the storage service configuration. Default multer limit is typically 1MB.
+**Solución:** Aumenta el límite de tamaño de archivo en `main.ts` o en la configuración del servicio de almacenamiento. El límite predeterminado de multer es típicamente 1MB.
 
-## Service Health Checks
+## Verificaciones de Salud de Servicios
 
 ```bash
 # Gateway root
@@ -122,25 +122,25 @@ curl -s http://<storage-host>:7000/
 curl -s http://<vehicle-host>:9000/api/v1/health
 ```
 
-## RabbitMQ Issues
+## Problemas con RabbitMQ
 
-If inspection creation fails with a validation error about client or vehicle:
+Si la creación de la inspección falla con un error de validación sobre el cliente o vehículo:
 
 ```bash
-# Check RabbitMQ is running
+# Verificar que RabbitMQ esté ejecutándose
 docker ps | grep rabbitmq
 
-# Check RabbitMQ logs
+# Verificar los registros de RabbitMQ
 docker logs <rabbitmq-container> --tail 50
 
-# Verify queues exist
+# Verificar que las colas existan
 docker exec <rabbitmq-container> rabbitmqctl list_queues
 
-# Verify consumers are connected
+# Verificar que los consumidores estén conectados
 docker exec <rabbitmq-container> rabbitmqctl list_consumers
 ```
 
-## Database Connection Issues
+## Problemas de Conexión a Base de Datos
 
 ```bash
 # PostgreSQL
@@ -153,18 +153,18 @@ docker exec <mongo-container> mongosh --eval "db.runCommand({ ping: 1 })"
 docker exec <cassandra-container> nodetool status
 ```
 
-## Debug Mode
+## Modo de Depuración
 
-Enable verbose logging by setting the `NODE_ENV` or `DEBUG` environment variable:
+Habilita el registro detallado configurando la variable de entorno `NODE_ENV` o `DEBUG`:
 
 ```bash
 docker run -e DEBUG=* -e NODE_ENV=development ...
 ```
 
-## Common Ports Reference
+## Referencia de Puertos Comunes
 
-| Service | Default Port |
-|---------|-------------|
+| Servicio | Puerto Predeterminado |
+|---------|----------------------|
 | API Gateway | `3600` |
 | Auth Service | `3001` |
 | Clients Service | `8080` |

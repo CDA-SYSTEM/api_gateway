@@ -2,9 +2,9 @@
 
 ## ResponseInterceptor
 
-**File:** `src/common/interceptors/response.interceptor.ts`
+**Archivo:** `src/common/interceptors/response.interceptor.ts`
 
-Registered **globally** in `main.ts`, this interceptor wraps every successful response in a standardized envelope:
+Registrado **globalmente** en `main.ts`, este interceptor envuelve cada respuesta exitosa en un envoltorio estandarizado:
 
 ```json
 {
@@ -16,9 +16,9 @@ Registered **globally** in `main.ts`, this interceptor wraps every successful re
 }
 ```
 
-### Skipping the Envelope
+### Omitir el Envoltorio
 
-Binary or streaming responses (e.g., file downloads) use the `@SkipResponseFormat()` decorator to bypass the envelope:
+Las respuestas binarias o de streaming (por ejemplo, descargas de archivos) usan el decorador `@SkipResponseFormat()` para omitir el envoltorio:
 
 ```typescript
 @SkipResponseFormat()
@@ -28,9 +28,9 @@ async getFileById(@Param('id') id: string, @Res() res: Response) {
 }
 ```
 
-### Error Responses
+### Respuestas de Error
 
-Errors are handled by the global `HttpExceptionFilter` (`src/common/filters/http-exception.filter.ts`), producing:
+Los errores son manejados por el `HttpExceptionFilter` global (`src/common/filters/http-exception.filter.ts`), produciendo:
 
 ```json
 {
@@ -42,12 +42,12 @@ Errors are handled by the global `HttpExceptionFilter` (`src/common/filters/http
 }
 ```
 
-## Internal Gateway Interceptor
+## Interceptor Interno del Gateway
 
-In `app.module.ts`, an Axios request interceptor is configured in `onModuleInit()` to automatically inject the `x-api-key` header (using the `API_KEY` environment variable) into all outbound HTTP requests to microservices. This ensures internal service-to-service communication is authenticated without manual header injection.
+En `app.module.ts`, se configura un interceptor de solicitudes Axios en `onModuleInit()` para inyectar automáticamente el encabezado `x-api-key` (usando la variable de entorno `API_KEY`) en todas las solicitudes HTTP salientes hacia los microservicios. Esto asegura que la comunicación interna entre servicios esté autenticada sin inyección manual de encabezados.
 
-## Error Response Builder
+## Constructor de Respuestas de Error
 
-**File:** `src/common/utils/error-response.util.ts`
+**Archivo:** `src/common/utils/error-response.util.ts`
 
-The `buildErrorResponse` utility creates consistent error objects for try/catch blocks, used primarily in file download handlers that manage their own response streams via `@Res()`.
+La utilidad `buildErrorResponse` crea objetos de error consistentes para bloques try/catch, utilizada principalmente en manejadores de descarga de archivos que gestionan sus propios streams de respuesta a través de `@Res()`.

@@ -1,12 +1,12 @@
 # Middleware
 
-The gateway uses minimal middleware, relying primarily on NestJS guards and pipes for cross-cutting concerns.
+El gateway utiliza middleware mínimo, apoyándose principalmente en guards y pipes de NestJS para aspectos transversales.
 
-## Swagger Basic Auth
+## Autenticación Básica de Swagger
 
-**File:** `main.ts`
+**Archivo:** `main.ts`
 
-The only custom middleware is **HTTP Basic Authentication** for the Swagger documentation page, provided by the `express-basic-auth` package:
+El único middleware personalizado es la **Autenticación Básica HTTP** para la página de documentación de Swagger, proporcionada por el paquete `express-basic-auth`:
 
 ```typescript
 app.use(
@@ -18,24 +18,24 @@ app.use(
 );
 ```
 
-This protects the API documentation from unauthorized access. Credentials are configured via:
+Esto protege la documentación del API contra acceso no autorizado. Las credenciales se configuran mediante:
 
-| Variable | Description |
+| Variable | Descripción |
 |----------|-------------|
-| `SWAGGER_USER` | Username for Swagger UI access |
-| `SWAGGER_PASS` | Password for Swagger UI access |
+| `SWAGGER_USER` | Nombre de usuario para acceso a Swagger UI |
+| `SWAGGER_PASS` | Contraseña para acceso a Swagger UI |
 
 ## CORS
 
-Disabled by default (the gateway relies on Tailscale for network-level access control in production). CORS can be enabled by uncommenting the configuration in `main.ts` if frontend clients require cross-origin access.
+Deshabilitado por defecto (el gateway depende de Tailscale para control de acceso a nivel de red en producción). CORS puede habilitarse descomentando la configuración en `main.ts` si los clientes frontend requieren acceso de origen cruzado.
 
-## Global Pipes
+## Pipes Globales
 
-A global `ValidationPipe` is registered with:
+Un `ValidationPipe` global está registrado con:
 
-- `whitelist: true` — Strips unknown properties from request bodies
-- `forbidNonWhitelisted: true` — Rejects requests with unknown properties
-- `transform: true` — Auto-transforms payloads to DTO instances
+- `whitelist: true` — Elimina propiedades desconocidas de los cuerpos de solicitud
+- `forbidNonWhitelisted: true` — Rechaza solicitudes con propiedades desconocidas
+- `transform: true` — Transforma automáticamente los payloads a instancias de DTO
 
 ```typescript
 app.useGlobalPipes(new ValidationPipe({
@@ -45,6 +45,6 @@ app.useGlobalPipes(new ValidationPipe({
 }));
 ```
 
-## No Custom NestJS Middleware
+## Sin Middleware Personalizado de NestJS
 
-There are no custom NestJS middleware classes. All cross-cutting behavior (authentication, response formatting, error handling) is implemented through **guards** and **interceptors**.
+No hay clases de middleware personalizadas de NestJS. Todo el comportamiento transversal (autenticación, formato de respuesta, manejo de errores) se implementa a través de **guards** e **interceptors**.

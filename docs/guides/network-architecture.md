@@ -1,8 +1,8 @@
-# Network Architecture
+# Arquitectura de Red
 
-## Overview
+## Visión General
 
-The system is deployed across a **Tailscale VPN network** that provides secure, encrypted communication between all services without exposing ports to the public internet.
+El sistema está desplegado a través de una **red VPN de Tailscale** que proporciona comunicación segura y cifrada entre todos los servicios sin exponer puertos a internet público.
 
 ```mermaid
 graph TB
@@ -46,39 +46,39 @@ graph TB
     Vehicles --> PG
 ```
 
-## Tailscale Configuration
+## Configuración de Tailscale
 
-### What is Tailscale?
+### ¿Qué es Tailscale?
 
-Tailscale creates a **WireGuard-based mesh VPN** where each machine gets a unique IP (`100.x.x.x`) and can communicate directly with any other machine in the network.
+Tailscale crea una **VPN en malla basada en WireGuard** donde cada máquina obtiene una IP única (`100.x.x.x`) y puede comunicarse directamente con cualquier otra máquina en la red.
 
-### Why Tailscale?
+### ¿Por qué Tailscale?
 
-- **Zero public ports** — Services are not exposed to the internet
-- **Encrypted by default** — All traffic is encrypted via WireGuard
-- **Simple authentication** — Uses SSO (Google, GitHub, Microsoft, etc.)
-- **MagicDNS** — Machines can be referenced by hostname instead of IP
+- **Cero puertos públicos** — Los servicios no están expuestos a internet
+- **Cifrado por defecto** — Todo el tráfico está cifrado mediante WireGuard
+- **Autenticación simple** — Utiliza SSO (Google, GitHub, Microsoft, etc.)
+- **MagicDNS** — Las máquinas pueden ser referenciadas por nombre de host en lugar de IP
 
-### Setup
+### Configuración
 
-1. Install Tailscale on each server:
+1. Instala Tailscale en cada servidor:
    ```bash
    curl -fsSL https://tailscale.com/install.sh | sh
    ```
 
-2. Authenticate each node:
+2. Autentica cada nodo:
    ```bash
    sudo tailscale up --authkey=<your-auth-key>
    ```
 
-3. Verify connectivity:
+3. Verifica la conectividad:
    ```bash
    tailscale status
    ```
 
-### GitHub Actions Integration
+### Integración con GitHub Actions
 
-The CI/CD pipeline uses the `tailscale/github-action@v2` action to connect the GitHub runner to the Tailscale network during deployment:
+El pipeline de CI/CD utiliza la acción `tailscale/github-action@v2` para conectar el runner de GitHub a la red de Tailscale durante el despliegue:
 
 ```yaml
 - name: Tailscale
@@ -87,49 +87,49 @@ The CI/CD pipeline uses the `tailscale/github-action@v2` action to connect the G
     authkey: ${{ secrets.TAILSCALE_AUTHKEY }}
 ```
 
-This allows the runner to SSH into the target server and deploy containers without exposing any ports.
+Esto permite que el runner acceda por SSH al servidor de destino y despliegue contenedores sin exponer ningún puerto.
 
-## Port Reference
+## Referencia de Puertos
 
-### Application Ports
+### Puertos de Aplicación
 
-| Service | Port | Protocol | Tailscale Only |
-|---------|------|----------|----------------|
-| API Gateway | `3600` | HTTP | Yes |
-| Auth Service | `3001` | HTTP | Yes |
-| Clients Service | `8080` | HTTP | Yes |
-| Vehicles Service | `9000` | HTTP | Yes |
-| Form Service | `7500` | HTTP | Yes |
-| Storage Service | `7000` | HTTP | Yes |
-| Checklist Service | `8000` | HTTP | Yes |
+| Servicio | Puerto | Protocolo | Solo Tailscale |
+|---------|-------|-----------|----------------|
+| API Gateway | `3600` | HTTP | Sí |
+| Auth Service | `3001` | HTTP | Sí |
+| Clients Service | `8080` | HTTP | Sí |
+| Vehicles Service | `9000` | HTTP | Sí |
+| Form Service | `7500` | HTTP | Sí |
+| Storage Service | `7000` | HTTP | Sí |
+| Checklist Service | `8000` | HTTP | Sí |
 
-### Infrastructure Ports
+### Puertos de Infraestructura
 
-| Service | Port | Protocol | Tailscale Only |
-|---------|------|----------|----------------|
-| PostgreSQL | `5432` | TCP | Yes |
-| RabbitMQ AMQP | `5672` | TCP | Yes |
-| RabbitMQ Admin | `15672` | HTTP | Yes |
-| MinIO API | `9000` | HTTP | Yes |
-| MinIO Console | `9001` | HTTP | Yes |
+| Servicio | Puerto | Protocolo | Solo Tailscale |
+|---------|-------|-----------|----------------|
+| PostgreSQL | `5432` | TCP | Sí |
+| RabbitMQ AMQP | `5672` | TCP | Sí |
+| RabbitMQ Admin | `15672` | HTTP | Sí |
+| MinIO API | `9000` | HTTP | Sí |
+| MinIO Console | `9001` | HTTP | Sí |
 
-## Deploying Without Tailscale (Open Network)
+## Despliegue sin Tailscale (Red Abierta)
 
-If you deploy in an environment without Tailscale:
+Si despliegas en un entorno sin Tailscale:
 
-1. **Modify the CI workflow** — Remove the Tailscale step and use direct SSH or a different VPN
-2. **Configure TLS** — Set up HTTPS certificates for all public endpoints
-3. **Enable CORS** — Uncomment CORS configuration in the gateway's `main.ts`
-4. **Firewall rules** — Restrict access to infrastructure ports (PostgreSQL, RabbitMQ)
-5. **API Key security** — Ensure all services validate the `x-api-key` header
-6. **Service discovery** — Replace Tailscale IPs/Hostnames with actual server addresses
+1. **Modifica el workflow de CI** — Elimina el paso de Tailscale y usa SSH directo o una VPN diferente
+2. **Configura TLS** — Configura certificados HTTPS para todos los endpoints públicos
+3. **Habilita CORS** — Descomenta la configuración CORS en `main.ts` del gateway
+4. **Reglas de firewall** — Restringe el acceso a los puertos de infraestructura (PostgreSQL, RabbitMQ)
+5. **Seguridad de API Key** — Asegúrate de que todos los servicios validen el encabezado `x-api-key`
+6. **Descubrimiento de servicios** — Reemplaza las IPs/hostnames de Tailscale con las direcciones reales de los servidores
 
-## DNS Resolution
+## Resolución DNS
 
-Services resolve each other via:
+Los servicios se resuelven entre sí mediante:
 - **Tailscale MagicDNS** — `machine-name.tailscale-xxxx.ts.net`
-- **Tailscale IPs** — `100.x.x.x`
-- **Environment variables** — Each service's `*_BASE_URL` env var defines the target address
+- **IPs de Tailscale** — `100.x.x.x`
+- **Variables de entorno** — La variable de entorno `*_BASE_URL` de cada servicio define la dirección de destino
 
 !!! example
     ```env

@@ -1,59 +1,59 @@
 # Vehicles Service
 
-**Port:** `9000`  
-**Tech:** Spring Boot 4 / Java 17  
-**Database:** PostgreSQL  
-**API Docs:** Swagger UI (implicit via springdoc)
+**Puerto:** `9000`  
+**Tecnología:** Spring Boot 4 / Java 17  
+**Base de datos:** PostgreSQL  
+**Documentación API:** Swagger UI (implícito via springdoc)
 
-## Purpose
+## Propósito
 
-Vehicle management microservice. Handles CRUD for vehicles and all catalog types (brands, lines, colors, classes, vehicle types, service types, fuel types). Supports unified catalog endpoints for generic CRUD operations.
+Microservicio de gestión de vehículos. Maneja CRUD para vehículos y todos los tipos de catálogo (marcas, líneas, colores, clases, tipos de vehículo, tipos de servicio, tipos de combustible). Soporta endpoints de catálogo unificados para operaciones CRUD genéricas.
 
-## Key Endpoints
+## Endpoints Principales
 
-### Health
+### Salud
 
-| Method | Path | Description |
+| Método | Ruta | Descripción |
 |--------|------|-------------|
-| `GET` | `/api/v1/health` | Health check with timestamp and service info |
+| `GET` | `/api/v1/health` | Verificación de salud con timestamp e información del servicio |
 
-### Vehicle
+### Vehículo
 
-| Method | Path | Description |
+| Método | Ruta | Descripción |
 |--------|------|-------------|
-| `POST` | `/vehiculo` | Create vehicle |
-| `GET` | `/vehiculo` | List vehicles (paginated, filterable by client) |
-| `GET` | `/vehiculo/:id` | Get vehicle by ID |
-| `GET` | `/vehiculo/cliente/:clienteId` | List vehicles by client |
-| `PUT` | `/vehiculo/:id` | Update vehicle |
-| `DELETE` | `/vehiculo/:id` | Delete vehicle |
+| `POST` | `/vehiculo` | Crear vehículo |
+| `GET` | `/vehiculo` | Listar vehículos (paginado, filtrable por cliente) |
+| `GET` | `/vehiculo/:id` | Obtener vehículo por ID |
+| `GET` | `/vehiculo/cliente/:clienteId` | Listar vehículos por cliente |
+| `PUT` | `/vehiculo/:id` | Actualizar vehículo |
+| `DELETE` | `/vehiculo/:id` | Eliminar vehículo |
 
-### Catalogs (Brand, Line, Color, Class, etc.)
+### Catálogos (Marca, Línea, Color, Clase, etc.)
 
-Each catalog type (`marca`, `linea`, `color`, `clase`, `tipo-vehiculo`, `tipo-servicio`, `tipo-combustible`) supports:
+Cada tipo de catálogo (`marca`, `linea`, `color`, `clase`, `tipo-vehiculo`, `tipo-servicio`, `tipo-combustible`) soporta:
 
-| Method | Path | Description |
+| Método | Ruta | Descripción |
 |--------|------|-------------|
-| `POST` | `/{catalogo}` | Create |
-| `GET` | `/{catalogo}` | List all |
-| `GET` | `/{catalogo}/:id` | Get by ID |
-| `PUT` | `/{catalogo}/:id` | Update |
-| `DELETE` | `/{catalogo}/:id` | Delete |
+| `POST` | `/{catalogo}` | Crear |
+| `GET` | `/{catalogo}` | Listar todos |
+| `GET` | `/{catalogo}/:id` | Obtener por ID |
+| `PUT` | `/{catalogo}/:id` | Actualizar |
+| `DELETE` | `/{catalogo}/:id` | Eliminar |
 
-### Unified Catalogs
+### Catálogos Unificados
 
-| Method | Path | Description |
+| Método | Ruta | Descripción |
 |--------|------|-------------|
-| `POST` | `/api/v1/catalogs/{type}` | Create catalog item |
-| `GET` | `/api/v1/catalogs/{type}` | List catalog items |
-| `GET` | `/api/v1/catalogs/{type}/:id` | Get by ID |
-| `PUT` | `/api/v1/catalogs/{type}/:id` | Update |
-| `DELETE` | `/api/v1/catalogs/{type}/:id` | Delete |
+| `POST` | `/api/v1/catalogs/{type}` | Crear elemento de catálogo |
+| `GET` | `/api/v1/catalogs/{type}` | Listar elementos de catálogo |
+| `GET` | `/api/v1/catalogs/{type}/:id` | Obtener por ID |
+| `PUT` | `/api/v1/catalogs/{type}/:id` | Actualizar |
+| `DELETE` | `/api/v1/catalogs/{type}/:id` | Eliminar |
 
-## Integration
+## Integración
 
-- **RabbitMQ** — Listens on `vehicle-service-queue` for RPC requests from the form service to validate vehicle existence
+- **RabbitMQ** — Escucha en `vehicle-service-queue` solicitudes RPC del servicio de formularios para validar existencia del vehículo
 
-## Architecture
+## Arquitectura
 
-Hexagonal (ports & adapters) with clear separation: domain (models), application (services, ports), infrastructure (web controllers, persistence, messaging).
+Hexagonal (puertos y adaptadores) con separación clara: dominio (modelos), aplicación (servicios, puertos), infraestructura (controladores web, persistencia, mensajería).

@@ -1,51 +1,51 @@
 # Checklist Service
 
-**Port:** `8000`  
-**Tech:** Django 6.0.3 / Python 3.12  
-**Database:** MongoDB  
+**Puerto:** `8000`  
+**Tecnología:** Django 6.0.3 / Python 3.12  
+**Base de datos:** MongoDB  
 **Framework:** Django REST Framework 3.17
 
-## Purpose
+## Propósito
 
-Checklist (NTC 5375) inspection management. Handles inspection templates, inspection records, tread measurements, and checklist templates organized by vehicle type. Provides specialized endpoints for filtering inspections by plate, date, status, and vehicle.
+Gestión de inspecciones de checklist (NTC 5375). Maneja plantillas de inspección, registros de inspección, mediciones de labrado y plantillas de checklist organizadas por tipo de vehículo. Proporciona endpoints especializados para filtrar inspecciones por placa, fecha, estado y vehículo.
 
-## Key Endpoints
+## Endpoints Principales
 
-### Templates
+### Plantillas
 
-| Method | Path | Description |
+| Método | Ruta | Descripción |
 |--------|------|-------------|
-| `GET` | `/templates` | List all templates |
-| `POST` | `/templates` | Create template |
-| `GET` | `/templates/motos` | Templates for motorcycles |
-| `GET` | `/templates/livianos-pesados` | Templates for light/heavy vehicles |
-| `GET` | `/templates/active/:vehicle_type` | Active template by type |
-| `GET` | `/templates/:id` | Get template by ID |
-| `PUT` | `/templates/:id` | Update template |
-| `DELETE` | `/templates/:id` | Delete template |
+| `GET` | `/templates` | Listar todas las plantillas |
+| `POST` | `/templates` | Crear plantilla |
+| `GET` | `/templates/motos` | Plantillas para motocicletas |
+| `GET` | `/templates/livianos-pesados` | Plantillas para vehículos livianos/pesados |
+| `GET` | `/templates/active/:vehicle_type` | Plantilla activa por tipo |
+| `GET` | `/templates/:id` | Obtener plantilla por ID |
+| `PUT` | `/templates/:id` | Actualizar plantilla |
+| `DELETE` | `/templates/:id` | Eliminar plantilla |
 
-### Inspections
+### Inspecciones
 
-| Method | Path | Description |
+| Método | Ruta | Descripción |
 |--------|------|-------------|
-| `GET` | `/inspections` | List inspections |
-| `POST` | `/inspections` | Create inspection |
-| `GET` | `/inspections/:id` | Get by ID |
-| `PUT` | `/inspections/:id` | Update |
-| `DELETE` | `/inspections/:id` | Delete |
-| `GET` | `/inspections/by-plate/:plate` | Lookup by plate |
-| `GET` | `/inspections/by-date` | Filter by date range |
-| `GET` | `/inspections/by-status/:status` | Filter by status |
-| `GET` | `/inspections/by-vehicle/:vehicle_id` | Filter by vehicle |
+| `GET` | `/inspections` | Listar inspecciones |
+| `POST` | `/inspections` | Crear inspección |
+| `GET` | `/inspections/:id` | Obtener por ID |
+| `PUT` | `/inspections/:id` | Actualizar |
+| `DELETE` | `/inspections/:id` | Eliminar |
+| `GET` | `/inspections/by-plate/:plate` | Buscar por placa |
+| `GET` | `/inspections/by-date` | Filtrar por rango de fechas |
+| `GET` | `/inspections/by-status/:status` | Filtrar por estado |
+| `GET` | `/inspections/by-vehicle/:vehicle_id` | Filtrar por vehículo |
 
-### Tread Measurement (Labrado)
+### Medición de Labrado
 
-| Method | Path | Description |
+| Método | Ruta | Descripción |
 |--------|------|-------------|
-| `GET` | `/labrado` | List tread measurements |
-| `POST` | `/labrado` | Create tread measurement |
-| `GET` | `/labrado/by-inspection/:inspection_id` | Get by inspection |
+| `GET` | `/labrado` | Listar mediciones de labrado |
+| `POST` | `/labrado` | Crear medición de labrado |
+| `GET` | `/labrado/by-inspection/:inspection_id` | Obtener por inspección |
 
-## Architecture
+## Arquitectura
 
-Hexagonal (DDD bounded contexts) with three Django apps: `templates`, `inspections`, and `labrado`. Each app follows domain/application/infrastructure/adapters structure. Settings split across `base.py`, `dev.py`, and `prod.py`.
+Hexagonal (contextos delimitados DDD) con tres aplicaciones Django: `templates`, `inspections` y `labrado`. Cada aplicación sigue la estructura dominio/aplicación/infraestructura/adaptadores. Configuraciones divididas entre `base.py`, `dev.py` y `prod.py`.

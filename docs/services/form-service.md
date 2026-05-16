@@ -1,53 +1,53 @@
 # Form Service
 
-**Port:** `7500`  
-**Tech:** NestJS 11 / TypeScript  
-**Database:** MongoDB  
-**Global Prefix:** `/api`  
-**API Docs:** `{RECEPTION_SERVICE_BASE_URL}/docs`
+**Puerto:** `7500`  
+**Tecnología:** NestJS 11 / TypeScript  
+**Base de datos:** MongoDB  
+**Prefijo Global:** `/api`  
+**Documentación API:** `{RECEPTION_SERVICE_BASE_URL}/docs`
 
-## Purpose
+## Propósito
 
-Vehicle reception form management. Creates, lists, updates, and soft-deletes vehicle inspections. Validates client and vehicle existence via RabbitMQ RPC before persisting. Enforces business rules per vehicle type.
+Gestión de formularios de recepción de vehículos. Crea, lista, actualiza y elimina de forma suave las inspecciones de vehículos. Valida la existencia del cliente y del vehículo mediante RabbitMQ RPC antes de persistir. Aplica reglas de negocio por tipo de vehículo.
 
-## Business Rules
+## Reglas de Negocio
 
-| Vehicle Type | Tires | Checklist |
-|-------------|-------|-----------|
-| `MOTOCICLETA_2_TIEMPOS` / `MOTOCICLETA_4_TIEMPOS` | 2 tires | Clean check only |
-| `LIVIANO` | 4 tires | Full checklist |
-| `PESADO` | Up to 12 tires | Full checklist |
+| Tipo de Vehículo | Llantas | Checklist |
+|-----------------|---------|-----------|
+| `MOTOCICLETA_2_TIEMPOS` / `MOTOCICLETA_4_TIEMPOS` | 2 llantas | Solo verificación limpia |
+| `LIVIANO` | 4 llantas | Checklist completo |
+| `PESADO` | Hasta 12 llantas | Checklist completo |
 
-## Key Endpoints
+## Endpoints Principales
 
-### Catalogs (Read-only enums)
+### Catálogos (Enums de solo lectura)
 
-| Method | Path | Description |
+| Método | Ruta | Descripción |
 |--------|------|-------------|
-| `GET` | `/api/catalogs/vehicle-types` | Vehicle types |
-| `GET` | `/api/catalogs/service-types` | Service types |
-| `GET` | `/api/catalogs/fuel-types` | Fuel types |
-| `GET` | `/api/catalogs/tire-positions` | Tire positions |
+| `GET` | `/api/catalogs/vehicle-types` | Tipos de vehículo |
+| `GET` | `/api/catalogs/service-types` | Tipos de servicio |
+| `GET` | `/api/catalogs/fuel-types` | Tipos de combustible |
+| `GET` | `/api/catalogs/tire-positions` | Posiciones de llantas |
 | `GET` | `/api/catalogs/ternary-choices` | SI/NO/NO_APLICA |
-| `GET` | `/api/catalogs/revision-types` | Revision types |
-| `GET` | `/api/catalogs/customer-types` | Customer types |
-| `GET` | `/api/catalogs/brake-fluid-sight-glass` | Brake fluid states |
+| `GET` | `/api/catalogs/revision-types` | Tipos de revisión |
+| `GET` | `/api/catalogs/customer-types` | Tipos de cliente |
+| `GET` | `/api/catalogs/brake-fluid-sight-glass` | Estados de líquido de frenos |
 
-### Inspections
+### Inspecciones
 
-| Method | Path | Description |
+| Método | Ruta | Descripción |
 |--------|------|-------------|
-| `POST` | `/api/inspections` | Create (validates client/vehicle via RabbitMQ) |
-| `GET` | `/api/inspections` | List with filters (includeDeleted, vehicle_id, page, size) |
-| `GET` | `/api/inspections/:id` | Get by ID |
-| `PATCH` | `/api/inspections/:id` | Update (re-validates vehicle type rules) |
-| `DELETE` | `/api/inspections/:id` | Soft delete |
+| `POST` | `/api/inspections` | Crear (valida cliente/vehículo via RabbitMQ) |
+| `GET` | `/api/inspections` | Listar con filtros (includeDeleted, vehicle_id, page, size) |
+| `GET` | `/api/inspections/:id` | Obtener por ID |
+| `PATCH` | `/api/inspections/:id` | Actualizar (re-valida reglas de tipo de vehículo) |
+| `DELETE` | `/api/inspections/:id` | Eliminación suave |
 
-## Integration
+## Integración
 
-- **RabbitMQ RPC** — Validates `customer_id` against `client-service-queue` and `vehicle_id` against `vehicle-service-queue` before saving inspections
-- **Soft Delete** — Sets `deleted_at` timestamp instead of physical deletion
+- **RabbitMQ RPC** — Valida `customer_id` contra `client-service-queue` y `vehicle_id` contra `vehicle-service-queue` antes de guardar inspecciones
+- **Eliminación Suave** — Establece timestamp `deleted_at` en lugar de eliminación física
 
-## Architecture
+## Arquitectura
 
-Modular with `CatalogsModule`, `InspectionModule`, and `RabbitMQModule`. Uses shared TypeScript enums for catalog values. Seed script available via `seed:inspection`.
+Modular con `CatalogsModule`, `InspectionModule` y `RabbitMQModule`. Usa enums TypeScript compartidos para valores de catálogo. Script de siembra disponible via `seed:inspection`.

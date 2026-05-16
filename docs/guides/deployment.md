@@ -1,8 +1,8 @@
-# Deployment Guide
+# Guía de Despliegue
 
-## Architecture Overview
+## Visión General de la Arquitectura
 
-The system uses a **microservices architecture** where each service runs in its own Docker container. Services communicate via HTTP through the **API Gateway**, and via **RabbitMQ** for cross-service validation.
+El sistema utiliza una **arquitectura de microservicios** donde cada servicio se ejecuta en su propio contenedor Docker. Los servicios se comunican vía HTTP a través del **API Gateway**, y vía **RabbitMQ** para validación entre servicios.
 
 ```mermaid
 graph TB
@@ -26,44 +26,44 @@ graph TB
     Form --> Vehicles
 ```
 
-## Prerequisites
+## Requisitos Previos
 
-- Docker & Docker Compose
-- Tailscale (for private network access)
-- GitHub Container Registry (GHCR) access
-- Access to the target server via SSH
+- Docker y Docker Compose
+- Tailscale (para acceso a red privada)
+- Acceso a GitHub Container Registry (GHCR)
+- Acceso al servidor de destino vía SSH
 
-## Environment Variables
+## Variables de Entorno
 
-Each service requires specific environment variables. Below are the minimum required for each:
+Cada servicio requiere variables de entorno específicas. A continuación se muestran las mínimas requeridas para cada uno:
 
 ### API Gateway
 
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `PORT` | Gateway port | Yes |
-| `AUTH_SERVICE_BASE_URL` | `http://<auth-host>:3001/api` | Yes |
-| `VEHICLE_SERVICE_BASE_URL` | `http://<vehicle-host>:9000` | Yes |
-| `CLIENT_SERVICE_BASE_URL` | `http://<client-host>:8080` | Yes |
-| `UPLOAD_FILES_SERVICE_BASE_URL` | `http://<storage-host>:7000` | Yes |
-| `RECEPTION_SERVICE_BASE_URL` | `http://<form-host>:7500` | Yes |
-| `API_GATEWAY_BASE_URL` | `http://<gateway-public-url>:3600` | Yes |
-| `API_KEY` | Internal API key for service-to-service | Yes |
-| `API_KEY_FRONT` | Frontend API key for client-to-gateway | Yes |
-| `SWAGGER_USER` | Swagger UI username | No |
-| `SWAGGER_PASS` | Swagger UI password | No |
+| Variable | Descripción | Requerida |
+|----------|-------------|-----------|
+| `PORT` | Puerto del Gateway | Sí |
+| `AUTH_SERVICE_BASE_URL` | `http://<auth-host>:3001/api` | Sí |
+| `VEHICLE_SERVICE_BASE_URL` | `http://<vehicle-host>:9000` | Sí |
+| `CLIENT_SERVICE_BASE_URL` | `http://<client-host>:8080` | Sí |
+| `UPLOAD_FILES_SERVICE_BASE_URL` | `http://<storage-host>:7000` | Sí |
+| `RECEPTION_SERVICE_BASE_URL` | `http://<form-host>:7500` | Sí |
+| `API_GATEWAY_BASE_URL` | `http://<gateway-public-url>:3600` | Sí |
+| `API_KEY` | Clave API interna para comunicación entre servicios | Sí |
+| `API_KEY_FRONT` | Clave API del frontend para comunicación cliente-gateway | Sí |
+| `SWAGGER_USER` | Nombre de usuario de Swagger UI | No |
+| `SWAGGER_PASS` | Contraseña de Swagger UI | No |
 
-### Other Services
+### Otros Servicios
 
-Each service has its own `.env.example` file in its repository with the required variables.
+Cada servicio tiene su propio archivo `.env.example` en su repositorio con las variables requeridas.
 
-## Deployment via GitHub Actions
+## Despliegue mediante GitHub Actions
 
-The project uses **GitHub Actions** with **Tailscale** for secure deployment to private servers.
+El proyecto utiliza **GitHub Actions** con **Tailscale** para el despliegue seguro en servidores privados.
 
 ### Workflow: Docker Deploy
 
-**File:** `.github/workflows/deploy-docker.yml`
+**Archivo:** `.github/workflows/deploy-docker.yml`
 
 ```yaml
 on:
@@ -73,15 +73,15 @@ on:
     branches: [main, develop]
 ```
 
-The workflow:
-1. Builds the Docker image
-2. Pushes to GHCR (`ghcr.io/<repo>:latest` and `:<sha>`)
-3. Connects via Tailscale to the target server
-4. SSH into the server, pulls the image, and restarts the container
+El workflow:
+1. Construye la imagen Docker
+2. La envía a GHCR (`ghcr.io/<repo>:latest` y `:<sha>`)
+3. Se conecta vía Tailscale al servidor de destino
+4. Accede por SSH al servidor, descarga la imagen y reinicia el contenedor
 
-### Workflow: Docs Deploy
+### Workflow: Despliegue de Documentación
 
-**File:** `.github/workflows/docs.yml`
+**Archivo:** `.github/workflows/docs.yml`
 
 ```yaml
 on:
@@ -91,11 +91,11 @@ on:
     branches: [main, develop, feat/manage-docs-basic-python]
 ```
 
-Builds MkDocs documentation and deploys to **GitHub Pages** (branch `gh-pages`).
+Construye la documentación MkDocs y la despliega en **GitHub Pages** (rama `gh-pages`).
 
-## Manual Deployment via SSH
+## Despliegue Manual mediante SSH
 
-If you need to deploy manually:
+Si necesitas desplegar manualmente:
 
 ```bash
 # Build the image
@@ -114,21 +114,21 @@ docker run -d \
   api-gateway
 ```
 
-## Tailscale Configuration
+## Configuración de Tailscale
 
-Tailscale creates a **secure WireGuard-based VPN** between all services, eliminating the need for exposed public ports.
+Tailscale crea una **VPN segura basada en WireGuard** entre todos los servicios, eliminando la necesidad de exponer puertos públicos.
 
-### Setup
+### Configuración
 
-1. Install Tailscale on each server
-2. Authenticate with the same Tailscale account
-3. Services communicate via Tailscale IPs or MagicDNS names
-4. The gateway is accessible at `http://<tailscale-hostname>:3600`
+1. Instala Tailscale en cada servidor
+2. Autentícate con la misma cuenta de Tailscale
+3. Los servicios se comunican mediante IPs de Tailscale o nombres MagicDNS
+4. El gateway es accesible en `http://<tailscale-hostname>:3600`
 
-!!! warning "Security"
-    This setup relies on Tailscale for network-level access control. If you deploy without Tailscale, you **must** configure proper firewall rules, TLS certificates, and CORS policies manually.
+!!! warning "Seguridad"
+    Esta configuración depende de Tailscale para el control de acceso a nivel de red. Si despliegas sin Tailscale, **debes** configurar manualmente las reglas de firewall, certificados TLS y políticas CORS adecuadas.
 
-## Docker Compose (Local Development)
+## Docker Compose (Desarrollo Local)
 
 ```yaml
 version: '3.8'
@@ -158,11 +158,11 @@ services:
       - postgres
 ```
 
-## Health Checks
+## Verificaciones de Salud
 
-Each service exposes a health endpoint:
+Cada servicio expone un endpoint de salud:
 
-| Service | Health Endpoint |
+| Servicio | Endpoint de Salud |
 |---------|----------------|
 | API Gateway | `GET /` |
 | Form Service | `GET /api/` |

@@ -1,16 +1,16 @@
 # Guards
 
-The gateway uses a **global guard** registered via `APP_GUARD` that protects every route unless explicitly marked as public.
+El gateway utiliza un **guard global** registrado a través de `APP_GUARD` que protege cada ruta a menos que esté marcada explícitamente como pública.
 
 ## CombinedGuard
 
-**File:** `src/common/guards/combined.guard.ts`
+**Archivo:** `src/common/guards/combined.guard.ts`
 
-The `CombinedGuard` is the primary guard and runs on every request. It performs three checks in sequence:
+El `CombinedGuard` es el guard principal y se ejecuta en cada solicitud. Realiza tres verificaciones en secuencia:
 
-### 1. Public Route Check
+### 1. Verificación de Ruta Pública
 
-If the route handler or controller class has the `@Public()` decorator, all authentication is skipped:
+Si el manejador de ruta o la clase del controlador tiene el decorador `@Public()`, se omite toda la autenticación:
 
 ```typescript
 @Public()
@@ -18,21 +18,21 @@ If the route handler or controller class has the `@Public()` decorator, all auth
 getFileById(@Param('id') id: string) { ... }
 ```
 
-### 2. API Key Validation
+### 2. Validación de API Key
 
-Validates the `x-api-key` header against the `API_KEY_FRONT` environment variable. This is used for frontend-to-gateway authentication.
+Valida el encabezado `x-api-key` contra la variable de entorno `API_KEY_FRONT`. Esto se usa para la autenticación frontend-to-gateway.
 
-### 3. Bearer Token Validation
+### 3. Validación de Bearer Token
 
-Extracts the `Authorization: Bearer <token>` header and validates it by calling the Auth Service at `AUTH_SERVICE_BASE_URL/auth/validate-token`. On success:
+Extrae el encabezado `Authorization: Bearer <token>` y lo valida llamando al Auth Service en `AUTH_SERVICE_BASE_URL/auth/validate-token`. Al tener éxito:
 
-- Attaches `request.user = { userId, roles }` for downstream use
-- Checks `@Roles()` decorator if present and enforces role-based access
-- Throws `ForbiddenException` if the user lacks the required role
+- Adjunta `request.user = { userId, roles }` para uso posterior
+- Verifica el decorador `@Roles()` si está presente y aplica el control de acceso basado en roles
+- Lanza `ForbiddenException` si el usuario no tiene el rol requerido
 
-## Role-Based Access
+## Acceso Basado en Roles
 
-The `@Roles()` decorator restricts routes to specific user roles:
+El decorador `@Roles()` restringe rutas a roles de usuario específicos:
 
 ```typescript
 @Roles(RoleConst.ADMIN)
@@ -40,23 +40,23 @@ The `@Roles()` decorator restricts routes to specific user roles:
 deleteInspection(@Param('id') id: string) { ... }
 ```
 
-Available roles: `admin`, `manager`, `operario`, `inspector`.
+Roles disponibles: `admin`, `manager`, `operario`, `inspector`.
 
-## Supporting Guards
+## Guards de Apoyo
 
-| Guard | File | Description |
-|-------|------|-------------|
-| `AuthGuard` | `src/common/guards/auth.guard.ts` | Bearer token validation only (not registered globally) |
-| `ApiKeyGuard` | `src/common/guards/api-key.guard.ts` | API key validation only (not registered globally) |
-| `RolesGuard` | `src/common/guards/roles.guard.ts` | Role check assuming `request.user` is populated (not registered globally) |
+| Guard | Archivo | Descripción |
+|-------|---------|-------------|
+| `AuthGuard` | `src/common/guards/auth.guard.ts` | Solo validación de Bearer token (no registrado globalmente) |
+| `ApiKeyGuard` | `src/common/guards/api-key.guard.ts` | Solo validación de API key (no registrado globalmente) |
+| `RolesGuard` | `src/common/guards/roles.guard.ts` | Verificación de roles asumiendo que `request.user` está poblado (no registrado globalmente) |
 
-## Public Routes
+## Rutas Públicas
 
-Routes decorated with `@Public()` bypass all authentication:
+Las rutas decoradas con `@Public()` omiten toda la autenticación:
 
-- `GET /` — Root health check
-- `POST /auth/login` — User login
-- `POST /auth/validate-token` — Token validation
-- `POST /auth/refresh` — Token refresh
-- `POST /auth/logout` — User logout
-- `GET /api/v1/storage/files/:id` — Public file download
+- `GET /` — Health check raíz
+- `POST /auth/login` — Inicio de sesión de usuario
+- `POST /auth/validate-token` — Validación de token
+- `POST /auth/refresh` — Refresco de token
+- `POST /auth/logout` — Cierre de sesión de usuario
+- `GET /api/v1/storage/files/:id` — Descarga pública de archivos

@@ -1,14 +1,14 @@
-# Backend API Overview
+# Visión general del Backend API
 
-The **API Gateway** is a [NestJS](https://nestjs.com/) application written in TypeScript. It serves as the single entry point for all client-facing HTTP requests, providing:
+El **API Gateway** es una aplicación [NestJS](https://nestjs.com/) escrita en TypeScript. Sirve como el punto de entrada único para todas las solicitudes HTTP orientadas al cliente, proporcionando:
 
-- **Routing & Proxying** — Forwarding requests to the appropriate microservice
-- **Authentication** — JWT token validation and role-based access control
-- **File Handling** — Multi-part file upload proxied to the storage service
-- **Response Enrichment** — Joining data from multiple services into unified responses
-- **API Key Security** — Internal service-to-service authentication
+- **Enrutamiento y Proxy** — Reenvío de solicitudes al microservicio correspondiente
+- **Autenticación** — Validación de tokens JWT y control de acceso basado en roles
+- **Manejo de Archivos** — Carga de archivos multiparte proxy al servicio de almacenamiento
+- **Enriquecimiento de Respuestas** — Combinación de datos de múltiples servicios en respuestas unificadas
+- **Seguridad con API Key** — Autenticación interna entre servicios
 
-## Request Flow
+## Flujo de Solicitudes
 
 ```mermaid
 sequenceDiagram
@@ -29,9 +29,9 @@ sequenceDiagram
     Gateway-->>Client: Standardized JSON Response
 ```
 
-## Key Design Decisions
+## Decisiones Clave de Diseño
 
-- **Global ValidationPipe** — All incoming requests are validated with `whitelist: true` and `forbidNonWhitelisted: true`
-- **Global ResponseInterceptor** — All responses are wrapped in a standard `{ statusCode, message, data, timestamp, path }` envelope
-- **Global CombinedGuard** — Every route is protected unless explicitly marked with `@Public()`
-- **File uploads before form submission** — Files are uploaded to the storage service first, then the resulting URLs are included in the form payload
+- **ValidationPipe global** — Todas las solicitudes entrantes se validan con `whitelist: true` y `forbidNonWhitelisted: true`
+- **ResponseInterceptor global** — Todas las respuestas se envuelven en un envoltorio estándar `{ statusCode, message, data, timestamp, path }`
+- **CombinedGuard global** — Cada ruta está protegida a menos que esté marcada explícitamente con `@Public()`
+- **Carga de archivos antes del envío del formulario** — Los archivos se cargan primero al servicio de almacenamiento, luego las URLs resultantes se incluyen en el payload del formulario

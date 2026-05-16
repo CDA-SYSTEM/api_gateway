@@ -1,41 +1,41 @@
 # Auth Service
 
-**Port:** `3001`  
-**Tech:** NestJS 11 / TypeScript  
-**Database:** PostgreSQL + Redis  
-**Global Prefix:** `/api`
+**Puerto:** `3001`  
+**Tecnología:** NestJS 11 / TypeScript  
+**Base de datos:** PostgreSQL + Redis  
+**Prefijo Global:** `/api`
 
-## Purpose
+## Propósito
 
-Authentication and authorization microservice. Manages user registration, JWT access/refresh tokens, role-based access control, and user lookup endpoints used by other services for data enrichment.
+Microservicio de autenticación y autorización. Gestiona registro de usuarios, tokens JWT de acceso/refresco, control de acceso basado en roles y endpoints de consulta de usuarios utilizados por otros servicios para enriquecimiento de datos.
 
 ## Roles
 
-| Role | Description |
-|------|-------------|
-| `ADMIN` | Full control — user registration, update, deletion |
-| `MANAGER` | Query, search, and inactivate users |
-| `OPERARIO` | Functional access to reception module |
-| `INSPECTOR` | Functional access to checklist module |
+| Rol | Descripción |
+|-----|-------------|
+| `ADMIN` | Control total — registro, actualización y eliminación de usuarios |
+| `MANAGER` | Consulta, búsqueda e inactivación de usuarios |
+| `OPERARIO` | Acceso funcional al módulo de recepción |
+| `INSPECTOR` | Acceso funcional al módulo de checklist |
 
-## Key Endpoints
+## Endpoints Principales
 
-| Method | Path | Auth | Description |
-|--------|------|------|-------------|
-| `POST` | `/api/auth/login` | Public | Authenticate, returns token pair |
-| `POST` | `/api/auth/refresh` | Public | Refresh access token |
-| `POST` | `/api/auth/logout` | Public | Invalidate refresh token |
-| `POST` | `/api/auth/validate-token` | Public | Validate an access token |
-| `POST` | `/api/auth/register` | Admin | Register a user |
-| `GET` | `/api/auth/users` | Admin/Manager | List users with optional `?role=` filter |
-| `GET` | `/api/auth/users/:id` | Admin/Manager | Get user by ID |
-| `GET` | `/api/auth/users/inspectors` | Internal | List inspectors |
-| `GET` | `/api/auth/users/operarios` | Internal | List operarios |
+| Método | Ruta | Autenticación | Descripción |
+|--------|------|---------------|-------------|
+| `POST` | `/api/auth/login` | Pública | Autenticar, devuelve par de tokens |
+| `POST` | `/api/auth/refresh` | Pública | Refrescar token de acceso |
+| `POST` | `/api/auth/logout` | Pública | Invalidar token de refresco |
+| `POST` | `/api/auth/validate-token` | Pública | Validar un token de acceso |
+| `POST` | `/api/auth/register` | Admin | Registrar un usuario |
+| `GET` | `/api/auth/users` | Admin/Manager | Listar usuarios con filtro opcional `?role=` |
+| `GET` | `/api/auth/users/:id` | Admin/Manager | Obtener usuario por ID |
+| `GET` | `/api/auth/users/inspectors` | Interna | Listar inspectores |
+| `GET` | `/api/auth/users/operarios` | Interna | Listar operarios |
 
-## Architecture
+## Arquitectura
 
-Hexagonal (ports & adapters) with three layers: Domain (interfaces, DTOs), Application (use cases), Infrastructure (controllers, JWT strategy, persistence).
+Hexagonal (puertos y adaptadores) con tres capas: Dominio (interfaces, DTOs), Aplicación (casos de uso), Infraestructura (controladores, estrategia JWT, persistencia).
 
 ## Swagger
 
-Swagger UI available at the service endpoint (if exposed).
+Swagger UI disponible en el endpoint del servicio (si está expuesto).

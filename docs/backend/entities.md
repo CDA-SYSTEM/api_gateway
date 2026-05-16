@@ -1,65 +1,65 @@
-# Entities & Data Types
+# Entidades y Tipos de Datos
 
-The gateway defines TypeScript interfaces and DTOs (Data Transfer Objects) for structured data exchange with microservices.
+El gateway define interfaces TypeScript y DTOs (Objetos de Transferencia de Datos) para el intercambio estructurado de datos con los microservicios.
 
 ## DTOs
 
-### Inspection-Related
+### Relacionados con Inspección
 
-All DTOs are defined under `src/reception/application/dtos/`:
+Todos los DTOs están definidos bajo `src/reception/application/dtos/`:
 
-| DTO | Description |
+| DTO | Descripción |
 |-----|-------------|
-| `CreateInspectionDto` | Required fields for creating an inspection |
-| `UpdateInspectionDto` | Optional fields for partial inspection updates |
-| `ChecklistDto` | Vehicle cleanliness and safety checklist |
-| `AxleDto` | Vehicle axle definition (index + type) |
-| `TireDto` | Tire measurement (position + code + pressure) |
+| `CreateInspectionDto` | Campos requeridos para crear una inspección |
+| `UpdateInspectionDto` | Campos opcionales para actualizaciones parciales de inspección |
+| `ChecklistDto` | Lista de verificación de limpieza y seguridad del vehículo |
+| `AxleDto` | Definición de eje del vehículo (índice + tipo) |
+| `TireDto` | Medición de neumático (posición + código + presión) |
 
-### Vehicle-Related
+### Relacionados con Vehículo
 
-Defined under `src/vehicle/application/dtos/`:
+Definidos bajo `src/vehicle/application/dtos/`:
 
-| DTO | Description |
+| DTO | Descripción |
 |-----|-------------|
-| `CreateCatalogoDto` | `{ nombre: string }` — Create catalog item |
-| `UpdateCatalogoDto` | `{ nombre: string }` — Update catalog item |
-| `CreateVehicleDto` | Full vehicle creation payload |
-| `UpdateVehicleDto` | Full vehicle update payload |
+| `CreateCatalogoDto` | `{ nombre: string }` — Crear elemento de catálogo |
+| `UpdateCatalogoDto` | `{ nombre: string }` — Actualizar elemento de catálogo |
+| `CreateVehicleDto` | Payload completo de creación de vehículo |
+| `UpdateVehicleDto` | Payload completo de actualización de vehículo |
 
-### Client-Related
+### Relacionados con Cliente
 
-Defined under `src/clients/application/dtos/`:
+Definidos bajo `src/clients/application/dtos/`:
 
-| DTO | Description |
+| DTO | Descripción |
 |-----|-------------|
-| `CreateClientDto` | Client creation with validation |
-| `UpdateClientDto` | Client update with validation |
-| `ListClientsQueryDto` | Paginated listing query parameters |
+| `CreateClientDto` | Creación de cliente con validación |
+| `UpdateClientDto` | Actualización de cliente con validación |
+| `ListClientsQueryDto` | Parámetros de consulta de listado paginado |
 
 ## Interfaces
 
-### Data Interfaces
+### Interfaces de Datos
 
-| Interface | Location | Description |
-|-----------|----------|-------------|
-| `InspectionItem` | `src/reception/application/dtos/` | Enriched inspection with client/vehicle/operator data |
-| `InspectionsResponse` | `src/reception/application/dtos/` | Paginated inspection list response |
-| `ClientData` | `src/reception/application/dtos/` | Client data structure |
-| `VehicleData` | `src/reception/application/dtos/` | Vehicle data structure |
-| `UserData` | `src/reception/application/dtos/` | User/operator data structure |
+| Interfaz | Ubicación | Descripción |
+|----------|-----------|-------------|
+| `InspectionItem` | `src/reception/application/dtos/` | Inspección enriquecida con datos de cliente/vehículo/operador |
+| `InspectionsResponse` | `src/reception/application/dtos/` | Respuesta de listado paginado de inspecciones |
+| `ClientData` | `src/reception/application/dtos/` | Estructura de datos del cliente |
+| `VehicleData` | `src/reception/application/dtos/` | Estructura de datos del vehículo |
+| `UserData` | `src/reception/application/dtos/` | Estructura de datos del usuario/operador |
 
-### Catalog Interface
+### Interfaz de Catálogo
 
-| Interface | Location | Description |
-|-----------|----------|-------------|
-| `CatalogItem` | `src/catalogs/catalogs.data.ts` | `{ value: string; label: string }` — removed in favor of live proxying |
+| Interfaz | Ubicación | Descripción |
+|----------|-----------|-------------|
+| `CatalogItem` | `src/catalogs/catalogs.data.ts` | `{ value: string; label: string }` — eliminada en favor de proxy en vivo |
 
-## Response Format
+## Formato de Respuesta
 
-All API responses follow a unified structure via the global `ResponseInterceptor`:
+Todas las respuestas del API siguen una estructura unificada a través del `ResponseInterceptor` global:
 
-### Success Response
+### Respuesta Exitosa
 ```json
 {
   "statusCode": 200,
@@ -70,7 +70,7 @@ All API responses follow a unified structure via the global `ResponseInterceptor
 }
 ```
 
-### Error Response
+### Respuesta de Error
 ```json
 {
   "statusCode": 400,
@@ -81,7 +81,7 @@ All API responses follow a unified structure via the global `ResponseInterceptor
 }
 ```
 
-### Paginated Response
+### Respuesta Paginada
 ```json
 {
   "statusCode": 200,

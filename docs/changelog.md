@@ -1,62 +1,62 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
+Todos los cambios notables de este proyecto se documentarán en este archivo.
 
-## [Unreleased]
+## [No liberado]
 
-### Added
-- MkDocs documentation site with Material theme
-- GitHub Actions workflow for docs deploy to GitHub Pages
-- curl examples page for all gateway endpoints
-- Deployment guide with Docker, Tailscale, and GitHub Actions
-- Troubleshooting guide with common errors and solutions
-- Network architecture guide with Tailscale VPN topology
-- Local development guide with setup steps for all services
-- Database architecture overview with ERDs
+### Agregado
+- Sitio de documentación MkDocs con tema Material
+- Flujo de trabajo de GitHub Actions para desplegar documentación en GitHub Pages
+- Página de ejemplos con curl para todos los endpoints del gateway
+- Guía de despliegue con Docker, Tailscale y GitHub Actions
+- Guía de solución de problemas con errores comunes y soluciones
+- Guía de arquitectura de red con topología VPN de Tailscale
+- Guía de desarrollo local con pasos de configuración para todos los servicios
+- Descripción general de la arquitectura de base de datos con ERDs
 
 ## [1.0.0] - 2026-05
 
-### Added
-- Unified catalog CRUD endpoints (`/api/v1/catalogs/{type}`)
-- `DELETE /vehiculo/:id` and `GET /vehiculo/cliente/:clienteId` endpoints
-- `PATCH /api/v1/inspections/:id` with optional file uploads
-- Catalogs proxied from form-service (replaced hardcoded data)
-- Public file download endpoint (`@Public()` decorator)
-- Explicit payload construction in inspection creation
+### Agregado
+- Endpoints CRUD de catálogos unificados (`/api/v1/catalogs/{type}`)
+- Endpoints `DELETE /vehiculo/:id` y `GET /vehiculo/cliente/:clienteId`
+- `PATCH /api/v1/inspections/:id` con carga opcional de archivos
+- Catálogos proxy desde form-service (reemplazaron datos hardcodeados)
+- Endpoint público de descarga de archivos (decorador `@Public()`)
+- Construcción explícita del payload en creación de inspecciones
 
-### Reception Module
-- `POST /api/v1/inspections` with multipart file uploads
-- `GET /api/v1/inspections` with filters, pagination, and data enrichment
-- `GET /api/v1/inspections/:id` with client/vehicle/operator enrichment
-- `DELETE /api/v1/inspections/:id` with admin role restriction
+### Módulo de Recepción
+- `POST /api/v1/inspections` con carga de archivos multiparte
+- `GET /api/v1/inspections` con filtros, paginación y enriquecimiento de datos
+- `GET /api/v1/inspections/:id` con enriquecimiento de cliente/vehículo/operador
+- `DELETE /api/v1/inspections/:id` con restricción de rol admin
 
-### Upload Files Module
-- `POST /api/v1/storage/upload` for file uploads
-- `GET /api/v1/storage/files` with listing
-- `GET /api/v1/storage/files/:id` for file download
-- `DELETE /api/v1/storage/files/:id` for soft delete
+### Módulo de Carga de Archivos
+- `POST /api/v1/storage/upload` para carga de archivos
+- `GET /api/v1/storage/files` con listado
+- `GET /api/v1/storage/files/:id` para descarga de archivos
+- `DELETE /api/v1/storage/files/:id` para borrado lógico
 
-### Vehicle Module
-- Full CRUD for vehicles, brands, lines, colors, classes
-- Full CRUD for vehicle types, fuel types, service types
-- Health check endpoint
+### Módulo de Vehículos
+- CRUD completo para vehículos, marcas, líneas, colores, clases
+- CRUD completo para tipos de vehículo, tipos de combustible, tipos de servicio
+- Endpoint de health check
 
-### Clients Module
-- Full CRUD for clients with pagination and filters
-- Soft delete and reactivation
-- Document types and person types catalogs
-- Root health check
+### Módulo de Clientes
+- CRUD completo para clientes con paginación y filtros
+- Borrado lógico y reactivación
+- Catálogos de tipos de documento y tipos de persona
+- Health check raíz
 
-### Auth Module
-- Login, register, token validation, refresh, logout
-- User management (CRUD)
-- Inspector and operator listing endpoints
+### Módulo de Autenticación
+- Inicio de sesión, registro, validación de token, renovación, cierre de sesión
+- Gestión de usuarios (CRUD)
+- Endpoints de listado de inspectores y operadores
 
-### Infrastructure
-- Global `CombinedGuard` (API key + JWT + roles)
-- Global `ResponseInterceptor` with standard envelope
-- Global `HttpExceptionFilter` for error formatting
-- Axios interceptor for internal API key injection
-- Safe JSON parsing utility (`safeParse`)
-- Tailscale-based CI/CD with GitHub Actions
-- Docker containerization
+### Infraestructura
+- `CombinedGuard` global (API key + JWT + roles)
+- `ResponseInterceptor` global con envoltura estándar
+- `HttpExceptionFilter` global para formateo de errores
+- Interceptor de Axios para inyección de API key interna
+- Utilidad de parseo seguro de JSON (`safeParse`)
+- CI/CD basado en Tailscale con GitHub Actions
+- Contenerización con Docker

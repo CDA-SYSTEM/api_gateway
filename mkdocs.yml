@@ -1,4 +1,4 @@
-site_name: CDA System - API Gateway Docs
+site_name: CDA System - Documentación del API Gateway
 site_description: Documentación del API Gateway y microservicios del sistema CDA
 site_url: https://cda-system.github.io/api_gateway
 repo_url: https://github.com/CDA-SYSTEM/api_gateway
@@ -6,6 +6,7 @@ repo_name: CDA-SYSTEM/api_gateway
 
 theme:
   name: material
+  language: es
   features:
     - navigation.tabs
     - navigation.sections
@@ -19,37 +20,37 @@ theme:
       accent: purple
       toggle:
         icon: material/brightness-7
-        name: Switch to dark mode
+        name: Cambiar a modo oscuro
     - scheme: slate
       primary: teal
       accent: purple
       toggle:
         icon: material/brightness-4
-        name: Switch to light mode
+        name: Cambiar a modo claro
 
 nav:
-  - Home: index.md
-  - Examples: examples.md
-  - Backend API:
-    - Overview: backend/index.md
-    - Core & Shared:
+  - Inicio: index.md
+  - Ejemplos: examples.md
+  - API Backend:
+    - Visión General: backend/index.md
+    - Núcleo & Compartido:
       - Guards: backend/guards.md
       - Interceptors: backend/interceptors.md
       - Middleware: backend/middleware.md
-    - Configuration: backend/configuration.md
-    - Modules: backend/modules.md
-    - Controllers: backend/controllers.md
-    - Services: backend/services.md
-    - Entities: backend/entities.md
-    - How It Works: backend/how-it-works.md
-  - Guides:
-    - Deployment: guides/deployment.md
-    - Local Development: guides/local-development.md
-    - Network Architecture: guides/network-architecture.md
-    - Troubleshooting: guides/troubleshooting.md
-  - Database: database/overview.md
+    - Configuración: backend/configuration.md
+    - Módulos: backend/modules.md
+    - Controladores: backend/controllers.md
+    - Servicios: backend/services.md
+    - Entidades: backend/entities.md
+    - Cómo Funciona: backend/how-it-works.md
+  - Guías:
+    - Despliegue: guides/deployment.md
+    - Desarrollo Local: guides/local-development.md
+    - Arquitectura de Red: guides/network-architecture.md
+    - Solución de Problemas: guides/troubleshooting.md
+  - Base de Datos: database/overview.md
   - Changelog: changelog.md
-  - Services:
+  - Servicios:
     - API Gateway: services/api-gateway.md
     - Auth Service: services/auth-service.md
     - Clients Service: services/clients-service.md
@@ -76,3 +77,6 @@ extra:
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/CDA-SYSTEM
+      name: CDA System en GitHub
+
+copyright: Copyright &copy; 2026 CDA System

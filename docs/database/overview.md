@@ -1,15 +1,15 @@
-# Database Architecture
+# Arquitectura de Base de Datos
 
-The system uses **multiple database technologies** chosen for each service's specific needs:
+El sistema utiliza **múltiples tecnologías de bases de datos** elegidas según las necesidades específicas de cada servicio:
 
-| Service | Database | Technology | Purpose |
-|---------|----------|------------|---------|
-| Auth Service | PostgreSQL | TypeORM | Users, roles, tokens |
-| Clients Service | PostgreSQL | Spring Data JPA + Flyway | Clients, person types, document types |
-| Vehicles Service | PostgreSQL | Spring Data JPA + Flyway | Vehicles, brands, lines, colors, classes |
-| Form Service | MongoDB | TypeORM | Inspection forms, catalogs |
-| Storage Service | Apache Cassandra | cassandra-driver | File metadata and binary storage |
-| Checklist Service | MongoDB | MongoEngine | Inspection templates, checklists, tread data |
+| Servicio | Base de Datos | Tecnología | Propósito |
+|---------|-------------|------------|----------|
+| Auth Service | PostgreSQL | TypeORM | Usuarios, roles, tokens |
+| Clients Service | PostgreSQL | Spring Data JPA + Flyway | Clientes, tipos de persona, tipos de documento |
+| Vehicles Service | PostgreSQL | Spring Data JPA + Flyway | Vehículos, marcas, líneas, colores, clases |
+| Form Service | MongoDB | TypeORM | Formularios de inspección, catálogos |
+| Storage Service | Apache Cassandra | cassandra-driver | Metadatos de archivos y almacenamiento binario |
+| Checklist Service | MongoDB | MongoEngine | Plantillas de inspección, checklists, datos de banda de rodadura |
 
 ## PostgreSQL Databases
 
@@ -198,9 +198,9 @@ CREATE TABLE storage_system.files (
 CREATE INDEX idx_files_deleted_at ON storage_system.files (deleted_at);
 ```
 
-The `data` column stores the actual file binary as a BLOB. `deleted_at` enables soft-delete: files with a non-null `deleted_at` are considered deleted.
+La columna `data` almacena el binario del archivo como un BLOB. `deleted_at` habilita el borrado lógico: los archivos con `deleted_at` no nulo se consideran eliminados.
 
-## Entity Relationships (Cross-Service)
+## Relaciones entre Entidades (Entre Servicios)
 
 ```mermaid
 erDiagram
@@ -211,10 +211,10 @@ erDiagram
     StorageService_File ||--o{ FormService_Inspection : signature
 ```
 
-## Migrations
+## Migraciones
 
-| Service | Tool | Location |
-|---------|------|----------|
+| Servicio | Herramienta | Ubicación |
+|---------|-------------|----------|
 | Clients Service | Flyway | `src/main/resources/db/migration/` |
 | Vehicles Service | Flyway | `src/main/resources/db/migration/` |
 | Auth Service | TypeORM sync | Auto-sync (development) |

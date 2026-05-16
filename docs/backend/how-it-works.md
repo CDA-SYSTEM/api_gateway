@@ -1,10 +1,10 @@
-# How It Works
+# Cómo Funciona
 
-This page explains the key flows through the system.
+Esta página explica los flujos clave a través del sistema.
 
-## 1. Inspection Creation Flow
+## 1. Flujo de Creación de Inspección
 
-The most complex flow in the system — creating a vehicle inspection with file uploads.
+El flujo más complejo del sistema — crear una inspección de vehículo con carga de archivos.
 
 ```mermaid
 sequenceDiagram
@@ -34,17 +34,17 @@ sequenceDiagram
     Gateway-->>Client: Standardized response
 ```
 
-### Key Details
+### Detalles Clave
 
-1. **File upload first** — Files are uploaded to the storage service in parallel (`forkJoin`) before the inspection payload is sent
-2. **URL construction** — File URLs are built as `{API_GATEWAY_BASE_URL}/api/v1/storage/files/{id}`
-3. **Payload filtering** — Only whitelisted DTO fields are included in the payload (prevents `forbidNonWhitelisted` rejections)
-4. **Operator mapping** — `operator_id` is mapped to both `responsible_id` and `customer_id`
-5. **Business validation** — Form-service validates tire counts and checklist completeness based on vehicle type
+1. **Carga de archivos primero** — Los archivos se cargan al servicio de almacenamiento en paralelo (`forkJoin`) antes de enviar el payload de la inspección
+2. **Construcción de URLs** — Las URLs de los archivos se construyen como `{API_GATEWAY_BASE_URL}/api/v1/storage/files/{id}`
+3. **Filtrado de payload** — Solo los campos del DTO permitidos se incluyen en el payload (previene rechazos por `forbidNonWhitelisted`)
+4. **Mapeo de operador** — `operator_id` se mapea tanto a `responsible_id` como a `customer_id`
+5. **Validación de negocio** — Form-service valida la cantidad de neumáticos y la integridad del checklist según el tipo de vehículo
 
-## 2. Inspection Update Flow
+## 2. Flujo de Actualización de Inspección
 
-Same as creation but all fields are optional — only provided fields are included in the payload.
+Igual que la creación pero todos los campos son opcionales — solo los campos proporcionados se incluyen en el payload.
 
 ```mermaid
 sequenceDiagram
@@ -67,9 +67,9 @@ sequenceDiagram
     Gateway-->>Client: Standardized response
 ```
 
-## 3. Inspection Listing with Enrichment
+## 3. Listado de Inspecciones con Enriquecimiento
 
-When listing inspections, the gateway enriches each item with client, vehicle, and operator data from the respective services.
+Al listar inspecciones, el gateway enriquece cada elemento con datos del cliente, vehículo y operador desde los servicios respectivos.
 
 ```mermaid
 sequenceDiagram
@@ -93,9 +93,9 @@ sequenceDiagram
     Gateway-->>Client: Enriched response
 ```
 
-## 4. File Download Flow
+## 4. Flujo de Descarga de Archivos
 
-File downloads are **public** (no authentication required) so that inspection photos and signatures can be accessed via their URLs.
+Las descargas de archivos son **públicas** (no requieren autenticación) para que las fotos y firmas de las inspecciones puedan accederse a través de sus URLs.
 
 ```mermaid
 sequenceDiagram
@@ -110,9 +110,9 @@ sequenceDiagram
     Gateway-->>Client: Raw binary (Content-Type + Content-Disposition)
 ```
 
-## 5. Unified Catalog CRUD
+## 5. CRUD de Catálogo Unificado
 
-The unified catalogs endpoint provides a consistent CRUD interface for all vehicle catalog types.
+El endpoint de catálogos unificados proporciona una interfaz CRUD consistente para todos los tipos de catálogo de vehículos.
 
 ```mermaid
 sequenceDiagram
@@ -127,9 +127,9 @@ sequenceDiagram
     Gateway-->>Client: Standardized response
 ```
 
-The type validation rejects invalid catalog types with a descriptive error message listing valid options.
+La validación de tipo rechaza tipos de catálogo inválidos con un mensaje de error descriptivo que lista las opciones válidas.
 
-## 6. Authentication Flow
+## 6. Flujo de Autenticación
 
 ```mermaid
 sequenceDiagram
@@ -151,13 +151,13 @@ sequenceDiagram
     Gateway->>Form: Proxied request
 ```
 
-## Cross-Cutting Concerns
+## Aspectos Transversales
 
-### API Key Injection
-Every outbound request from the gateway to a microservice automatically includes the `x-api-key` header via an Axios interceptor. Each microservice validates this key before processing.
+### Inyección de API Key
+Cada solicitud saliente del gateway hacia un microservicio incluye automáticamente el encabezado `x-api-key` a través de un interceptor Axios. Cada microservicio valida esta clave antes de procesar.
 
-### Error Handling
-- **Connection errors** → `502 Bad Gateway` with service name
-- **Validation errors** → `400 Bad Request` with details
-- **Auth errors** → `401 Unauthorized` or `403 Forbidden`
-- **Not found** → `404 Not Found`
+### Manejo de Errores
+- **Errores de conexión** → `502 Bad Gateway` con nombre del servicio
+- **Errores de validación** → `400 Bad Request` con detalles
+- **Errores de autenticación** → `401 Unauthorized` o `403 Forbidden`
+- **No encontrado** → `404 Not Found`

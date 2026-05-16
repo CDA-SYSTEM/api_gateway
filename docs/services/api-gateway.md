@@ -1,33 +1,33 @@
 # API Gateway
 
-**Port:** `3600`  
-**Tech:** NestJS 11 / TypeScript  
-**Role:** Single entry point for all client requests.
+**Puerto:** `3600`  
+**Tecnología:** NestJS 11 / TypeScript  
+**Rol:** Punto de entrada único para todas las solicitudes de los clientes.
 
-## Responsibilities
+## Responsabilidades
 
-- **Authentication & Authorization** — Validates JWT tokens, enforces API keys, checks role-based access
-- **Request Routing** — Proxies HTTP requests to the appropriate microservice
-- **File Upload Orchestration** — Handles multi-part file uploads, uploads to storage service, and includes resulting URLs in inspection payloads
-- **Response Enrichment** — Joins data from multiple services (client, vehicle, operator) into unified inspection responses
-- **API Documentation** — Exposes Swagger UI at `/docs` with basic auth protection
-- **Security** — Internal API key injection for service-to-service communication
+- **Autenticación y Autorización** — Valida tokens JWT, aplica claves API, verifica acceso basado en roles
+- **Enrutamiento de Solicitudes** — Redirige solicitudes HTTP al microservicio correspondiente
+- **Orquestación de Carga de Archivos** — Gestiona cargas de archivos multiparte, sube al servicio de almacenamiento e incluye las URLs resultantes en los payloads de inspección
+- **Enriquecimiento de Respuestas** — Combina datos de múltiples servicios (cliente, vehículo, operador) en respuestas de inspección unificadas
+- **Documentación de API** — Expone Swagger UI en `/docs` con protección de autenticación básica
+- **Seguridad** — Inyección de clave API interna para comunicación entre servicios
 
-## Key Files
+## Archivos Clave
 
-| File | Purpose |
-|------|---------|
-| `src/main.ts` | Bootstrap, global pipes, interceptors, Swagger setup |
-| `src/app.module.ts` | Root module, global guard registration, Axios interceptor |
-| `src/common/guards/combined.guard.ts` | Global auth guard (public check + API key + JWT + roles) |
-| `src/common/interceptors/response.interceptor.ts` | Global response envelope |
-| `src/reception/application/reception.service.ts` | Inspection creation/update orchestration |
-| `src/upload-files/application/upload-files.service.ts` | File upload/download handling |
+| Archivo | Propósito |
+|---------|-----------|
+| `src/main.ts` | Arranque, pipes globales, interceptores, configuración de Swagger |
+| `src/app.module.ts` | Módulo raíz, registro de guardia global, interceptor Axios |
+| `src/common/guards/combined.guard.ts` | Guardia de autenticación global (verificación pública + clave API + JWT + roles) |
+| `src/common/interceptors/response.interceptor.ts` | Envoltorio de respuesta global |
+| `src/reception/application/reception.service.ts` | Orquestación de creación/actualización de inspecciones |
+| `src/upload-files/application/upload-files.service.ts` | Gestión de carga/descarga de archivos |
 
-## Proxy Layer
+## Capa de Proxy
 
-The gateway does not implement business logic for domain entities. Instead, it delegates to dedicated microservices through a **three-layer proxy architecture** (Controller → Application Service → Infrastructure Service). This keeps the gateway thin and focused on cross-cutting concerns.
+El gateway no implementa lógica de negocio para entidades de dominio. En su lugar, delega en microservicios dedicados a través de una **arquitectura de proxy de tres capas** (Controlador → Servicio de Aplicación → Servicio de Infraestructura). Esto mantiene el gateway delgado y enfocado en preocupaciones transversales.
 
 ## Swagger
 
-`{API_GATEWAY_BASE_URL}/docs` — Protected with HTTP Basic Auth.
+`{API_GATEWAY_BASE_URL}/docs` — Protegido con HTTP Basic Auth.

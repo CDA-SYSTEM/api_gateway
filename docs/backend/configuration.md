@@ -1,26 +1,26 @@
-# Configuration
+# Configuración
 
-The gateway is configured via **environment variables** loaded from a `.env` file at the project root using `@nestjs/config`.
+El gateway se configura a través de **variables de entorno** cargadas desde un archivo `.env` en la raíz del proyecto usando `@nestjs/config`.
 
-## Environment Variables
+## Variables de Entorno
 
-| Variable | Required | Default | Description |
-|----------|----------|---------|-------------|
-| `PORT` | Yes | `3600` | Gateway HTTP port |
-| `AUTH_SERVICE_BASE_URL` | Yes | - | Auth service base URL |
-| `VEHICLE_SERVICE_BASE_URL` | Yes | - | Vehicle service base URL |
-| `CLIENT_SERVICE_BASE_URL` | Yes | - | Client service base URL |
-| `UPLOAD_FILES_SERVICE_BASE_URL` | Yes | - | File storage service base URL |
-| `RECEPTION_SERVICE_BASE_URL` | Yes | - | Form/reception service base URL |
-| `API_GATEWAY_BASE_URL` | Yes | - | Gateway public URL (for generating file download links) |
-| `API_KEY` | Yes | - | Internal API key for gateway-to-microservice requests |
-| `API_KEY_FRONT` | Yes | - | Frontend API key for client-to-gateway requests |
-| `SWAGGER_USER` | No | `admin` | Swagger UI basic auth username |
-| `SWAGGER_PASS` | No | `admin` | Swagger UI basic auth password |
+| Variable | Requerida | Por Defecto | Descripción |
+|----------|-----------|-------------|-------------|
+| `PORT` | Sí | `3600` | Puerto HTTP del gateway |
+| `AUTH_SERVICE_BASE_URL` | Sí | - | URL base del servicio de autenticación |
+| `VEHICLE_SERVICE_BASE_URL` | Sí | - | URL base del servicio de vehículos |
+| `CLIENT_SERVICE_BASE_URL` | Sí | - | URL base del servicio de clientes |
+| `UPLOAD_FILES_SERVICE_BASE_URL` | Sí | - | URL base del servicio de almacenamiento de archivos |
+| `RECEPTION_SERVICE_BASE_URL` | Sí | - | URL base del servicio de formularios/recepción |
+| `API_GATEWAY_BASE_URL` | Sí | - | URL pública del gateway (para generar enlaces de descarga de archivos) |
+| `API_KEY` | Sí | - | API Key interna para solicitudes gateway-to-microservice |
+| `API_KEY_FRONT` | Sí | - | API Key del frontend para solicitudes client-to-gateway |
+| `SWAGGER_USER` | No | `admin` | Nombre de usuario para autenticación básica de Swagger UI |
+| `SWAGGER_PASS` | No | `admin` | Contraseña para autenticación básica de Swagger UI |
 
-## Security Configuration
+## Configuración de Seguridad
 
-### API Key Flow
+### Flujo de API Key
 
 ```mermaid
 sequenceDiagram
@@ -34,20 +34,20 @@ sequenceDiagram
     Microservice->>Microservice: Validate x-api-key === API_KEY
 ```
 
-- **Frontend requests** carry `x-api-key` matching `API_KEY_FRONT`
-- **Internal requests** automatically receive the `API_KEY` header via the Axios interceptor configured in `app.module.ts`
-- Each microservice independently validates the API key before processing requests
+- **Solicitudes del frontend** llevan `x-api-key` que coincide con `API_KEY_FRONT`
+- **Solicitudes internas** reciben automáticamente el encabezado `API_KEY` a través del interceptor Axios configurado en `app.module.ts`
+- Cada microservicio valida independientemente la API Key antes de procesar las solicitudes
 
-### JWT Token Validation
+### Validación de Token JWT
 
-- Bearer tokens are validated against the Auth Service on every protected request
-- Tokens contain `userId` and `roles` for authorization decisions
-- Refresh tokens are supported via the `POST /auth/refresh` public endpoint
+- Los Bearer tokens se validan contra el Auth Service en cada solicitud protegida
+- Los tokens contienen `userId` y `roles` para decisiones de autorización
+- Los Refresh tokens son compatibles a través del endpoint público `POST /auth/refresh`
 
-## Swagger Documentation
+## Documentación Swagger
 
-Swagger UI is available at `/docs` with basic auth protection using `SWAGGER_USER` and `SWAGGER_PASS`. The OpenAPI spec includes:
+Swagger UI está disponible en `/docs` con protección de autenticación básica usando `SWAGGER_USER` y `SWAGGER_PASS`. La especificación OpenAPI incluye:
 
-- API Key security scheme (`x-api-key` header)
-- Bearer token security scheme for JWT
-- Endpoint descriptions, request/response examples, and DTO schemas
+- Esquema de seguridad de API Key (encabezado `x-api-key`)
+- Esquema de seguridad de Bearer token para JWT
+- Descripciones de endpoints, ejemplos de solicitud/respuesta y esquemas de DTO
