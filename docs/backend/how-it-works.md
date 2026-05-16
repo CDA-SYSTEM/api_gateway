@@ -1,0 +1,163 @@
+# How It Works
+
+This page explains the key flows through the system.
+
+## 1. Inspection Creation Flow
+
+The most complex flow in the system — creating a vehicle inspection with file uploads.
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Gateway
+    participant Storage as Storage Service
+    participant Form as Form Service
+    participant Auth as Auth Service
+    participant Clients as Clients Service
+    participant Vehicles as Vehicles Service
+
+    Client->>Gateway: POST /api/v1/inspections (multipart: data + signature + photo)
+    Gateway->>Gateway: Validate Bearer Token (CombinedGuard)
+    Gateway->>Gateway: Parse data JSON → CreateInspectionDto
+    par Upload Files
+        Gateway->>Storage: POST /storage/upload (signature)
+        Storage-->>Gateway: { file: { id: "uuid" } }
+        Gateway->>Storage: POST /storage/upload (photo)
+        Storage-->>Gateway: { file: { id: "uuid" } }
+    end
+    Gateway->>Gateway: Build payload with file URLs
+    Gateway->>Form: POST /api/inspections
+    Form->>Clients: RabbitMQ RPC: validate client exists
+    Form->>Vehicles: RabbitMQ RPC: validate vehicle exists
+    Form->>Form: Apply business rules per vehicle type
+    Form-->>Gateway: 201 Created
+    Gateway-->>Client: Standardized response
+```
+
+### Key Details
+
+1. **File upload first** — Files are uploaded to the storage service in parallel (`forkJoin`) before the inspection payload is sent
+2. **URL construction** — File URLs are built as `{API_GATEWAY_BASE_URL}/api/v1/storage/files/{id}`
+3. **Payload filtering** — Only whitelisted DTO fields are included in the payload (prevents `forbidNonWhitelisted` rejections)
+4. **Operator mapping** — `operator_id` is mapped to both `responsible_id` and `customer_id`
+5. **Business validation** — Form-service validates tire counts and checklist completeness based on vehicle type
+
+## 2. Inspection Update Flow
+
+Same as creation but all fields are optional — only provided fields are included in the payload.
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Gateway
+    participant Storage
+    participant Form
+
+    Client->>Gateway: PATCH /api/v1/inspections/{id} (multipart)
+    Gateway->>Gateway: Parse partial data JSON
+    opt New signature file provided
+        Gateway->>Storage: Upload signature
+    end
+    opt New photo file provided
+        Gateway->>Storage: Upload photo
+    end
+    Gateway->>Gateway: Build partial payload (defined fields only)
+    Gateway->>Form: PATCH /api/inspections/{id}
+    Form-->>Gateway: 200 OK
+    Gateway-->>Client: Standardized response
+```
+
+## 3. Inspection Listing with Enrichment
+
+When listing inspections, the gateway enriches each item with client, vehicle, and operator data from the respective services.
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Gateway
+    participant Form
+    participant Clients
+    participant Vehicles
+    participant Auth
+
+    Client->>Gateway: GET /api/v1/inspections
+    Gateway->>Form: GET /api/inspections
+    Form-->>Gateway: Inspection list
+    Gateway->>Gateway: Extract unique client/vehicle/operator IDs
+    par Enrichment
+        Gateway->>Clients: GET /clients/{id} (xN)
+        Gateway->>Vehicles: GET /vehiculo/{id} (xN)
+        Gateway->>Auth: GET /auth/users/{id} (xN)
+    end
+    Gateway->>Gateway: Merge data into each item
+    Gateway-->>Client: Enriched response
+```
+
+## 4. File Download Flow
+
+File downloads are **public** (no authentication required) so that inspection photos and signatures can be accessed via their URLs.
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Gateway
+    participant Storage
+
+    Client->>Gateway: GET /api/v1/storage/files/{id}
+    Gateway->>Gateway: @Public() → skip auth
+    Gateway->>Storage: GET /storage/files/{id}
+    Storage-->>Gateway: Binary stream + headers
+    Gateway-->>Client: Raw binary (Content-Type + Content-Disposition)
+```
+
+## 5. Unified Catalog CRUD
+
+The unified catalogs endpoint provides a consistent CRUD interface for all vehicle catalog types.
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Gateway
+    participant Vehicles
+
+    Client->>Gateway: POST /api/v1/catalogs/marcas { nombre: "Toyota" }
+    Gateway->>Gateway: Validate type "marcas" → maps to "marca"
+    Gateway->>Vehicles: POST /marca { nombre: "Toyota" }
+    Vehicles-->>Gateway: 201 Created
+    Gateway-->>Client: Standardized response
+```
+
+The type validation rejects invalid catalog types with a descriptive error message listing valid options.
+
+## 6. Authentication Flow
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Gateway
+    participant Auth
+
+    Client->>Gateway: POST /api/v1/auth/login { email, password }
+    Gateway->>Auth: POST /api/auth/login
+    Auth-->>Gateway: { access_token, refresh_token, user }
+    Gateway-->>Client: Token pair + user data
+
+    Note over Client,Gateway: Subsequent requests
+    Client->>Gateway: GET /api/v1/inspections (Authorization: Bearer <token>)
+    Gateway->>Gateway: CombinedGuard validates token
+    Gateway->>Auth: POST /api/auth/validate-token
+    Auth-->>Gateway: { userId, roles }
+    Gateway->>Gateway: Check @Roles() if present
+    Gateway->>Form: Proxied request
+```
+
+## Cross-Cutting Concerns
+
+### API Key Injection
+Every outbound request from the gateway to a microservice automatically includes the `x-api-key` header via an Axios interceptor. Each microservice validates this key before processing.
+
+### Error Handling
+- **Connection errors** → `502 Bad Gateway` with service name
+- **Validation errors** → `400 Bad Request` with details
+- **Auth errors** → `401 Unauthorized` or `403 Forbidden`
+- **Not found** → `404 Not Found`
