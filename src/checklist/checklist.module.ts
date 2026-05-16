@@ -8,9 +8,11 @@ import { TemplatesChecklistService } from './application/templates-checklist.ser
 import { InspectionsChecklistService } from './application/inspections-checklist.service';
 import { LabradoChecklistService } from './application/labrado-checklist.service';
 import { ChecklistInfrastructureService } from './infrastructure/checklist.service';
+import { ClientsModule } from '../clients/clients.module';
+import { VehicleModule } from '../vehicle/vehicle.module';
 
 @Module({
-  imports: [HttpModule, ConfigModule],
+  imports: [HttpModule, ConfigModule, ClientsModule, VehicleModule],
   controllers: [
     TemplatesChecklistController,
     InspectionsChecklistController,
