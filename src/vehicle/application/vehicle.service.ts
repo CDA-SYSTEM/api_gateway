@@ -50,6 +50,12 @@ export class VehicleService {
     });
   }
 
+  deleteVehicle(id: string, token: string): Observable<any> {
+    return this.vehicleInfrastructureService.proxyRequest('DELETE', `/vehiculo/${id}`, null, {
+      Authorization: `Bearer ${token}`,
+    });
+  }
+
   // Marcas
   createMarca(data: CreateCatalogoDto, token: string): Observable<any> {
     return this.vehicleInfrastructureService.proxyRequest('POST', '/marca', data, {
