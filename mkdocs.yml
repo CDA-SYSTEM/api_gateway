@@ -29,6 +29,7 @@ theme:
 
 nav:
   - Home: index.md
+  - Examples: examples.md
   - Backend API:
     - Overview: backend/index.md
     - Core & Shared:
