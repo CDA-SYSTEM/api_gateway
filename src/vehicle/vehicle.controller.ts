@@ -52,6 +52,14 @@ export class VehicleController {
     return this.vehicleService.deleteVehicle(id, token);
   }
 
+  @Get('vehiculo/cliente/:clienteId')
+  @ApiOperation({ summary: 'Listar vehículos por cliente' })
+  @ApiResponse({ status: 200, description: 'Lista de vehículos del cliente' })
+  async listVehiclesByClientId(@Param('clienteId') clienteId: string, @Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.vehicleService.listVehiclesByClientId(clienteId, token);
+  }
+
   // Marcas
   @Post('marca')
   @ApiOperation({ summary: 'Crear marca' })
