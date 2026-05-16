@@ -90,9 +90,15 @@ export class InspectionsChecklistService {
     );
   }
 
+  private enrichSafe(response: any, token: string): Observable<any> {
+    return this.enrichResponse(response, token).pipe(
+      catchError(() => of(response)),
+    );
+  }
+
   list(token: string): Observable<any> {
     return this.infrastructure.listInspections(token).pipe(
-      switchMap(res => this.enrichResponse(res, token)),
+      switchMap(res => this.enrichSafe(res, token)),
     );
   }
 
@@ -102,7 +108,7 @@ export class InspectionsChecklistService {
 
   getById(id: string, token: string): Observable<any> {
     return this.infrastructure.getInspectionById(id, token).pipe(
-      switchMap(res => this.enrichResponse(res, token)),
+      switchMap(res => this.enrichSafe(res, token)),
     );
   }
 
@@ -116,25 +122,25 @@ export class InspectionsChecklistService {
 
   getByPlate(plate: string, token: string): Observable<any> {
     return this.infrastructure.getInspectionsByPlate(plate, token).pipe(
-      switchMap(res => this.enrichResponse(res, token)),
+      switchMap(res => this.enrichSafe(res, token)),
     );
   }
 
   getByDate(start: string, end: string, token: string): Observable<any> {
     return this.infrastructure.getInspectionsByDate(start, end, token).pipe(
-      switchMap(res => this.enrichResponse(res, token)),
+      switchMap(res => this.enrichSafe(res, token)),
     );
   }
 
   getByStatus(status: string, token: string): Observable<any> {
     return this.infrastructure.getInspectionsByStatus(status, token).pipe(
-      switchMap(res => this.enrichResponse(res, token)),
+      switchMap(res => this.enrichSafe(res, token)),
     );
   }
 
   getByVehicle(vehicleId: string, token: string): Observable<any> {
     return this.infrastructure.getInspectionsByVehicle(vehicleId, token).pipe(
-      switchMap(res => this.enrichResponse(res, token)),
+      switchMap(res => this.enrichSafe(res, token)),
     );
   }
 
