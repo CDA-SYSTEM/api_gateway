@@ -44,6 +44,14 @@ export class VehicleController {
     return this.vehicleService.updateVehicle(id, body, token);
   }
 
+  @Delete('vehiculo/:id')
+  @ApiOperation({ summary: 'Eliminar vehículo' })
+  @ApiResponse({ status: 200, description: 'Vehículo eliminado' })
+  async deleteVehicle(@Param('id') id: string, @Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.vehicleService.deleteVehicle(id, token);
+  }
+
   // Marcas
   @Post('marca')
   @ApiOperation({ summary: 'Crear marca' })
