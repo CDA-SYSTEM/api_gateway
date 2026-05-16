@@ -1,1 +1,202 @@
-# Local Development Guide## Prerequisites- Node.js 20+ and npm- Python 3.12+ (for Checklist service)- Java 17+ (for Clients and Vehicles services)- Docker & Docker Compose (for databases and infrastructure)- Git## Quick Start### 1. Clone Repositories```bash# API Gateway (this project)git clone https://github.com/CDA-SYSTEM/api_gateway.git# Other services (as needed)git clone https://github.com/CDA-SYSTEM/AuthServices.gitgit clone https://github.com/CDA-SYSTEM/clients-services.gitgit clone https://github.com/CDA-SYSTEM/vehicles-service.gitgit clone https://github.com/CDA-SYSTEM/form-services.gitgit clone https://github.com/CDA-SYSTEM/storage-service.git```### 2. Start Infrastructure with Docker```bash# PostgreSQLdocker run -d \  --name postgres \  -e POSTGRES_PASSWORD=yourpassword \  -p 5432:5432 \  postgres:16# RabbitMQdocker run -d \  --name rabbitmq \  -p 5672:5672 \  -p 15672:15672 \  rabbitmq:3-management# MinIO (for storage service)docker run -d \  --name minio \  -p 9000:9000 \  -p 9001:9001 \  minio/minio server /data --console-address ":9001"```### 3. Configure EnvironmentCopy `.env.example` to `.env` and update the values:```bashcp .env.example .env```Minimum required variables for local development:```envPORT=3600AUTH_SERVICE_BASE_URL=http://localhost:3001/apiVEHICLE_SERVICE_BASE_URL=http://localhost:9000CLIENT_SERVICE_BASE_URL=http://localhost:8080UPLOAD_FILES_SERVICE_BASE_URL=http://localhost:7000RECEPTION_SERVICE_BASE_URL=http://localhost:7500API_GATEWAY_BASE_URL=http://localhost:3600API_KEY=my-secret-api-key-12345API_KEY_FRONT=my-frontend-api-key-67890SWAGGER_USER=adminSWAGGER_PASS=admin123```### 4. Start Services#### API Gateway```bashcd api_gatewaynpm installnpm run start:dev```#### Form Service```bashcd form-servicesnpm installnpm run start:dev```#### Storage Service```bashcd storage-servicenpm installnpm run start:dev```#### Auth Service```bashcd AuthServicesnpm installnpm run start:dev```#### Clients Service (Spring Boot)```bashcd clients-services./mvnw spring-boot:run```#### Vehicles Service (Spring Boot)```bashcd vehicles-service./mvnw spring-boot:run```#### Checklist Service (Django)```bashcd checklist-servicepip install -r requirements.txtpython manage.py runserver 0.0.0.0:8000```### 5. Verify Everything is Running```bash# Gatewaycurl -s http://localhost:3600/# Each servicecurl -s http://localhost:3001/api/auth/login -X POST -H 'Content-Type: application/json' -d '{}'curl -s http://localhost:7500/api/curl -s http://localhost:7000/curl -s http://localhost:9000/api/v1/health```## Docker Compose (All Services)For a fully containerized setup, create a `docker-compose.yml`:```yamlversion: '3.8'services:  postgres:    image: postgres:16    environment:      POSTGRES_PASSWORD: password    ports:      - "5432:5432"  rabbitmq:    image: rabbitmq:3-management    ports:      - "5672:5672"      - "15672:15672"  minio:    image: minio/minio    command: server /data --console-address ":9001"    ports:      - "9000:9000"      - "9001:9001"  api-gateway:    build: ./api_gateway    ports:      - "3600:3600"    env_file: ./api_gateway/.env    depends_on: [postgres, rabbitmq]```## Running Tests```bash# Gateway unit testscd api_gatewaynpm run test# Form service testscd form-servicesnpm run test```## Building Documentation Locally```bashpip install mkdocs mkdocs-materialmkdocs serve# Opens at http://127.0.0.1:8000```## Useful Commands| Command | Description ||---------|-------------|| `npm run start:dev` | Start with hot-reload || `npm run build` | Compile TypeScript || `npm run test` | Run tests || `npm run lint` | Lint code || `mkdocs serve` | Preview documentation || `mkdocs build` | Build static docs site |
+# Local Development Guide
+
+## Prerequisites
+
+- Node.js 20+ and npm
+- Python 3.12+ (for Checklist service)
+- Java 17+ (for Clients and Vehicles services)
+- Docker & Docker Compose (for databases and infrastructure)
+- Git
+
+## Quick Start
+
+### 1. Clone Repositories
+
+```bash
+# API Gateway (this project)
+git clone https://github.com/CDA-SYSTEM/api_gateway.git
+
+# Other services (as needed)
+git clone https://github.com/CDA-SYSTEM/AuthServices.git
+git clone https://github.com/CDA-SYSTEM/clients-services.git
+git clone https://github.com/CDA-SYSTEM/vehicles-service.git
+git clone https://github.com/CDA-SYSTEM/form-services.git
+git clone https://github.com/CDA-SYSTEM/storage-service.git
+```
+
+### 2. Start Infrastructure with Docker
+
+```bash
+# PostgreSQL
+docker run -d \
+  --name postgres \
+  -e POSTGRES_PASSWORD=yourpassword \
+  -p 5432:5432 \
+  postgres:16
+
+# RabbitMQ
+docker run -d \
+  --name rabbitmq \
+  -p 5672:5672 \
+  -p 15672:15672 \
+  rabbitmq:3-management
+
+# MinIO (for storage service)
+docker run -d \
+  --name minio \
+  -p 9000:9000 \
+  -p 9001:9001 \
+  minio/minio server /data --console-address ":9001"
+```
+
+### 3. Configure Environment
+
+Copy `.env.example` to `.env` and update the values:
+
+```bash
+cp .env.example .env
+```
+
+Minimum required variables for local development:
+
+```env
+PORT=3600
+AUTH_SERVICE_BASE_URL=http://localhost:3001/api
+VEHICLE_SERVICE_BASE_URL=http://localhost:9000
+CLIENT_SERVICE_BASE_URL=http://localhost:8080
+UPLOAD_FILES_SERVICE_BASE_URL=http://localhost:7000
+RECEPTION_SERVICE_BASE_URL=http://localhost:7500
+API_GATEWAY_BASE_URL=http://localhost:3600
+API_KEY=my-secret-api-key-12345
+API_KEY_FRONT=my-frontend-api-key-67890
+SWAGGER_USER=admin
+SWAGGER_PASS=admin123
+```
+
+### 4. Start Services
+
+#### API Gateway
+```bash
+cd api_gateway
+npm install
+npm run start:dev
+```
+
+#### Form Service
+```bash
+cd form-services
+npm install
+npm run start:dev
+```
+
+#### Storage Service
+```bash
+cd storage-service
+npm install
+npm run start:dev
+```
+
+#### Auth Service
+```bash
+cd AuthServices
+npm install
+npm run start:dev
+```
+
+#### Clients Service (Spring Boot)
+```bash
+cd clients-services
+./mvnw spring-boot:run
+```
+
+#### Vehicles Service (Spring Boot)
+```bash
+cd vehicles-service
+./mvnw spring-boot:run
+```
+
+#### Checklist Service (Django)
+```bash
+cd checklist-service
+pip install -r requirements.txt
+python manage.py runserver 0.0.0.0:8000
+```
+
+### 5. Verify Everything is Running
+
+```bash
+# Gateway
+curl -s http://localhost:3600/
+
+# Each service
+curl -s http://localhost:3001/api/auth/login -X POST -H 'Content-Type: application/json' -d '{}'
+curl -s http://localhost:7500/api/
+curl -s http://localhost:7000/
+curl -s http://localhost:9000/api/v1/health
+```
+
+## Docker Compose (All Services)
+
+For a fully containerized setup, create a `docker-compose.yml`:
+
+```yaml
+version: '3.8'
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  minio:
+    image: minio/minio
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+
+  api-gateway:
+    build: ./api_gateway
+    ports:
+      - "3600:3600"
+    env_file: ./api_gateway/.env
+    depends_on: [postgres, rabbitmq]
+```
+
+## Running Tests
+
+```bash
+# Gateway unit tests
+cd api_gateway
+npm run test
+
+# Form service tests
+cd form-services
+npm run test
+```
+
+## Building Documentation Locally
+
+```bash
+pip install mkdocs mkdocs-material
+mkdocs serve
+# Opens at http://127.0.0.1:8000
+```
+
+## Useful Commands
+
+| Command | Description |
+|---------|-------------|
+| `npm run start:dev` | Start with hot-reload |
+| `npm run build` | Compile TypeScript |
+| `npm run test` | Run tests |
+| `npm run lint` | Lint code |
+| `mkdocs serve` | Preview documentation |
+| `mkdocs build` | Build static docs site |

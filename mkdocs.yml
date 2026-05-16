@@ -73,10 +73,54 @@ markdown_extensions:
   - toc:
       permalink: true
 
+plugins:
+  - search
+  - i18n:
+      languages:
+        - locale: es
+          name: Español
+          default: true
+          build: true
+        - locale: en
+          name: English
+          build: true
+          nav_translations:
+            Inicio: Home
+            Ejemplos: Examples
+            API Backend: Backend API
+            Visión General: Overview
+            Núcleo & Compartido: Core & Shared
+            Guards: Guards
+            Interceptors: Interceptors
+            Middleware: Middleware
+            Configuración: Configuration
+            Módulos: Modules
+            Controladores: Controllers
+            Servicios: Services
+            Entidades: Entities
+            Cómo Funciona: How It Works
+            Guías: Guides
+            Despliegue: Deployment
+            Desarrollo Local: Local Development
+            Arquitectura de Red: Network Architecture
+            Solución de Problemas: Troubleshooting
+            Base de Datos: Database
+            Changelog: Changelog
+            API Gateway: API Gateway
+            Auth Service: Auth Service
+            Clients Service: Clients Service
+            Vehicles Service: Vehicles Service
+            Form Service: Form Service
+            Storage Service: Storage Service
+            Checklist Service: Checklist Service
+
 extra:
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/CDA-SYSTEM
       name: CDA System en GitHub
+    - icon: fontawesome/solid/language
+      link: https://cda-system.github.io/api_gateway/en/
+      name: English version
 
 copyright: Copyright &copy; 2026 CDA System

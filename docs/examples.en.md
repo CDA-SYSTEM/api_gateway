@@ -1,1 +1,241 @@
-# Curl Examples## Authentication### Login```bashcurl -s -X POST http://localhost:3600/api/v1/auth/login \  -H 'Content-Type: application/json' \  -H 'x-api-key: your-frontend-api-key' \  -d '{    "email": "admin@cda.com",    "password": "secret123"  }'```### Validate Token```bashcurl -s -X POST http://localhost:3600/api/v1/auth/validate-token \  -H 'x-api-key: your-frontend-api-key' \  -H 'Authorization: Bearer <token>'```## Inspections### Create Inspection (with files)```bashcurl -s -X POST http://localhost:3600/api/v1/inspections \  -H 'x-api-key: your-frontend-api-key' \  -H 'Authorization: Bearer <token>' \  -F 'data={    "mileage": 1200,    "client_id": "1",    "vehicle_id": "1",    "vehicle_type": "LIVIANO",    "fuel_type": "GASOLINA",    "service_type": "PARTICULAR",    "operator_id": "1",    "customer_type": "PROPIETARIO",    "revision_type": "TECNICO_MECANICA",    "tinted_windows": "NO",    "armored_vehicle": "NO",    "brake_fluid_sight_glass": "BUEN_ESTADO",    "checklist": {"is_clean": true},    "axles": [{"index": 1, "axle_type": "DELANTERO"}],    "tires": [{"position": "FRONT_LEFT", "code": "TIR-001", "tire_pressure": 32}]  }' \  -F 'photo=@/path/to/photo.jpg' \  -F 'signature=@/path/to/signature.png'```### Update Inspection (partial)```bashcurl -s -X PATCH http://localhost:3600/api/v1/inspections/<id> \  -H 'x-api-key: your-frontend-api-key' \  -H 'Authorization: Bearer <token>' \  -F 'data={"mileage": 1500, "observations": "Actualizado"}' \  -F 'photo=@/path/to/new-photo.jpg'```### List Inspections```bashcurl -s 'http://localhost:3600/api/v1/inspections?page=1&size=10&vehicle_id=ABC123' \  -H 'x-api-key: your-frontend-api-key' \  -H 'Authorization: Bearer <token>'```### Get Inspection by ID```bashcurl -s http://localhost:3600/api/v1/inspections/<id> \  -H 'x-api-key: your-frontend-api-key' \  -H 'Authorization: Bearer <token>'```### Delete Inspection (Admin)```bashcurl -s -X DELETE http://localhost:3600/api/v1/inspections/<id> \  -H 'x-api-key: your-frontend-api-key' \  -H 'Authorization: Bearer <token>'```## Files### Upload File```bashcurl -s -X POST http://localhost:3600/api/v1/storage/upload \  -H 'x-api-key: your-frontend-api-key' \  -H 'Authorization: Bearer <token>' \  -F 'file=@/path/to/document.pdf'```### Download File (Public)```bashcurl -s -O http://localhost:3600/api/v1/storage/files/<uuid>```### List Files```bashcurl -s 'http://localhost:3600/api/v1/storage/files?limit=20' \  -H 'x-api-key: your-frontend-api-key' \  -H 'Authorization: Bearer <token>'```## Catalogs (Read-only)### List Vehicle Types```bashcurl -s http://localhost:3600/api/v1/catalogs/vehicle-types \  -H 'x-api-key: your-frontend-api-key' \  -H 'Authorization: Bearer <token>'```### List Fuel Types```bashcurl -s http://localhost:3600/api/v1/catalogs/fuel-types \  -H 'x-api-key: your-frontend-api-key' \  -H 'Authorization: Bearer <token>'```## Unified Catalogs (CRUD)### Create Catalog Item```bashcurl -s -X POST http://localhost:3600/api/v1/catalogs/marcas \  -H 'x-api-key: your-frontend-api-key' \  -H 'Authorization: Bearer <token>' \  -H 'Content-Type: application/json' \  -d '{"nombre": "Toyota"}'```### List Catalog Items```bashcurl -s http://localhost:3600/api/v1/catalogs/lineas \  -H 'x-api-key: your-frontend-api-key' \  -H 'Authorization: Bearer <token>'```### Get Catalog Item by ID```bashcurl -s http://localhost:3600/api/v1/catalogs/colores/1 \  -H 'x-api-key: your-frontend-api-key' \  -H 'Authorization: Bearer <token>'```### Update Catalog Item```bashcurl -s -X PUT http://localhost:3600/api/v1/catalogs/tipos-vehiculo/1 \  -H 'x-api-key: your-frontend-api-key' \  -H 'Authorization: Bearer <token>' \  -H 'Content-Type: application/json' \  -d '{"nombre": "CAMIONETA"}'```### Delete Catalog Item```bashcurl -s -X DELETE http://localhost:3600/api/v1/catalogs/tipos-combustible/1 \  -H 'x-api-key: your-frontend-api-key' \  -H 'Authorization: Bearer <token>'```## Vehicles### Create Vehicle```bashcurl -s -X POST http://localhost:3600/api/v1/vehiculo \  -H 'x-api-key: your-frontend-api-key' \  -H 'Authorization: Bearer <token>' \  -H 'Content-Type: application/json' \  -d '{    "placa": "ABC123",    "marca_id": 1,    "linea_id": 1,    "modelo": 2024,    "cliente_id": "1"  }'```### List Vehicles```bashcurl -s 'http://localhost:3600/api/v1/vehiculo?page=1&size=10' \  -H 'x-api-key: your-frontend-api-key' \  -H 'Authorization: Bearer <token>'```### List Vehicles by Client```bashcurl -s http://localhost:3600/api/v1/vehiculo/cliente/1 \  -H 'x-api-key: your-frontend-api-key' \  -H 'Authorization: Bearer <token>'```## Clients### Create Client```bashcurl -s -X POST http://localhost:3600/api/v1/clients \  -H 'x-api-key: your-frontend-api-key' \  -H 'Authorization: Bearer <token>' \  -H 'Content-Type: application/json' \  -d '{    "nombre": "Juan P├®rez",    "documento": "12345678",    "tipo_documento_id": 1,    "tipo_persona_id": 1  }'```### Health Check```bashcurl -s http://localhost:3600/api/v1/health \  -H 'x-api-key: your-frontend-api-key' \  -H 'Authorization: Bearer <token>'```## Response FormatAll successful responses follow this structure:```json{  "statusCode": 200,  "message": "Success",  "data": { ... },  "timestamp": "2026-05-10T21:12:09.144Z",  "path": "/api/v1/inspections"}```Error responses:```json{  "statusCode": 400,  "message": "Validation error details",  "error": "Bad Request",  "timestamp": "2026-05-10T21:12:10.504Z",  "path": "/api/v1/inspections"}```!!! tip "Replace placeholders"    Replace `localhost:3600`, `<token>`, `<id>`, `<uuid>`, `your-frontend-api-key`, and file paths with your actual values.
+# Curl Examples
+
+## Authentication
+
+### Login
+```bash
+curl -s -X POST http://localhost:3600/api/v1/auth/login \
+  -H 'Content-Type: application/json' \
+  -H 'x-api-key: your-frontend-api-key' \
+  -d '{
+    "email": "admin@cda.com",
+    "password": "secret123"
+  }'
+```
+
+### Validate Token
+```bash
+curl -s -X POST http://localhost:3600/api/v1/auth/validate-token \
+  -H 'x-api-key: your-frontend-api-key' \
+  -H 'Authorization: Bearer <token>'
+```
+
+## Inspections
+
+### Create Inspection (with files)
+```bash
+curl -s -X POST http://localhost:3600/api/v1/inspections \
+  -H 'x-api-key: your-frontend-api-key' \
+  -H 'Authorization: Bearer <token>' \
+  -F 'data={
+    "mileage": 1200,
+    "client_id": "1",
+    "vehicle_id": "1",
+    "vehicle_type": "LIVIANO",
+    "fuel_type": "GASOLINA",
+    "service_type": "PARTICULAR",
+    "operator_id": "1",
+    "customer_type": "PROPIETARIO",
+    "revision_type": "TECNICO_MECANICA",
+    "tinted_windows": "NO",
+    "armored_vehicle": "NO",
+    "brake_fluid_sight_glass": "BUEN_ESTADO",
+    "checklist": {"is_clean": true},
+    "axles": [{"index": 1, "axle_type": "DELANTERO"}],
+    "tires": [{"position": "FRONT_LEFT", "code": "TIR-001", "tire_pressure": 32}]
+  }' \
+  -F 'photo=@/path/to/photo.jpg' \
+  -F 'signature=@/path/to/signature.png'
+```
+
+### Update Inspection (partial)
+```bash
+curl -s -X PATCH http://localhost:3600/api/v1/inspections/<id> \
+  -H 'x-api-key: your-frontend-api-key' \
+  -H 'Authorization: Bearer <token>' \
+  -F 'data={"mileage": 1500, "observations": "Actualizado"}' \
+  -F 'photo=@/path/to/new-photo.jpg'
+```
+
+### List Inspections
+```bash
+curl -s 'http://localhost:3600/api/v1/inspections?page=1&size=10&vehicle_id=ABC123' \
+  -H 'x-api-key: your-frontend-api-key' \
+  -H 'Authorization: Bearer <token>'
+```
+
+### Get Inspection by ID
+```bash
+curl -s http://localhost:3600/api/v1/inspections/<id> \
+  -H 'x-api-key: your-frontend-api-key' \
+  -H 'Authorization: Bearer <token>'
+```
+
+### Delete Inspection (Admin)
+```bash
+curl -s -X DELETE http://localhost:3600/api/v1/inspections/<id> \
+  -H 'x-api-key: your-frontend-api-key' \
+  -H 'Authorization: Bearer <token>'
+```
+
+## Files
+
+### Upload File
+```bash
+curl -s -X POST http://localhost:3600/api/v1/storage/upload \
+  -H 'x-api-key: your-frontend-api-key' \
+  -H 'Authorization: Bearer <token>' \
+  -F 'file=@/path/to/document.pdf'
+```
+
+### Download File (Public)
+```bash
+curl -s -O http://localhost:3600/api/v1/storage/files/<uuid>
+```
+
+### List Files
+```bash
+curl -s 'http://localhost:3600/api/v1/storage/files?limit=20' \
+  -H 'x-api-key: your-frontend-api-key' \
+  -H 'Authorization: Bearer <token>'
+```
+
+## Catalogs (Read-only)
+
+### List Vehicle Types
+```bash
+curl -s http://localhost:3600/api/v1/catalogs/vehicle-types \
+  -H 'x-api-key: your-frontend-api-key' \
+  -H 'Authorization: Bearer <token>'
+```
+
+### List Fuel Types
+```bash
+curl -s http://localhost:3600/api/v1/catalogs/fuel-types \
+  -H 'x-api-key: your-frontend-api-key' \
+  -H 'Authorization: Bearer <token>'
+```
+
+## Unified Catalogs (CRUD)
+
+### Create Catalog Item
+```bash
+curl -s -X POST http://localhost:3600/api/v1/catalogs/marcas \
+  -H 'x-api-key: your-frontend-api-key' \
+  -H 'Authorization: Bearer <token>' \
+  -H 'Content-Type: application/json' \
+  -d '{"nombre": "Toyota"}'
+```
+
+### List Catalog Items
+```bash
+curl -s http://localhost:3600/api/v1/catalogs/lineas \
+  -H 'x-api-key: your-frontend-api-key' \
+  -H 'Authorization: Bearer <token>'
+```
+
+### Get Catalog Item by ID
+```bash
+curl -s http://localhost:3600/api/v1/catalogs/colores/1 \
+  -H 'x-api-key: your-frontend-api-key' \
+  -H 'Authorization: Bearer <token>'
+```
+
+### Update Catalog Item
+```bash
+curl -s -X PUT http://localhost:3600/api/v1/catalogs/tipos-vehiculo/1 \
+  -H 'x-api-key: your-frontend-api-key' \
+  -H 'Authorization: Bearer <token>' \
+  -H 'Content-Type: application/json' \
+  -d '{"nombre": "CAMIONETA"}'
+```
+
+### Delete Catalog Item
+```bash
+curl -s -X DELETE http://localhost:3600/api/v1/catalogs/tipos-combustible/1 \
+  -H 'x-api-key: your-frontend-api-key' \
+  -H 'Authorization: Bearer <token>'
+```
+
+## Vehicles
+
+### Create Vehicle
+```bash
+curl -s -X POST http://localhost:3600/api/v1/vehiculo \
+  -H 'x-api-key: your-frontend-api-key' \
+  -H 'Authorization: Bearer <token>' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "placa": "ABC123",
+    "marca_id": 1,
+    "linea_id": 1,
+    "modelo": 2024,
+    "cliente_id": "1"
+  }'
+```
+
+### List Vehicles
+```bash
+curl -s 'http://localhost:3600/api/v1/vehiculo?page=1&size=10' \
+  -H 'x-api-key: your-frontend-api-key' \
+  -H 'Authorization: Bearer <token>'
+```
+
+### List Vehicles by Client
+```bash
+curl -s http://localhost:3600/api/v1/vehiculo/cliente/1 \
+  -H 'x-api-key: your-frontend-api-key' \
+  -H 'Authorization: Bearer <token>'
+```
+
+## Clients
+
+### Create Client
+```bash
+curl -s -X POST http://localhost:3600/api/v1/clients \
+  -H 'x-api-key: your-frontend-api-key' \
+  -H 'Authorization: Bearer <token>' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "nombre": "Juan P├®rez",
+    "documento": "12345678",
+    "tipo_documento_id": 1,
+    "tipo_persona_id": 1
+  }'
+```
+
+### Health Check
+```bash
+curl -s http://localhost:3600/api/v1/health \
+  -H 'x-api-key: your-frontend-api-key' \
+  -H 'Authorization: Bearer <token>'
+```
+
+## Response Format
+
+All successful responses follow this structure:
+
+```json
+{
+  "statusCode": 200,
+  "message": "Success",
+  "data": { ... },
+  "timestamp": "2026-05-10T21:12:09.144Z",
+  "path": "/api/v1/inspections"
+}
+```
+
+Error responses:
+
+```json
+{
+  "statusCode": 400,
+  "message": "Validation error details",
+  "error": "Bad Request",
+  "timestamp": "2026-05-10T21:12:10.504Z",
+  "path": "/api/v1/inspections"
+}
+```
+
+!!! tip "Replace placeholders"
+    Replace `localhost:3600`, `<token>`, `<id>`, `<uuid>`, `your-frontend-api-key`, and file paths with your actual values.
