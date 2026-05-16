@@ -42,6 +42,13 @@ nav:
     - Services: backend/services.md
     - Entities: backend/entities.md
     - How It Works: backend/how-it-works.md
+  - Guides:
+    - Deployment: guides/deployment.md
+    - Local Development: guides/local-development.md
+    - Network Architecture: guides/network-architecture.md
+    - Troubleshooting: guides/troubleshooting.md
+  - Database: database/overview.md
+  - Changelog: changelog.md
   - Services:
     - API Gateway: services/api-gateway.md
     - Auth Service: services/auth-service.md
