@@ -1,0 +1,70 @@
+site_name: CDA System - API Gateway Docs
+site_description: Documentación del API Gateway y microservicios del sistema CDA
+site_url: https://cda-system.github.io/api_gateway
+repo_url: https://github.com/CDA-SYSTEM/api_gateway
+repo_name: CDA-SYSTEM/api_gateway
+
+theme:
+  name: material
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - toc.integrate
+    - navigation.footer
+    - navigation.top
+    - content.code.copy
+  palette:
+    - scheme: default
+      primary: teal
+      accent: purple
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: teal
+      accent: purple
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+nav:
+  - Home: index.md
+  - Backend API:
+    - Overview: backend/index.md
+    - Core & Shared:
+      - Guards: backend/guards.md
+      - Interceptors: backend/interceptors.md
+      - Middleware: backend/middleware.md
+    - Configuration: backend/configuration.md
+    - Modules: backend/modules.md
+    - Controllers: backend/controllers.md
+    - Services: backend/services.md
+    - Entities: backend/entities.md
+    - How It Works: backend/how-it-works.md
+  - Services:
+    - API Gateway: services/api-gateway.md
+    - Auth Service: services/auth-service.md
+    - Clients Service: services/clients-service.md
+    - Vehicles Service: services/vehicles-service.md
+    - Form Service: services/form-service.md
+    - Storage Service: services/storage-service.md
+    - Checklist Service: services/checklist-service.md
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
+  - tables
+  - toc:
+      permalink: true
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/CDA-SYSTEM
