@@ -9,7 +9,7 @@ import { TemplateQueryDto } from './application/dtos/template-query.dto';
 import type { Request } from 'express';
 
 @ApiTags('checklist-templates')
-@Controller('api/v1/templates')
+@Controller('api/v1/checklist/templates')
 @UsePipes(new ValidationPipe({ transform: true }))
 @ApiSecurity('x-api-key')
 @ApiBearerAuth()

@@ -10,7 +10,7 @@ import { InspectionQueryDto } from './application/dtos/inspection-query.dto';
 import type { Request } from 'express';
 
 @ApiTags('checklist-inspections')
-@Controller('api/v1/inspections')
+@Controller('api/v1/checklist/inspections')
 @UsePipes(new ValidationPipe({ transform: true }))
 @ApiSecurity('x-api-key')
 @ApiBearerAuth()
@@ -47,9 +47,9 @@ export class InspectionsChecklistController {
   @ApiQuery({ name: 'start', required: true, example: '2026-05-01T00:00:00Z' })
   @ApiQuery({ name: 'end', required: true, example: '2026-05-16T23:59:59Z' })
   @ApiResponse({ status: 200, description: 'Inspecciones encontradas' })
-  getByDate(@Query() query: InspectionQueryDto, @Req() req: Request) {
+  getByDate(@Query('start') start: string, @Query('end') end: string, @Req() req: Request) {
     const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
-    return this.inspectionsService.getByDate(query.start!, query.end!, token);
+    return this.inspectionsService.getByDate(start, end, token);
   }
 
   @Get('by-status/:status')

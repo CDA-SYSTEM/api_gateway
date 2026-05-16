@@ -8,7 +8,7 @@ import { UpdateLabradoDto } from './application/dtos/update-labrado.dto';
 import type { Request } from 'express';
 
 @ApiTags('checklist-labrado')
-@Controller('api/v1/labrado')
+@Controller('api/v1/checklist/labrado')
 @UsePipes(new ValidationPipe({ transform: true }))
 @ApiSecurity('x-api-key')
 @ApiBearerAuth()
