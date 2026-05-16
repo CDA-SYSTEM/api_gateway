@@ -29,10 +29,12 @@ export class ChecklistInfrastructureService {
             HttpStatus.BAD_GATEWAY,
           );
         }
-        throw new HttpException(
-          error.response?.data || `Service error: ${error.message}`,
-          error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR,
-        );
+        const rawData = error.response?.data;
+        const isHtml = typeof rawData === 'string' && rawData.trim().startsWith('<!');
+        const message = isHtml
+          ? `Error interno del checklist-service (${error.response?.status || 500})`
+          : (rawData || `Service error: ${error.message}`);
+        throw new HttpException(message, error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR);
       }),
     );
   }
