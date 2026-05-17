@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Patch, Delete, Body, Query, Param, UseGuards, ValidationPipe, UsePipes, Req } from '@nestjs/common';
+import { Controller, Post, Get, Patch, Delete, Body, Query, Param, UseGuards, ValidationPipe, UsePipes, Req, HttpCode } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBody, ApiResponse, ApiQuery, ApiSecurity, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthApplicationService } from './application/auth.service';
 import { LoginDto } from './application/dtos/login.dto';
@@ -21,6 +21,7 @@ export class AuthController {
 
   @Public()
   @Post('login')
+  @HttpCode(200)
   @ApiOperation({ summary: 'Login de usuario' })
   @ApiBody({ type: LoginDto })
   @ApiResponse({ status: 200, description: 'Login exitoso' })
