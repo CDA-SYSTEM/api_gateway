@@ -28,6 +28,49 @@
 
 El gateway no implementa lógica de negocio para entidades de dominio. En su lugar, delega en microservicios dedicados a través de una **arquitectura de proxy de tres capas** (Controlador → Servicio de Aplicación → Servicio de Infraestructura). Esto mantiene el gateway delgado y enfocado en preocupaciones transversales.
 
+## Formato de Respuesta
+
+Todas las respuestas exitosas pasan por el `ResponseInterceptor` global y se envuelven en una estructura estándar:
+
+```json
+{
+  "statusCode": 200,
+  "message": "Success",
+  "data": { ... },
+  "timestamp": "2026-05-17T22:00:00.000Z",
+  "path": "/auth/login"
+}
+```
+
+Los errores usan el mismo formato pero con `error` en lugar de `data`:
+
+```json
+{
+  "statusCode": 400,
+  "message": "Validation failed",
+  "error": "El email no es válido",
+  "timestamp": "2026-05-17T22:00:00.000Z",
+  "path": "/auth/login"
+}
+```
+
+Los endpoints pueden omitir este envoltorio con el decorador `@SkipResponseFormat()`.
+
+## Códigos de Estado HTTP
+
+NestJS 11 asigna **201 Created** por defecto a todas las rutas `POST`. El `ResponseInterceptor` lee `response.statusCode` y lo refleja en el campo `statusCode` del body.
+
+Para sobreescribir este comportamiento en un endpoint específico, usa `@HttpCode(200)`:
+
+```typescript
+@Post('login')
+@HttpCode(200)
+async login(@Body() body: LoginDto) { ... }
+```
+
+**Endpoints que requieren `@HttpCode(200)` explícito:**
+- `POST /auth/login` (login no es creación de recurso)
+
 ## Swagger
 
 `{API_GATEWAY_BASE_URL}/docs` — Protegido con HTTP Basic Auth.

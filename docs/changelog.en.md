@@ -4,7 +4,11 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Fixed
+- `POST /auth/login` returned HTTP 201 instead of 200 due to NestJS 11 default for POST routes; added explicit `@HttpCode(200)` override
+
 ### Added
+- Standard response format and HTTP status code documentation in `docs/services/api-gateway.md`
 - MkDocs documentation site with Material theme
 - GitHub Actions workflow for docs deploy to GitHub Pages
 - curl examples page for all gateway endpoints
