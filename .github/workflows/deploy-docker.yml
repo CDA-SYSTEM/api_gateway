@@ -72,6 +72,7 @@ jobs:
               -e CLIENT_SERVICE_BASE_URL="${{ secrets.CLIENT_SERVICE_BASE_URL }}" \
               -e UPLOAD_FILES_SERVICE_BASE_URL="${{ secrets.UPLOAD_FILES_SERVICE_BASE_URL }}" \
               -e RECEPTION_SERVICE_BASE_URL="${{ secrets.RECEPTION_SERVICE_BASE_URL }}" \
+              -e CHECKLIST_SERVICE_BASE_URL="${{ secrets.CHECKLIST_SERVICE_BASE_URL }}" \
               -e SWAGGER_PASS="${{ secrets.SWAGGER_PASS }}" \
               --restart unless-stopped \
               ghcr.io/${{ env.REPO_LC }}:latest

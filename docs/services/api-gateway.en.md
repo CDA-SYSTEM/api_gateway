@@ -28,6 +28,49 @@
 
 The gateway does not implement business logic for domain entities. Instead, it delegates to dedicated microservices through a **three-layer proxy architecture** (Controller ÔåÆ Application Service ÔåÆ Infrastructure Service). This keeps the gateway thin and focused on cross-cutting concerns.
 
+## Response Format
+
+Every successful response passes through the global `ResponseInterceptor` and is wrapped in a standard envelope:
+
+```json
+{
+  "statusCode": 200,
+  "message": "Success",
+  "data": { ... },
+  "timestamp": "2026-05-17T22:00:00.000Z",
+  "path": "/auth/login"
+}
+```
+
+Errors use the same format but with `error` instead of `data`:
+
+```json
+{
+  "statusCode": 400,
+  "message": "Validation failed",
+  "error": "The email is not valid",
+  "timestamp": "2026-05-17T22:00:00.000Z",
+  "path": "/auth/login"
+}
+```
+
+Endpoints can skip this wrapper with the `@SkipResponseFormat()` decorator.
+
+## HTTP Status Codes
+
+NestJS 11 defaults **201 Created** for all `POST` routes. The `ResponseInterceptor` reads `response.statusCode` and reflects it in the body's `statusCode` field.
+
+To override this on a specific endpoint, use `@HttpCode(200)`:
+
+```typescript
+@Post('login')
+@HttpCode(200)
+async login(@Body() body: LoginDto) { ... }
+```
+
+**Endpoints requiring explicit `@HttpCode(200)`:**
+- `POST /auth/login` (login is not resource creation)
+
 ## Swagger
 
 `{API_GATEWAY_BASE_URL}/docs` ÔÇö Protected with HTTP Basic Auth.

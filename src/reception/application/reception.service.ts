@@ -81,6 +81,7 @@ export class ReceptionService {
       }),
     );
   }
+  
 
   updateInspection(
     id: string,

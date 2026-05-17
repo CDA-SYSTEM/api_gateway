@@ -611,6 +611,603 @@ Encabezados comunes usados por todas las peticiones:
     }).then(r => r.json()).then(console.log);
     ```
 
+## Checklist — Plantillas
+
+### Crear plantilla
+
+=== "cURL"
+    ```bash
+    curl -s -X POST http://localhost:3600/api/v1/checklist/templates \
+      -H 'x-api-key: your-frontend-api-key' \
+      -H 'Authorization: Bearer <token>' \
+      -H 'Content-Type: application/json' \
+      -d '{
+        "code": "MOTOS",
+        "name": "Inspección Motos",
+        "supported_vehicle_types": ["MOTO"],
+        "sections": [
+          {
+            "title": "Sistema Eléctrico",
+            "order": 1,
+            "subsections": [
+              {
+                "title": "Batería",
+                "order": 1,
+                "items": [
+                  {
+                    "code": "BAT-001",
+                    "description": "La batería está en buen estado",
+                    "defect_type": "A",
+                    "order": 1
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }'
+    ```
+=== "Python"
+    ```python
+    import requests
+
+    url = "http://localhost:3600/api/v1/checklist/templates"
+    headers = {"x-api-key": "your-frontend-api-key", "Authorization": "Bearer <token>", "Content-Type": "application/json"}
+    data = {
+        "code": "MOTOS",
+        "name": "Inspección Motos",
+        "supported_vehicle_types": ["MOTO"],
+        "sections": [{
+            "title": "Sistema Eléctrico",
+            "order": 1,
+            "subsections": [{
+                "title": "Batería",
+                "order": 1,
+                "items": [{
+                    "code": "BAT-001",
+                    "description": "La batería está en buen estado",
+                    "defect_type": "A",
+                    "order": 1
+                }]
+            }]
+        }]
+    }
+    response = requests.post(url, json=data, headers=headers)
+    print(response.json())
+    ```
+=== "JavaScript"
+    ```javascript
+    fetch('http://localhost:3600/api/v1/checklist/templates', {
+      method: 'POST',
+      headers: {'x-api-key': 'your-frontend-api-key', 'Authorization': 'Bearer <token>', 'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        code: 'MOTOS',
+        name: 'Inspección Motos',
+        supported_vehicle_types: ['MOTO'],
+        sections: [{title: 'Sistema Eléctrico', order: 1, subsections: [{title: 'Batería', order: 1, items: [{code: 'BAT-001', description: 'La batería está en buen estado', defect_type: 'A', order: 1}]}]}]
+      })
+    }).then(r => r.json()).then(console.log);
+    ```
+
+### Listar plantillas
+
+=== "cURL"
+    ```bash
+    curl -s 'http://localhost:3600/api/v1/checklist/templates?vehicle_type=MOTO' \
+      -H 'x-api-key: your-frontend-api-key' \
+      -H 'Authorization: Bearer <token>'
+    ```
+=== "Python"
+    ```python
+    import requests
+
+    url = "http://localhost:3600/api/v1/checklist/templates"
+    params = {"vehicle_type": "MOTO"}
+    headers = {"x-api-key": "your-frontend-api-key", "Authorization": "Bearer <token>"}
+    response = requests.get(url, params=params, headers=headers)
+    print(response.json())
+    ```
+=== "JavaScript"
+    ```javascript
+    fetch('http://localhost:3600/api/v1/checklist/templates?vehicle_type=MOTO', {
+      headers: {'x-api-key': 'your-frontend-api-key', 'Authorization': 'Bearer <token>'}
+    }).then(r => r.json()).then(console.log);
+    ```
+
+### Obtener plantilla por ID
+
+=== "cURL"
+    ```bash
+    curl -s http://localhost:3600/api/v1/checklist/templates/<id> \
+      -H 'x-api-key: your-frontend-api-key' \
+      -H 'Authorization: Bearer <token>'
+    ```
+=== "Python"
+    ```python
+    import requests
+
+    url = "http://localhost:3600/api/v1/checklist/templates/<id>"
+    headers = {"x-api-key": "your-frontend-api-key", "Authorization": "Bearer <token>"}
+    response = requests.get(url, headers=headers)
+    print(response.json())
+    ```
+=== "JavaScript"
+    ```javascript
+    fetch('http://localhost:3600/api/v1/checklist/templates/<id>', {
+      headers: {'x-api-key': 'your-frontend-api-key', 'Authorization': 'Bearer <token>'}
+    }).then(r => r.json()).then(console.log);
+    ```
+
+### Obtener plantilla activa por tipo de vehículo
+
+=== "cURL"
+    ```bash
+    # Motos, Livianos o Pesados
+    curl -s http://localhost:3600/api/v1/checklist/templates/active/MOTO \
+      -H 'x-api-key: your-frontend-api-key' \
+      -H 'Authorization: Bearer <token>'
+    ```
+=== "Python"
+    ```python
+    import requests
+
+    url = "http://localhost:3600/api/v1/checklist/templates/active/MOTO"
+    headers = {"x-api-key": "your-frontend-api-key", "Authorization": "Bearer <token>"}
+    response = requests.get(url, headers=headers)
+    print(response.json())
+    ```
+=== "JavaScript"
+    ```javascript
+    fetch('http://localhost:3600/api/v1/checklist/templates/active/MOTO', {
+      headers: {'x-api-key': 'your-frontend-api-key', 'Authorization': 'Bearer <token>'}
+    }).then(r => r.json()).then(console.log);
+    ```
+
+### Eliminar plantilla
+
+=== "cURL"
+    ```bash
+    curl -s -X DELETE http://localhost:3600/api/v1/checklist/templates/<id> \
+      -H 'x-api-key: your-frontend-api-key' \
+      -H 'Authorization: Bearer <token>'
+    ```
+=== "Python"
+    ```python
+    import requests
+
+    url = "http://localhost:3600/api/v1/checklist/templates/<id>"
+    headers = {"x-api-key": "your-frontend-api-key", "Authorization": "Bearer <token>"}
+    response = requests.delete(url, headers=headers)
+    print(response.json())
+    ```
+=== "JavaScript"
+    ```javascript
+    fetch('http://localhost:3600/api/v1/checklist/templates/<id>', {
+      method: 'DELETE',
+      headers: {'x-api-key': 'your-frontend-api-key', 'Authorization': 'Bearer <token>'}
+    }).then(r => r.json()).then(console.log);
+    ```
+
+## Checklist — Inspecciones
+
+### Crear inspección (borrador)
+
+=== "cURL"
+    ```bash
+    curl -s -X POST http://localhost:3600/api/v1/checklist/inspections \
+      -H 'x-api-key: your-frontend-api-key' \
+      -H 'Authorization: Bearer <token>' \
+      -H 'Content-Type: application/json' \
+      -d '{
+        "plate": "ABC123",
+        "vehicle_id": 1,
+        "client_id": 1,
+        "vehicle_type": "LIVIANO",
+        "inspector_id": "02524568-5b17-4218-94c5-3fc09d5b6268",
+        "responses": [
+          {
+            "section_code": "SEC-001",
+            "subsection_code": "SUB-001",
+            "item_code": "BAT-001",
+            "response": "OK",
+            "observation": ""
+          }
+        ]
+      }'
+    ```
+=== "Python"
+    ```python
+    import requests
+
+    url = "http://localhost:3600/api/v1/checklist/inspections"
+    headers = {"x-api-key": "your-frontend-api-key", "Authorization": "Bearer <token>", "Content-Type": "application/json"}
+    data = {
+        "plate": "ABC123",
+        "vehicle_id": 1,
+        "client_id": 1,
+        "vehicle_type": "LIVIANO",
+        "inspector_id": "02524568-5b17-4218-94c5-3fc09d5b6268",
+        "responses": [{"section_code": "SEC-001", "subsection_code": "SUB-001", "item_code": "BAT-001", "response": "OK", "observation": ""}]
+    }
+    response = requests.post(url, json=data, headers=headers)
+    print(response.json())
+    ```
+=== "JavaScript"
+    ```javascript
+    fetch('http://localhost:3600/api/v1/checklist/inspections', {
+      method: 'POST',
+      headers: {'x-api-key': 'your-frontend-api-key', 'Authorization': 'Bearer <token>', 'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        plate: 'ABC123',
+        vehicle_id: 1,
+        client_id: 1,
+        vehicle_type: 'LIVIANO',
+        inspector_id: '02524568-5b17-4218-94c5-3fc09d5b6268',
+        responses: [{section_code: 'SEC-001', subsection_code: 'SUB-001', item_code: 'BAT-001', response: 'OK', observation: ''}]
+      })
+    }).then(r => r.json()).then(console.log);
+    ```
+
+### Listar inspecciones
+
+=== "cURL"
+    ```bash
+    curl -s 'http://localhost:3600/api/v1/checklist/inspections' \
+      -H 'x-api-key: your-frontend-api-key' \
+      -H 'Authorization: Bearer <token>'
+    ```
+=== "Python"
+    ```python
+    import requests
+
+    url = "http://localhost:3600/api/v1/checklist/inspections"
+    headers = {"x-api-key": "your-frontend-api-key", "Authorization": "Bearer <token>"}
+    response = requests.get(url, headers=headers)
+    print(response.json())
+    ```
+=== "JavaScript"
+    ```javascript
+    fetch('http://localhost:3600/api/v1/checklist/inspections', {
+      headers: {'x-api-key': 'your-frontend-api-key', 'Authorization': 'Bearer <token>'}
+    }).then(r => r.json()).then(console.log);
+    ```
+
+### Obtener inspección por ID
+
+=== "cURL"
+    ```bash
+    curl -s http://localhost:3600/api/v1/checklist/inspections/<id> \
+      -H 'x-api-key: your-frontend-api-key' \
+      -H 'Authorization: Bearer <token>'
+    ```
+=== "Python"
+    ```python
+    import requests
+
+    url = "http://localhost:3600/api/v1/checklist/inspections/<id>"
+    headers = {"x-api-key": "your-frontend-api-key", "Authorization": "Bearer <token>"}
+    response = requests.get(url, headers=headers)
+    print(response.json())
+    ```
+=== "JavaScript"
+    ```javascript
+    fetch('http://localhost:3600/api/v1/checklist/inspections/<id>', {
+      headers: {'x-api-key': 'your-frontend-api-key', 'Authorization': 'Bearer <token>'}
+    }).then(r => r.json()).then(console.log);
+    ```
+
+### Buscar inspecciones por placa
+
+=== "cURL"
+    ```bash
+    curl -s http://localhost:3600/api/v1/checklist/inspections/by-plate/ABC123 \
+      -H 'x-api-key: your-frontend-api-key' \
+      -H 'Authorization: Bearer <token>'
+    ```
+=== "Python"
+    ```python
+    import requests
+
+    url = "http://localhost:3600/api/v1/checklist/inspections/by-plate/ABC123"
+    headers = {"x-api-key": "your-frontend-api-key", "Authorization": "Bearer <token>"}
+    response = requests.get(url, headers=headers)
+    print(response.json())
+    ```
+=== "JavaScript"
+    ```javascript
+    fetch('http://localhost:3600/api/v1/checklist/inspections/by-plate/ABC123', {
+      headers: {'x-api-key': 'your-frontend-api-key', 'Authorization': 'Bearer <token>'}
+    }).then(r => r.json()).then(console.log);
+    ```
+
+### Buscar inspecciones por rango de fechas
+
+=== "cURL"
+    ```bash
+    curl -s 'http://localhost:3600/api/v1/checklist/inspections/by-date?start=2026-01-01&end=2026-12-31' \
+      -H 'x-api-key: your-frontend-api-key' \
+      -H 'Authorization: Bearer <token>'
+    ```
+=== "Python"
+    ```python
+    import requests
+
+    url = "http://localhost:3600/api/v1/checklist/inspections/by-date"
+    params = {"start": "2026-01-01", "end": "2026-12-31"}
+    headers = {"x-api-key": "your-frontend-api-key", "Authorization": "Bearer <token>"}
+    response = requests.get(url, params=params, headers=headers)
+    print(response.json())
+    ```
+=== "JavaScript"
+    ```javascript
+    fetch('http://localhost:3600/api/v1/checklist/inspections/by-date?start=2026-01-01&end=2026-12-31', {
+      headers: {'x-api-key': 'your-frontend-api-key', 'Authorization': 'Bearer <token>'}
+    }).then(r => r.json()).then(console.log);
+    ```
+
+### Buscar inspecciones por estado
+
+=== "cURL"
+    ```bash
+    # Estados: draft, in_progress, completed, cancelled
+    curl -s http://localhost:3600/api/v1/checklist/inspections/by-status/draft \
+      -H 'x-api-key: your-frontend-api-key' \
+      -H 'Authorization: Bearer <token>'
+    ```
+=== "Python"
+    ```python
+    import requests
+
+    url = "http://localhost:3600/api/v1/checklist/inspections/by-status/draft"
+    headers = {"x-api-key": "your-frontend-api-key", "Authorization": "Bearer <token>"}
+    response = requests.get(url, headers=headers)
+    print(response.json())
+    ```
+=== "JavaScript"
+    ```javascript
+    fetch('http://localhost:3600/api/v1/checklist/inspections/by-status/draft', {
+      headers: {'x-api-key': 'your-frontend-api-key', 'Authorization': 'Bearer <token>'}
+    }).then(r => r.json()).then(console.log);
+    ```
+
+### Marcar inspección en progreso
+
+=== "cURL"
+    ```bash
+    curl -s -X PATCH http://localhost:3600/api/v1/checklist/inspections/<id>/in-progress \
+      -H 'x-api-key: your-frontend-api-key' \
+      -H 'Authorization: Bearer <token>' \
+      -H 'Content-Type: application/json' \
+      -d '{"responses": [{"section_code":"SEC-001","subsection_code":"SUB-001","item_code":"BAT-001","response":"OK"}]}'
+    ```
+=== "Python"
+    ```python
+    import requests
+
+    url = "http://localhost:3600/api/v1/checklist/inspections/<id>/in-progress"
+    headers = {"x-api-key": "your-frontend-api-key", "Authorization": "Bearer <token>", "Content-Type": "application/json"}
+    data = {"responses": [{"section_code": "SEC-001", "subsection_code": "SUB-001", "item_code": "BAT-001", "response": "OK"}]}
+    response = requests.patch(url, json=data, headers=headers)
+    print(response.json())
+    ```
+=== "JavaScript"
+    ```javascript
+    fetch('http://localhost:3600/api/v1/checklist/inspections/<id>/in-progress', {
+      method: 'PATCH',
+      headers: {'x-api-key': 'your-frontend-api-key', 'Authorization': 'Bearer <token>', 'Content-Type': 'application/json'},
+      body: JSON.stringify({responses: [{section_code: 'SEC-001', subsection_code: 'SUB-001', item_code: 'BAT-001', response: 'OK'}]})
+    }).then(r => r.json()).then(console.log);
+    ```
+
+### Cerrar inspección
+
+=== "cURL"
+    ```bash
+    curl -s -X PATCH http://localhost:3600/api/v1/checklist/inspections/<id>/close \
+      -H 'x-api-key: your-frontend-api-key' \
+      -H 'Authorization: Bearer <token>' \
+      -H 'Content-Type: application/json' \
+      -d '{"general_result": "APROBADO"}'
+    ```
+=== "Python"
+    ```python
+    import requests
+
+    url = "http://localhost:3600/api/v1/checklist/inspections/<id>/close"
+    headers = {"x-api-key": "your-frontend-api-key", "Authorization": "Bearer <token>", "Content-Type": "application/json"}
+    data = {"general_result": "APROBADO"}
+    response = requests.patch(url, json=data, headers=headers)
+    print(response.json())
+    ```
+=== "JavaScript"
+    ```javascript
+    fetch('http://localhost:3600/api/v1/checklist/inspections/<id>/close', {
+      method: 'PATCH',
+      headers: {'x-api-key': 'your-frontend-api-key', 'Authorization': 'Bearer <token>', 'Content-Type': 'application/json'},
+      body: JSON.stringify({general_result: 'APROBADO'})
+    }).then(r => r.json()).then(console.log);
+    ```
+
+### Eliminar inspección
+
+=== "cURL"
+    ```bash
+    curl -s -X DELETE http://localhost:3600/api/v1/checklist/inspections/<id> \
+      -H 'x-api-key: your-frontend-api-key' \
+      -H 'Authorization: Bearer <token>'
+    ```
+=== "Python"
+    ```python
+    import requests
+
+    url = "http://localhost:3600/api/v1/checklist/inspections/<id>"
+    headers = {"x-api-key": "your-frontend-api-key", "Authorization": "Bearer <token>"}
+    response = requests.delete(url, headers=headers)
+    print(response.json())
+    ```
+=== "JavaScript"
+    ```javascript
+    fetch('http://localhost:3600/api/v1/checklist/inspections/<id>', {
+      method: 'DELETE',
+      headers: {'x-api-key': 'your-frontend-api-key', 'Authorization': 'Bearer <token>'}
+    }).then(r => r.json()).then(console.log);
+    ```
+
+## Checklist — Labrado
+
+### Crear medidas de labrado
+
+=== "cURL"
+    ```bash
+    curl -s -X POST http://localhost:3600/api/v1/checklist/labrado \
+      -H 'x-api-key: your-frontend-api-key' \
+      -H 'Authorization: Bearer <token>' \
+      -H 'Content-Type: application/json' \
+      -d '{
+        "inspection_id": "<inspection_id>",
+        "axles": [
+          {
+            "axle_code": "DEL-001",
+            "wheels": [
+              {
+                "wheel_code": "WHEEL-LF",
+                "tires": [
+                  {
+                    "tire_code": "TIR-001",
+                    "outer_mm": 6.5,
+                    "middle_mm": 6.2,
+                    "inner_mm": 6.0
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }'
+    ```
+=== "Python"
+    ```python
+    import requests
+
+    url = "http://localhost:3600/api/v1/checklist/labrado"
+    headers = {"x-api-key": "your-frontend-api-key", "Authorization": "Bearer <token>", "Content-Type": "application/json"}
+    data = {
+        "inspection_id": "<inspection_id>",
+        "axles": [{
+            "axle_code": "DEL-001",
+            "wheels": [{
+                "wheel_code": "WHEEL-LF",
+                "tires": [{
+                    "tire_code": "TIR-001",
+                    "outer_mm": 6.5,
+                    "middle_mm": 6.2,
+                    "inner_mm": 6.0
+                }]
+            }]
+        }]
+    }
+    response = requests.post(url, json=data, headers=headers)
+    print(response.json())
+    ```
+=== "JavaScript"
+    ```javascript
+    fetch('http://localhost:3600/api/v1/checklist/labrado', {
+      method: 'POST',
+      headers: {'x-api-key': 'your-frontend-api-key', 'Authorization': 'Bearer <token>', 'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        inspection_id: '<inspection_id>',
+        axles: [{axle_code: 'DEL-001', wheels: [{wheel_code: 'WHEEL-LF', tires: [{tire_code: 'TIR-001', outer_mm: 6.5, middle_mm: 6.2, inner_mm: 6.0}]}]}]
+      })
+    }).then(r => r.json()).then(console.log);
+    ```
+
+### Obtener medidas de labrado por inspección
+
+=== "cURL"
+    ```bash
+    curl -s http://localhost:3600/api/v1/checklist/labrado/by-inspection/<inspection_id> \
+      -H 'x-api-key: your-frontend-api-key' \
+      -H 'Authorization: Bearer <token>'
+    ```
+=== "Python"
+    ```python
+    import requests
+
+    url = "http://localhost:3600/api/v1/checklist/labrado/by-inspection/<inspection_id>"
+    headers = {"x-api-key": "your-frontend-api-key", "Authorization": "Bearer <token>"}
+    response = requests.get(url, headers=headers)
+    print(response.json())
+    ```
+=== "JavaScript"
+    ```javascript
+    fetch('http://localhost:3600/api/v1/checklist/labrado/by-inspection/<inspection_id>', {
+      headers: {'x-api-key': 'your-frontend-api-key', 'Authorization': 'Bearer <token>'}
+    }).then(r => r.json()).then(console.log);
+    ```
+
+### Actualizar medidas de labrado por inspección
+
+=== "cURL"
+    ```bash
+    curl -s -X PUT http://localhost:3600/api/v1/checklist/labrado/by-inspection/<inspection_id> \
+      -H 'x-api-key: your-frontend-api-key' \
+      -H 'Authorization: Bearer <token>' \
+      -H 'Content-Type: application/json' \
+      -d '{
+        "axles": [
+          {
+            "axle_code": "DEL-001",
+            "wheels": [
+              {
+                "wheel_code": "WHEEL-LF",
+                "tires": [
+                  {
+                    "tire_code": "TIR-001",
+                    "outer_mm": 7.0,
+                    "middle_mm": 6.8,
+                    "inner_mm": 6.5
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }'
+    ```
+=== "Python"
+    ```python
+    import requests
+
+    url = "http://localhost:3600/api/v1/checklist/labrado/by-inspection/<inspection_id>"
+    headers = {"x-api-key": "your-frontend-api-key", "Authorization": "Bearer <token>", "Content-Type": "application/json"}
+    data = {
+        "axles": [{
+            "axle_code": "DEL-001",
+            "wheels": [{
+                "wheel_code": "WHEEL-LF",
+                "tires": [{
+                    "tire_code": "TIR-001",
+                    "outer_mm": 7.0,
+                    "middle_mm": 6.8,
+                    "inner_mm": 6.5
+                }]
+            }]
+        }]
+    }
+    response = requests.put(url, json=data, headers=headers)
+    print(response.json())
+    ```
+=== "JavaScript"
+    ```javascript
+    fetch('http://localhost:3600/api/v1/checklist/labrado/by-inspection/<inspection_id>', {
+      method: 'PUT',
+      headers: {'x-api-key': 'your-frontend-api-key', 'Authorization': 'Bearer <token>', 'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        axles: [{axle_code: 'DEL-001', wheels: [{wheel_code: 'WHEEL-LF', tires: [{tire_code: 'TIR-001', outer_mm: 7.0, middle_mm: 6.8, inner_mm: 6.5}]}]}]
+      })
+    }).then(r => r.json()).then(console.log);
+    ```
+
 ## Formato de respuesta
 
 Todas las respuestas exitosas siguen esta estructura:

@@ -4,7 +4,13 @@ Todos los cambios notables de este proyecto se documentarán en este archivo.
 
 ## [No liberado]
 
+### Corregido
+- `POST /auth/login` retornaba HTTP 201 en lugar de 200 por el default de NestJS 11 para rutas POST; se agregó `@HttpCode(200)` explícito
+
 ### Agregado
+- Documentación del módulo de checklist (arquitectura, endpoints, DTOs, enriquecimiento) en `docs/services/checklist-service.md`
+- Ejemplos de uso con cURL/Python/JavaScript para todos los endpoints de checklist en `docs/examples.md`
+- Documentación del formato de respuesta estándar y manejo de códigos HTTP en `docs/services/api-gateway.md`
 - Sitio de documentación MkDocs con tema Material
 - Flujo de trabajo de GitHub Actions para desplegar documentación en GitHub Pages
 - Página de ejemplos con curl para todos los endpoints del gateway
