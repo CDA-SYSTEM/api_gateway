@@ -7,44 +7,107 @@
 
 ## Purpose
 
-Checklist (NTC 5375) inspection management. Handles inspection templates, inspection records, tread measurements, and checklist templates organized by vehicle type. Provides specialized endpoints for filtering inspections by plate, date, status, and vehicle.
+Checklist (NTC 5375) inspection management. Handles inspection templates, inspection records, tread measurements, and checklist templates organized by vehicle type.
 
-## Key Endpoints
+## Gateway Module
 
-### Templates
+The API Gateway exposes the `ChecklistModule` in `src/checklist/` acting as a three-layer proxy to the upstream service.
+
+**Base path:** `/api/v1/checklist`
+
+### Module Architecture
+
+```
+src/checklist/
+├── checklist.module.ts
+├── templates-checklist.controller.ts   (8 endpoints)
+├── inspections-checklist.controller.ts (12 endpoints)
+├── labrado-checklist.controller.ts     (3 endpoints)
+├── application/
+│   ├── templates-checklist.service.ts   (thin proxy)
+│   ├── inspections-checklist.service.ts (with enrichment)
+│   ├── labrado-checklist.service.ts      (thin proxy)
+│   └── dtos/           (9 DTOs)
+└── infrastructure/
+    └── checklist.service.ts  (generic HTTP proxy)
+```
+
+### Gateway Features
+
+| Feature | Description |
+|---|---|
+| **Generic proxy** | `proxyRequest(method, path, data?, headers?)` forwards to checklist-service |
+| **Enrichment** | Inspection reads auto-enrich `client` and `vehicle` data from clients/vehicles services |
+| **Batch enrichment** | Deduplicates IDs in lists — one call per unique ID |
+| **Graceful degradation** | If enrichment fails, response returns unenriched (`enrichSafe`) |
+| **Error sanitization** | HTML error pages from upstream become clean JSON messages |
+
+### Controllers and Endpoints
+
+#### Templates — `/api/v1/checklist/templates`
 
 | Method | Path | Description |
 |--------|------|-------------|
-| `GET` | `/templates` | List all templates |
-| `POST` | `/templates` | Create template |
-| `GET` | `/templates/motos` | Templates for motorcycles |
-| `GET` | `/templates/livianos-pesados` | Templates for light/heavy vehicles |
-| `GET` | `/templates/active/:vehicle_type` | Active template by type |
-| `GET` | `/templates/:id` | Get template by ID |
-| `PUT` | `/templates/:id` | Update template |
-| `DELETE` | `/templates/:id` | Delete template |
+| `GET` | `/api/v1/checklist/templates` | List templates (optional `?vehicle_type=MOTO`) |
+| `POST` | `/api/v1/checklist/templates` | Create template |
+| `GET` | `/api/v1/checklist/templates/motos` | Active motorcycle template |
+| `GET` | `/api/v1/checklist/templates/livianos-pesados` | Active light/heavy vehicle template |
+| `GET` | `/api/v1/checklist/templates/active/:vehicleType` | Active template by vehicle type |
+| `GET` | `/api/v1/checklist/templates/:id` | Get template by ID |
+| `PUT` | `/api/v1/checklist/templates/:id` | Update template |
+| `DELETE` | `/api/v1/checklist/templates/:id` | Delete template |
 
-### Inspections
-
-| Method | Path | Description |
-|--------|------|-------------|
-| `GET` | `/inspections` | List inspections |
-| `POST` | `/inspections` | Create inspection |
-| `GET` | `/inspections/:id` | Get by ID |
-| `PUT` | `/inspections/:id` | Update |
-| `DELETE` | `/inspections/:id` | Delete |
-| `GET` | `/inspections/by-plate/:plate` | Lookup by plate |
-| `GET` | `/inspections/by-date` | Filter by date range |
-| `GET` | `/inspections/by-status/:status` | Filter by status |
-| `GET` | `/inspections/by-vehicle/:vehicle_id` | Filter by vehicle |
-
-### Tread Measurement (Labrado)
+#### Inspections — `/api/v1/checklist/inspections`
 
 | Method | Path | Description |
 |--------|------|-------------|
-| `GET` | `/labrado` | List tread measurements |
-| `POST` | `/labrado` | Create tread measurement |
-| `GET` | `/labrado/by-inspection/:inspection_id` | Get by inspection |
+| `GET` | `/api/v1/checklist/inspections` | List inspections (enriched) |
+| `POST` | `/api/v1/checklist/inspections` | Create inspection (draft) |
+| `GET` | `/api/v1/checklist/inspections/:id` | Get by ID (enriched) |
+| `PUT` | `/api/v1/checklist/inspections/:id` | Update inspection |
+| `DELETE` | `/api/v1/checklist/inspections/:id` | Delete inspection |
+| `GET` | `/api/v1/checklist/inspections/by-plate/:plate` | Search by plate (enriched) |
+| `GET` | `/api/v1/checklist/inspections/by-date` | Filter by date range `?start=&end=` (enriched) |
+| `GET` | `/api/v1/checklist/inspections/by-status/:status` | Filter by status (enriched) |
+| `GET` | `/api/v1/checklist/inspections/by-vehicle/:vehicleId` | Filter by vehicle (enriched) |
+| `PATCH` | `/api/v1/checklist/inspections/:id/draft` | Save as draft |
+| `PATCH` | `/api/v1/checklist/inspections/:id/in-progress` | Mark in progress |
+| `PATCH` | `/api/v1/checklist/inspections/:id/close` | Close with result (`APROBADO`/`RECHAZADO`) |
+
+#### Tread Measurement (Labrado) — `/api/v1/checklist/labrado`
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `POST` | `/api/v1/checklist/labrado` | Create or update tread measurements |
+| `GET` | `/api/v1/checklist/labrado/by-inspection/:inspectionId` | Get measurements by inspection |
+| `PUT` | `/api/v1/checklist/labrado/by-inspection/:inspectionId` | Update measurements by inspection |
+
+### Key DTOs
+
+| DTO | Key fields |
+|-----|------------|
+| `CreateInspectionChecklistDto` | `plate`, `vehicle_id`, `client_id?`, `vehicle_type` (`MOTO`/`LIVIANO`/`PESADO`), `template_id?`, `inspection_datetime?`, `inspector_id`, `responses?[]` |
+| `CreateTemplateDto` | `code` (`MOTOS`/`LIVIANOS_PESADOS`), `name`, `version?`, `active?`, `supported_vehicle_types[]`, `sections[]` |
+| `CreateLabradoDto` | `inspection_id`, `axles[]` (axle_code -> wheels[] -> tires[] with `outer_mm`, `middle_mm`, `inner_mm`) |
+| `CloseInspectionChecklistDto` | `general_result` (`APROBADO`/`RECHAZADO`) |
+
+### Enrichment
+
+**Read** endpoints for inspections auto-enrich the response with client and vehicle data:
+
+```json
+{
+  "data": {
+    "id": "...",
+    "plate": "ABC123",
+    "client": { "id": 1, "name": "Juan Pérez", ... },
+    "vehicle": { "id": 1, "plate": "ABC123", "brand": "Toyota", ... },
+    ...
+  }
+}
+```
+
+**Write** endpoints (`POST`, `PUT`, `PATCH`, `DELETE`) do NOT perform enrichment.
 
 ## Architecture
 
