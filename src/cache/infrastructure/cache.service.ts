@@ -1,7 +1,7 @@
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus, Inject, Optional } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
-import { Observable, map, catchError } from 'rxjs';
+import { Observable, of, map, catchError, switchMap, tap } from 'rxjs';
 import { AxiosResponse, AxiosError } from 'axios';
 
 @Injectable()
@@ -52,5 +52,27 @@ export class CacheInfrastructureService {
 
   deleteByKey(key: string, token: string): Observable<any> {
     return this.proxyRequest('DELETE', `/cache/${key}`, null, { Authorization: `Bearer ${token}` });
+  }
+
+  getOrFetch<T>(key: string, token: string, fetchFn: () => Observable<T>, ttlSeconds: number): Observable<T> {
+    return this.getByKey(key, token).pipe(
+      switchMap((cached) => {
+        if (cached && cached.value !== undefined && cached.value !== null) {
+          return of(cached.value as T);
+        }
+        return this.fetchAndCache(key, token, fetchFn, ttlSeconds);
+      }),
+      catchError(() => this.fetchAndCache(key, token, fetchFn, ttlSeconds)),
+    );
+  }
+
+  private fetchAndCache<T>(key: string, token: string, fetchFn: () => Observable<T>, ttlSeconds: number): Observable<T> {
+    return fetchFn().pipe(
+      tap((data) => {
+        this.save({ key, value: data, ttlSeconds }, token).subscribe({
+          error: () => {},
+        });
+      }),
+    );
   }
 }
