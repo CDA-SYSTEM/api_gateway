@@ -1,7 +1,7 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
-import { Observable, map, catchError } from 'rxjs';
+import { Observable, of, map, catchError, switchMap } from 'rxjs';
 import { AxiosResponse, AxiosError } from 'axios';
 import { CacheInfrastructureService } from '../../cache/infrastructure/cache.service';
 import { CACHE_KEYS, CACHE_TTL } from '../../cache/application/cache-keys.constant';
@@ -57,13 +57,15 @@ export class VehicleInfrastructureService {
     );
   }
 
-  proxyRequestCached(method: string, path: string, cacheKey: string, ttlSeconds: number, data?: any, headers?: any): Observable<any> {
+  proxyRequestCached(method: string, path: string, cacheKey: string, ttlSeconds: number, data?: any, headers?: any, transform?: (data: any, token: string) => Observable<any>): Observable<any> {
     if (method !== 'GET') {
       return this.proxyRequest(method, path, data, headers);
     }
     const token = (headers?.['Authorization'] as string)?.replace('Bearer ', '') ?? '';
     return this.cacheService.getOrFetch(cacheKey, token, () =>
-      this.proxyRequest(method, path, data, headers),
+      this.proxyRequest(method, path, data, headers).pipe(
+        switchMap((raw) => transform ? transform(raw, token) : of(raw)),
+      ),
       ttlSeconds,
     );
   }
