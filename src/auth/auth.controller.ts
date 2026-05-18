@@ -2,7 +2,6 @@ import { Controller, Post, Get, Patch, Delete, Body, Query, Param, UseGuards, Va
 import { ApiTags, ApiOperation, ApiBody, ApiResponse, ApiQuery, ApiSecurity, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthApplicationService } from './application/auth.service';
 import { LoginDto } from './application/dtos/login.dto';
-import { RegisterDto } from './application/dtos/register.dto';
 import { RegisterPersonnelDto } from './application/dtos/register-personnel.dto';
 import { UpdateUserDto } from './application/dtos/update-user.dto';
 import { ValidateTokenDto } from './application/dtos/validate-token.dto';
@@ -98,13 +97,12 @@ export class AuthController {
   }
 
   @Roles(RoleConst.ADMIN, RoleConst.MANAGER, RoleConst.INSPECTOR, RoleConst.OPERARIO)
-  @Get('modules/:module*')
+  @Get('modules/*module')
   @ApiOperation({ summary: 'Verificar acceso a módulo (soporta sub-rutas)' })
   @ApiQuery({ name: 'module', required: true, description: 'Ruta del módulo (ej: ntc-5375/checklists)' })
   @ApiResponse({ status: 200, description: 'Acceso verificado' })
-  async checkModuleAccess(@Param() params: Record<string, string>, @Req() req: Request) {
+  async checkModuleAccess(@Param('module') modulePath: string, @Req() req: Request) {
     const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
-    const modulePath = params['0'] ? `${params['module']}${params['0']}` : params['module'];
     return this.authService.checkModuleAccess(modulePath, token);
   }
 
