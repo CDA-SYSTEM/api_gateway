@@ -3,6 +3,8 @@ import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { Observable, map, catchError } from 'rxjs';
 import { AxiosResponse, AxiosError } from 'axios';
+import { CacheInfrastructureService } from '../../cache/infrastructure/cache.service';
+import { CACHE_KEYS, CACHE_TTL } from '../../cache/application/cache-keys.constant';
 
 @Injectable()
 export class VehicleInfrastructureService {
@@ -11,6 +13,7 @@ export class VehicleInfrastructureService {
   constructor(
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
+    private readonly cacheService: CacheInfrastructureService,
   ) {
     this.baseUrl = this.configService.get<string>('VEHICLE_SERVICE_BASE_URL') || '';
     if (!this.baseUrl) {
@@ -51,6 +54,17 @@ export class VehicleInfrastructureService {
           error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR,
         );
       }),
+    );
+  }
+
+  proxyRequestCached(method: string, path: string, cacheKey: string, ttlSeconds: number, data?: any, headers?: any): Observable<any> {
+    if (method !== 'GET') {
+      return this.proxyRequest(method, path, data, headers);
+    }
+    const token = (headers?.['Authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.cacheService.getOrFetch(cacheKey, token, () =>
+      this.proxyRequest(method, path, data, headers),
+      ttlSeconds,
     );
   }
 }
