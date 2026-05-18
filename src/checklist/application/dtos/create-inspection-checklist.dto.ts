@@ -2,7 +2,7 @@ import { IsString, IsOptional, IsNumber, IsIn, IsArray, ValidateNested, IsDateSt
 import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
-class InspectionItemResponseDto {
+export class InspectionItemResponseDto {
   @ApiProperty({ example: '6.1' })
   @IsString()
   section_code: string;
@@ -63,13 +63,6 @@ export class CreateInspectionChecklistDto {
   @ApiProperty({ example: 'usr_001' })
   @IsString()
   inspector_id: string;
-
-  @ApiPropertyOptional({ type: [InspectionItemResponseDto] })
-  @IsOptional()
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => InspectionItemResponseDto)
-  responses?: InspectionItemResponseDto[];
 
   @ApiPropertyOptional({ example: 'Observaciones generales' })
   @IsOptional()
