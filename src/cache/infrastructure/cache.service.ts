@@ -1,4 +1,4 @@
-import { Injectable, HttpException, HttpStatus, Inject, Optional } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { Observable, of, map, catchError, switchMap, tap } from 'rxjs';
@@ -58,7 +58,9 @@ export class CacheInfrastructureService {
     return this.getByKey(key, token).pipe(
       switchMap((cached) => {
         if (cached && cached.value !== undefined && cached.value !== null) {
-          return of(cached.value as T);
+          const result = cached.value as T;
+          markOrigin(result, 'cache');
+          return of(result);
         }
         return this.fetchAndCache(key, token, fetchFn, ttlSeconds);
       }),
@@ -73,6 +75,36 @@ export class CacheInfrastructureService {
           error: () => {},
         });
       }),
+      map((data) => {
+        markOrigin(data, 'service');
+        return data;
+      }),
     );
   }
+
+  isOriginCache(data: any): boolean {
+    return getOrigin(data) === 'cache';
+  }
+}
+
+const ORIGIN_KEY = '_cacheOrigin';
+
+function markOrigin(data: any, origin: 'cache' | 'service'): void {
+  if (typeof data === 'object' && data !== null) {
+    Object.defineProperty(data, ORIGIN_KEY, { value: origin, enumerable: false, configurable: true });
+  }
+}
+
+function getOrigin(data: any): string | undefined {
+  if (typeof data === 'object' && data !== null) {
+    return data[ORIGIN_KEY];
+  }
+  return undefined;
+}
+
+export function extractOrigin(data: any): string {
+  if (typeof data === 'object' && data !== null) {
+    return data[ORIGIN_KEY] || 'service';
+  }
+  return 'service';
 }

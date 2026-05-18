@@ -9,6 +9,7 @@ import { Observable, map } from 'rxjs';
 import { ApiResponse } from '../interfaces/api-response.interface';
 import { SKIP_RESPONSE_FORMAT_KEY } from '../decorators/skip-response-format.decorator';
 import { safeParse } from '../utils/parse.util';
+import { extractOrigin } from '../../cache/infrastructure/cache.service';
 
 @Injectable()
 export class ResponseInterceptor implements NestInterceptor {
@@ -29,13 +30,17 @@ export class ResponseInterceptor implements NestInterceptor {
     const request = ctx.getRequest();
 
     return next.handle().pipe(
-      map((raw) => ({
-        statusCode: response.statusCode,
-        message: 'Success',
-        data: safeParse(raw) ?? null,
-        timestamp: new Date().toISOString(),
-        path: request.url,
-      })),
+      map((raw) => {
+        const data = safeParse(raw) ?? null;
+        return {
+          statusCode: response.statusCode,
+          message: 'Success',
+          data,
+          timestamp: new Date().toISOString(),
+          path: request.url,
+          origin: extractOrigin(raw),
+        } as ApiResponse;
+      }),
     );
   }
 }
