@@ -110,7 +110,7 @@ export class AuthApplicationService {
   }
 
   listRoles(token: string): Observable<any> {
-    return this.cacheService.getOrFetch('auth:roles', token, () =>
+    return this.cacheService.getOrFetch(CACHE_KEYS.AUTH.ROLES, token, () =>
       this.authInfrastructureService.proxyRequest('GET', '/auth/roles', null, {
         Authorization: `Bearer ${token}`,
       }),
@@ -119,7 +119,7 @@ export class AuthApplicationService {
   }
 
   listIdentificationTypes(token: string): Observable<any> {
-    return this.cacheService.getOrFetch('auth:identification-types', token, () =>
+    return this.cacheService.getOrFetch(CACHE_KEYS.AUTH.IDENTIFICATION_TYPES, token, () =>
       this.authInfrastructureService.proxyRequest('GET', '/auth/identification-types', null, {
         Authorization: `Bearer ${token}`,
       }),

@@ -6,6 +6,8 @@ export const CACHE_KEYS = {
     MODULE_ACCESS: (mod: string) => `auth:modules:${mod}`,
     INSPECTORS: 'auth:users:inspectors',
     OPERARIOS: 'auth:users:operarios',
+    ROLES: 'auth:roles',
+    IDENTIFICATION_TYPES: 'auth:identification-types',
   },
   VEHICLE: {
     MARCA_LIST: 'vehicle:marcas',
