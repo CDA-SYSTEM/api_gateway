@@ -136,7 +136,9 @@ export class VehicleService {
   listVehiclesByClientId(clientId: string, token: string): Observable<any> {
     return this.vehicleInfrastructureService.proxyRequestCached('GET', `/vehiculo/cliente/${clientId}`, CACHE_KEYS.VEHICLE.VEHICULOS_BY_CLIENT(clientId), CACHE_TTL.SHORT, null, {
       Authorization: `Bearer ${token}`,
-    });
+    }).pipe(
+      switchMap((res) => this.enrichSafe(res, token)),
+    );
   }
 
   createMarca(data: CreateCatalogoDto, token: string): Observable<any> {
