@@ -1,0 +1,821 @@
+{
+  "info": {
+    "_postman_id": "6bcfe5e8-1efc-49c1-beb3-9bdfdbb5e9f0",
+    "name": "CDA-System",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "44546428",
+    "_collection_link": "https://go.postman.co/collection/44546428-6bcfe5e8-1efc-49c1-beb3-9bdfdbb5e9f0?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Checklist-Service",
+      "item": [
+        {
+          "name": "Templates",
+          "item": [
+            {
+              "name": "crear-template",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "x-api-key",
+                    "value": "{{apiKey}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"code\": \"MOTOS\",\n  \"name\": \"Inspección Motos NTC 5375\",\n  \"version\": 1,\n  \"active\": true,\n  \"supported_vehicle_types\": [\"MOTO\"],\n  \"sections\": [\n    {\n      \"title\": \"Sistema Eléctrico\",\n      \"order\": 1,\n      \"subsections\": [\n        {\n          \"title\": \"Batería\",\n          \"order\": 1,\n          \"items\": [\n            { \"code\": \"BAT-001\", \"description\": \"La batería está en buen estado\", \"defect_type\": \"A\", \"order\": 1 },\n            { \"code\": \"BAT-002\", \"description\": \"Bornes y conexiones en buen estado\", \"defect_type\": \"B\", \"order\": 2 }\n          ]\n        },\n        {\n          \"title\": \"Luces\",\n          \"order\": 2,\n          \"items\": [\n            { \"code\": \"LUZ-001\", \"description\": \"Luces delanteras funcionan correctamente\", \"defect_type\": \"A\", \"order\": 1 },\n            { \"code\": \"LUZ-002\", \"description\": \"Luces traseras funcionan correctamente\", \"defect_type\": \"A\", \"order\": 2 }\n          ]\n        }\n      ]\n    },\n    {\n      \"title\": \"Sistema de Frenos\",\n      \"order\": 2,\n      \"subsections\": [\n        {\n          \"title\": \"Frenos Delanteros\",\n          \"order\": 1,\n          \"items\": [\n            { \"code\": \"FRENO-001\", \"description\": \"Pastillas de freno con espesor adecuado\", \"defect_type\": \"A\", \"order\": 1 }\n          ]\n        }\n      ]\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/checklist/templates",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "checklist", "templates"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "obtener-templates",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "x-api-key",
+                    "value": "{{apiKey}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/checklist/templates",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "checklist", "templates"],
+                  "query": [
+                    {
+                      "key": "vehicle_type",
+                      "value": "MOTO",
+                      "description": "Filtrar por tipo de vehículo (MOTO, LIVIANO, PESADO)",
+                      "disabled": true
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "obtener-template-de-motos",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "x-api-key",
+                    "value": "{{apiKey}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/checklist/templates/motos",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "checklist", "templates", "motos"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "obtener-template-de-livianos-pesados",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "x-api-key",
+                    "value": "{{apiKey}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/checklist/templates/livianos-pesados",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "checklist", "templates", "livianos-pesados"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "obtener-template-activo-por-tipo",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "x-api-key",
+                    "value": "{{apiKey}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/checklist/templates/active/{{vehicleType}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "checklist", "templates", "active", "{{vehicleType}}"],
+                  "variable": [
+                    {
+                      "key": "vehicleType",
+                      "value": "MOTO",
+                      "description": "Tipo de vehículo: MOTO, LIVIANO o PESADO"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "obtener-template-por-id",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "x-api-key",
+                    "value": "{{apiKey}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/checklist/templates/{{templateId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "checklist", "templates", "{{templateId}}"],
+                  "variable": [
+                    {
+                      "key": "templateId",
+                      "value": "67d5c5f0b8b1a2b3c4d5e6f7"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "actualizar-template",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "x-api-key",
+                    "value": "{{apiKey}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"code\": \"MOTOS\",\n  \"name\": \"Inspección Motos NTC 5375 - Actualizada\",\n  \"version\": 2,\n  \"active\": true,\n  \"supported_vehicle_types\": [\"MOTO\"],\n  \"sections\": [\n    {\n      \"code\": \"SEC-ELEC\",\n      \"title\": \"Sistema Eléctrico\",\n      \"order\": 1,\n      \"subsections\": [\n        {\n          \"code\": \"SUB-BAT\",\n          \"title\": \"Batería\",\n          \"order\": 1,\n          \"items\": [\n            { \"code\": \"BAT-001\", \"description\": \"La batería está en buen estado\", \"defect_type\": \"A\", \"observation\": \"\", \"order\": 1 },\n            { \"code\": \"BAT-002\", \"description\": \"Bornes y conexiones en buen estado\", \"defect_type\": \"B\", \"observation\": \"\", \"order\": 2 }\n          ]\n        }\n      ]\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/checklist/templates/{{templateId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "checklist", "templates", "{{templateId}}"],
+                  "variable": [
+                    {
+                      "key": "templateId",
+                      "value": "67d5c5f0b8b1a2b3c4d5e6f7"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "eliminar-template",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "x-api-key",
+                    "value": "{{apiKey}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/checklist/templates/{{templateId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "checklist", "templates", "{{templateId}}"],
+                  "variable": [
+                    {
+                      "key": "templateId",
+                      "value": "67d5c5f0b8b1a2b3c4d5e6f7"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Inspections",
+          "item": [
+            {
+              "name": "crear-inspection",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "x-api-key",
+                    "value": "{{apiKey}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"plate\": \"ABC123\",\n  \"vehicle_id\": 1,\n  \"client_id\": 1,\n  \"vehicle_type\": \"LIVIANO\",\n  \"template_id\": \"{{templateId}}\",\n  \"inspection_datetime\": \"2026-05-17T10:00:00Z\",\n  \"inspector_id\": \"{{inspectorId}}\",\n  \"responses\": [\n    {\n      \"section_code\": \"SEC-001\",\n      \"subsection_code\": \"SUB-001\",\n      \"item_code\": \"BAT-001\",\n      \"response\": \"OK\",\n      \"observation\": \"\"\n    }\n  ],\n  \"observations\": \"Inspección de rutina\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/checklist/inspections",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "checklist", "inspections"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "obtener-inspections",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "x-api-key",
+                    "value": "{{apiKey}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/checklist/inspections",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "checklist", "inspections"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "obtener-inspection-por-id",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "x-api-key",
+                    "value": "{{apiKey}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/checklist/inspections/{{inspectionId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "checklist", "inspections", "{{inspectionId}}"],
+                  "variable": [
+                    {
+                      "key": "inspectionId",
+                      "value": "67d5c5f0b8b1a2b3c4d5e6f7"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "obtener-inspection-por-placa",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "x-api-key",
+                    "value": "{{apiKey}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/checklist/inspections/by-plate/{{plate}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "checklist", "inspections", "by-plate", "{{plate}}"],
+                  "variable": [
+                    {
+                      "key": "plate",
+                      "value": "ABC123"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "obtener-inspections-por-fecha",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "x-api-key",
+                    "value": "{{apiKey}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/checklist/inspections/by-date?start={{startDate}}&end={{endDate}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "checklist", "inspections", "by-date"],
+                  "query": [
+                    {
+                      "key": "start",
+                      "value": "2026-05-01T00:00:00Z",
+                      "description": "Fecha inicio (ISO 8601)"
+                    },
+                    {
+                      "key": "end",
+                      "value": "2026-05-17T23:59:59Z",
+                      "description": "Fecha fin (ISO 8601)"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "obtener-inspections-por-estado",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "x-api-key",
+                    "value": "{{apiKey}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/checklist/inspections/by-status/{{status}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "checklist", "inspections", "by-status", "{{status}}"],
+                  "variable": [
+                    {
+                      "key": "status",
+                      "value": "draft",
+                      "description": "Estados: draft, in_progress, completed, cancelled"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "obtener-inspection-por-vehicle",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "x-api-key",
+                    "value": "{{apiKey}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/checklist/inspections/by-vehicle/{{vehicleId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "checklist", "inspections", "by-vehicle", "{{vehicleId}}"],
+                  "variable": [
+                    {
+                      "key": "vehicleId",
+                      "value": "1"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "actualizar-inspection",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "x-api-key",
+                    "value": "{{apiKey}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"plate\": \"ABC123\",\n  \"vehicle_id\": 1,\n  \"client_id\": 1,\n  \"vehicle_type\": \"LIVIANO\",\n  \"template_id\": \"{{templateId}}\",\n  \"inspection_datetime\": \"2026-05-17T14:00:00Z\",\n  \"inspector_id\": \"{{inspectorId}}\",\n  \"responses\": [\n    {\n      \"section_code\": \"SEC-001\",\n      \"subsection_code\": \"SUB-001\",\n      \"item_code\": \"BAT-001\",\n      \"response\": \"OK\",\n      \"defect_type\": null,\n      \"observation\": \"\"\n    },\n    {\n      \"section_code\": \"SEC-001\",\n      \"subsection_code\": \"SUB-002\",\n      \"item_code\": \"LUZ-001\",\n      \"response\": \"FALLA\",\n      \"defect_type\": \"A\",\n      \"observation\": \"Foco izquierdo fundido\"\n    }\n  ],\n  \"observations\": \"Inspección actualizada - se encontraron fallas\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/checklist/inspections/{{inspectionId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "checklist", "inspections", "{{inspectionId}}"],
+                  "variable": [
+                    {
+                      "key": "inspectionId",
+                      "value": "67d5c5f0b8b1a2b3c4d5e6f7"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "guardar-borrador",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "x-api-key",
+                    "value": "{{apiKey}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"responses\": [\n    {\n      \"section_code\": \"SEC-001\",\n      \"subsection_code\": \"SUB-001\",\n      \"item_code\": \"BAT-001\",\n      \"response\": \"OK\",\n      \"observation\": \"\"\n    }\n  ],\n  \"observations\": \"Guardado como borrador\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/checklist/inspections/{{inspectionId}}/draft",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "checklist", "inspections", "{{inspectionId}}", "draft"],
+                  "variable": [
+                    {
+                      "key": "inspectionId",
+                      "value": "67d5c5f0b8b1a2b3c4d5e6f7"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "marcar-en-progreso",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "x-api-key",
+                    "value": "{{apiKey}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"responses\": [\n    {\n      \"section_code\": \"SEC-001\",\n      \"subsection_code\": \"SUB-001\",\n      \"item_code\": \"BAT-001\",\n      \"response\": \"OK\",\n      \"defect_type\": null,\n      \"observation\": \"\"\n    },\n    {\n      \"section_code\": \"SEC-001\",\n      \"subsection_code\": \"SUB-002\",\n      \"item_code\": \"LUZ-001\",\n      \"response\": \"FALLA\",\n      \"defect_type\": \"A\",\n      \"observation\": \"Foco izquierdo fundido\"\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/checklist/inspections/{{inspectionId}}/in-progress",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "checklist", "inspections", "{{inspectionId}}", "in-progress"],
+                  "variable": [
+                    {
+                      "key": "inspectionId",
+                      "value": "67d5c5f0b8b1a2b3c4d5e6f7"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "cerrar-inspection",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "x-api-key",
+                    "value": "{{apiKey}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"general_result\": \"APROBADO\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/checklist/inspections/{{inspectionId}}/close",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "checklist", "inspections", "{{inspectionId}}", "close"],
+                  "variable": [
+                    {
+                      "key": "inspectionId",
+                      "value": "67d5c5f0b8b1a2b3c4d5e6f7"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "eliminar-inspection",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "x-api-key",
+                    "value": "{{apiKey}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/checklist/inspections/{{inspectionId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "checklist", "inspections", "{{inspectionId}}"],
+                  "variable": [
+                    {
+                      "key": "inspectionId",
+                      "value": "67d5c5f0b8b1a2b3c4d5e6f7"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Labrado",
+          "item": [
+            {
+              "name": "crear-labrado",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "x-api-key",
+                    "value": "{{apiKey}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"inspection_id\": \"{{inspectionId}}\",\n  \"axles\": [\n    {\n      \"axle_code\": \"EJE_DELANTERO\",\n      \"wheels\": [\n        {\n          \"wheel_code\": \"RUEDA_IZQUIERDA\",\n          \"tires\": [\n            {\n              \"tire_code\": \"LLANTA_IZQ\",\n              \"outer_mm\": 6.5,\n              \"middle_mm\": 6.2,\n              \"inner_mm\": 6.0\n            }\n          ]\n        },\n        {\n          \"wheel_code\": \"RUEDA_DERECHA\",\n          \"tires\": [\n            {\n              \"tire_code\": \"LLANTA_DER\",\n              \"outer_mm\": 6.4,\n              \"middle_mm\": 6.1,\n              \"inner_mm\": 5.9\n            }\n          ]\n        }\n      ]\n    },\n    {\n      \"axle_code\": \"EJE_TRASERO\",\n      \"wheels\": [\n        {\n          \"wheel_code\": \"RUEDA_IZQUIERDA\",\n          \"tires\": [\n            {\n              \"tire_code\": \"LLANTA_IZQ\",\n              \"outer_mm\": 5.8,\n              \"middle_mm\": 5.5,\n              \"inner_mm\": 5.4\n            }\n          ]\n        },\n        {\n          \"wheel_code\": \"RUEDA_DERECHA\",\n          \"tires\": [\n            {\n              \"tire_code\": \"LLANTA_DER\",\n              \"outer_mm\": 5.7,\n              \"middle_mm\": 5.6,\n              \"inner_mm\": 5.5\n            }\n          ]\n        }\n      ]\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/checklist/labrado",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "checklist", "labrado"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "obtener-labrado-de-inspection",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "x-api-key",
+                    "value": "{{apiKey}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/checklist/labrado/by-inspection/{{inspectionId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "checklist", "labrado", "by-inspection", "{{inspectionId}}"],
+                  "variable": [
+                    {
+                      "key": "inspectionId",
+                      "value": "67d5c5f0b8b1a2b3c4d5e6f7"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "actualizar-labrado-de-inspection",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "x-api-key",
+                    "value": "{{apiKey}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"axles\": [\n    {\n      \"axle_code\": \"EJE_DELANTERO\",\n      \"wheels\": [\n        {\n          \"wheel_code\": \"RUEDA_IZQUIERDA\",\n          \"tires\": [\n            {\n              \"tire_code\": \"LLANTA_IZQ\",\n              \"outer_mm\": 7.0,\n              \"middle_mm\": 6.8,\n              \"inner_mm\": 6.5\n            }\n          ]\n        },\n        {\n          \"wheel_code\": \"RUEDA_DERECHA\",\n          \"tires\": [\n            {\n              \"tire_code\": \"LLANTA_DER\",\n              \"outer_mm\": 6.9,\n              \"middle_mm\": 6.7,\n              \"inner_mm\": 6.4\n            }\n          ]\n        }\n      ]\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/checklist/labrado/by-inspection/{{inspectionId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "checklist", "labrado", "by-inspection", "{{inspectionId}}"],
+                  "variable": [
+                    {
+                      "key": "inspectionId",
+                      "value": "67d5c5f0b8b1a2b3c4d5e6f7"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
