@@ -157,6 +157,31 @@ export class ChecklistInfrastructureService {
     );
   }
 
+  search(params: Record<string, any>, token: string): Observable<any> {
+    const query = new URLSearchParams();
+    const paramMap: Record<string, string> = {
+      page: 'page',
+      page_size: 'page_size',
+      plate: 'plate',
+      status: 'status',
+      vehicle_id: 'vehicle_id',
+      start_date: 'start_date',
+      end_date: 'end_date',
+    };
+    for (const [key, param] of Object.entries(paramMap)) {
+      const val = params[key];
+      if (val !== undefined && val !== null) {
+        query.append(param, String(val));
+      }
+    }
+    const qs = query.toString();
+    const path = `/inspections/search${qs ? '?' + qs : ''}`;
+    return this.cacheService.getOrFetch(CACHE_KEYS.CHECKLIST.INSPECTIONS_SEARCH(qs), token, () =>
+      this.proxyRequest('GET', path, null, { Authorization: `Bearer ${token}` }),
+      CACHE_TTL.SHORT,
+    );
+  }
+
   saveDraft(id: string, data: any, token: string): Observable<any> {
     return this.proxyRequest('PATCH', `/inspections/${id}/draft`, data, {
       Authorization: `Bearer ${token}`,
