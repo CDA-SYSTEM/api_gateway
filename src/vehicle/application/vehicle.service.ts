@@ -1,15 +1,88 @@
 import { Injectable } from '@nestjs/common';
-import { Observable } from 'rxjs';
+import { Observable, forkJoin, of } from 'rxjs';
+import { map, switchMap, catchError } from 'rxjs';
 import { VehicleInfrastructureService } from '../infrastructure/vehicle.service';
 import { CreateCatalogoDto } from './dtos/create-catalogo.dto';
 import { UpdateCatalogoDto } from './dtos/update-catalogo.dto';
 import { CreateVehicleDto } from './dtos/create-vehicle.dto';
 import { UpdateVehicleDto } from './dtos/update-vehicle.dto';
 import { CACHE_KEYS, CACHE_TTL } from '../../cache/application/cache-keys.constant';
+import { ClientsApplicationService } from '../../clients/application/clients.service';
 
 @Injectable()
 export class VehicleService {
-  constructor(private readonly vehicleInfrastructureService: VehicleInfrastructureService) {}
+  constructor(
+    private readonly vehicleInfrastructureService: VehicleInfrastructureService,
+    private readonly clientService: ClientsApplicationService,
+  ) {}
+
+  private enrichVehicleItem(item: any, token: string): Observable<any> {
+    if (!item?.clienteId) return of(item);
+
+    return this.clientService.getClientById(String(item.clienteId), token).pipe(
+      catchError(() => of(null)),
+      map((raw) => {
+        const clientData = raw?.data ?? raw ?? null;
+        return { ...item, client: clientData };
+      }),
+    );
+  }
+
+  private enrichVehicleList(items: any[], token: string): Observable<any[]> {
+    if (!items.length) return of(items);
+
+    const clientIds = [...new Set(items.map((i) => String(i.clienteId)).filter(Boolean))] as string[];
+
+    const clientReqs = clientIds.map((id) =>
+      this.clientService.getClientById(id, token).pipe(
+        catchError(() => of(null)),
+        map((raw) => ({ id, data: raw?.data ?? raw ?? null })),
+      ),
+    );
+
+    if (!clientReqs.length) return of(items);
+
+    return forkJoin(clientReqs).pipe(
+      map((results: any[]) => {
+        const clientMap = new Map(
+          results.filter((r) => r).map((r) => [r.id, r.data]),
+        );
+        return items.map((item) => ({
+          ...item,
+          client: item.clienteId ? clientMap.get(String(item.clienteId)) ?? null : null,
+        }));
+      }),
+    );
+  }
+
+  private enrichVehicleResponse(response: any, token: string): Observable<any> {
+    if (response?.content && Array.isArray(response.content)) {
+      return this.enrichVehicleList(response.content, token).pipe(
+        map((enriched) => ({ ...response, content: enriched })),
+      );
+    }
+    if (response?.data?.content && Array.isArray(response.data.content)) {
+      return this.enrichVehicleList(response.data.content, token).pipe(
+        map((enriched) => ({ ...response, data: { ...response.data, content: enriched } })),
+      );
+    }
+    if (response?.id || response?.data?.id) {
+      const item = response?.id ? response : response.data;
+      return this.enrichVehicleItem(item, token).pipe(
+        map((enriched) => {
+          if (response?.id) return enriched;
+          return { ...response, data: enriched };
+        }),
+      );
+    }
+    return of(response);
+  }
+
+  private enrichSafe(response: any, token: string): Observable<any> {
+    return this.enrichVehicleResponse(response, token).pipe(
+      catchError(() => of(response)),
+    );
+  }
 
   healthCheck(token: string): Observable<any> {
     return this.vehicleInfrastructureService.proxyRequestCached('GET', '/api/v1/health', 'vehicle:health', CACHE_TTL.SHORT, null, {
