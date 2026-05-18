@@ -21,6 +21,13 @@ export class AuthApplicationService {
     });
   }
 
+  registerPersonnel(data: any, token: string): Observable<any> {
+    return this.authInfrastructureService.proxyRequest('POST', '/admin/personnel/register', data, {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    });
+  }
+
   getUsers(role: string, token: string): Observable<any> {
     return this.cacheService.getOrFetch(CACHE_KEYS.AUTH.USERS_BY_ROLE(role), token, () =>
       this.authInfrastructureService.proxyRequest('GET', `/auth/users?role=${role}`, null, {
@@ -99,6 +106,24 @@ export class AuthApplicationService {
         Authorization: `Bearer ${token}`,
       }),
       CACHE_TTL.MEDIUM,
+    );
+  }
+
+  listRoles(token: string): Observable<any> {
+    return this.cacheService.getOrFetch('auth:roles', token, () =>
+      this.authInfrastructureService.proxyRequest('GET', '/auth/roles', null, {
+        Authorization: `Bearer ${token}`,
+      }),
+      CACHE_TTL.LONG,
+    );
+  }
+
+  listIdentificationTypes(token: string): Observable<any> {
+    return this.cacheService.getOrFetch('auth:identification-types', token, () =>
+      this.authInfrastructureService.proxyRequest('GET', '/auth/identification-types', null, {
+        Authorization: `Bearer ${token}`,
+      }),
+      CACHE_TTL.LONG,
     );
   }
 

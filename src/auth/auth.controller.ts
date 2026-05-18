@@ -3,6 +3,7 @@ import { ApiTags, ApiOperation, ApiBody, ApiResponse, ApiQuery, ApiSecurity, Api
 import { AuthApplicationService } from './application/auth.service';
 import { LoginDto } from './application/dtos/login.dto';
 import { RegisterDto } from './application/dtos/register.dto';
+import { RegisterPersonnelDto } from './application/dtos/register-personnel.dto';
 import { UpdateUserDto } from './application/dtos/update-user.dto';
 import { ValidateTokenDto } from './application/dtos/validate-token.dto';
 import { RefreshTokenDto } from './application/dtos/refresh-token.dto';
@@ -30,13 +31,13 @@ export class AuthController {
   }
 
   @Roles(RoleConst.ADMIN, RoleConst.MANAGER)
-  @Post('register')
-  @ApiOperation({ summary: 'Registro de usuario (requiere token admin/manager)' })
-  @ApiBody({ type: RegisterDto })
-  @ApiResponse({ status: 201, description: 'Usuario registrado' })
-  async register(@Body() body: RegisterDto, @Req() req: Request) {
+  @Post('admin/personnel/register')
+  @ApiOperation({ summary: 'Registro de personal (admin/manager)' })
+  @ApiBody({ type: RegisterPersonnelDto })
+  @ApiResponse({ status: 201, description: 'Personal registrado' })
+  async registerPersonnel(@Body() body: RegisterPersonnelDto, @Req() req: Request) {
     const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
-    return this.authService.register(body, token);
+    return this.authService.registerPersonnel(body, token);
   }
 
   @Roles(RoleConst.ADMIN, RoleConst.MANAGER)
@@ -97,12 +98,14 @@ export class AuthController {
   }
 
   @Roles(RoleConst.ADMIN, RoleConst.MANAGER, RoleConst.INSPECTOR, RoleConst.OPERARIO)
-  @Get('modules/:module')
-  @ApiOperation({ summary: 'Verificar acceso a módulo' })
+  @Get('modules/:module*')
+  @ApiOperation({ summary: 'Verificar acceso a módulo (soporta sub-rutas)' })
+  @ApiQuery({ name: 'module', required: true, description: 'Ruta del módulo (ej: ntc-5375/checklists)' })
   @ApiResponse({ status: 200, description: 'Acceso verificado' })
-  async checkModuleAccess(@Param('module') module: string, @Req() req: Request) {
+  async checkModuleAccess(@Param() params: Record<string, string>, @Req() req: Request) {
     const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
-    return this.authService.checkModuleAccess(module, token);
+    const modulePath = params['0'] ? `${params['module']}${params['0']}` : params['module'];
+    return this.authService.checkModuleAccess(modulePath, token);
   }
 
   @Roles(RoleConst.ADMIN, RoleConst.MANAGER)
