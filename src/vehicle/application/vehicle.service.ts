@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Observable, forkJoin, of } from 'rxjs';
-import { map, switchMap, catchError } from 'rxjs';
+import { map, catchError } from 'rxjs';
 import { VehicleInfrastructureService } from '../infrastructure/vehicle.service';
 import { CreateCatalogoDto } from './dtos/create-catalogo.dto';
 import { UpdateCatalogoDto } from './dtos/update-catalogo.dto';
@@ -107,17 +107,13 @@ export class VehicleService {
     
     return this.vehicleInfrastructureService.proxyRequestCached('GET', url, CACHE_KEYS.VEHICLE.VEHICULO_LIST(page, size), CACHE_TTL.SHORT, null, {
       Authorization: `Bearer ${token}`,
-    }).pipe(
-      switchMap((res) => this.enrichSafe(res, token)),
-    );
+    }, (raw, t) => this.enrichSafe(raw, t));
   }
 
   getVehicleById(id: string, token: string): Observable<any> {
     return this.vehicleInfrastructureService.proxyRequestCached('GET', `/vehiculo/${id}`, CACHE_KEYS.VEHICLE.VEHICULO_BY_ID(id), CACHE_TTL.SHORT, null, {
       Authorization: `Bearer ${token}`,
-    }).pipe(
-      switchMap((res) => this.enrichSafe(res, token)),
-    );
+    }, (raw, t) => this.enrichSafe(raw, t));
   }
 
   updateVehicle(id: string, data: UpdateVehicleDto, token: string): Observable<any> {
@@ -136,9 +132,7 @@ export class VehicleService {
   listVehiclesByClientId(clientId: string, token: string): Observable<any> {
     return this.vehicleInfrastructureService.proxyRequestCached('GET', `/vehiculo/cliente/${clientId}`, CACHE_KEYS.VEHICLE.VEHICULOS_BY_CLIENT(clientId), CACHE_TTL.SHORT, null, {
       Authorization: `Bearer ${token}`,
-    }).pipe(
-      switchMap((res) => this.enrichSafe(res, token)),
-    );
+    }, (raw, t) => this.enrichSafe(raw, t));
   }
 
   createMarca(data: CreateCatalogoDto, token: string): Observable<any> {
