@@ -5,18 +5,18 @@ import { CreateCatalogoDto } from './dtos/create-catalogo.dto';
 import { UpdateCatalogoDto } from './dtos/update-catalogo.dto';
 import { CreateVehicleDto } from './dtos/create-vehicle.dto';
 import { UpdateVehicleDto } from './dtos/update-vehicle.dto';
+import { CACHE_KEYS, CACHE_TTL } from '../../cache/application/cache-keys.constant';
 
 @Injectable()
 export class VehicleService {
   constructor(private readonly vehicleInfrastructureService: VehicleInfrastructureService) {}
 
   healthCheck(token: string): Observable<any> {
-    return this.vehicleInfrastructureService.proxyRequest('GET', '/api/v1/health', null, {
+    return this.vehicleInfrastructureService.proxyRequestCached('GET', '/api/v1/health', 'vehicle:health', CACHE_TTL.SHORT, null, {
       Authorization: `Bearer ${token}`,
     });
   }
 
-  // Vehículos CRUD
   createVehicle(data: CreateVehicleDto, token: string): Observable<any> {
     return this.vehicleInfrastructureService.proxyRequest('POST', '/vehiculo', data, {
       Authorization: `Bearer ${token}`,
@@ -32,13 +32,13 @@ export class VehicleService {
     const queryString = queryParams.toString();
     const url = `/vehiculo${queryString ? '?' + queryString : ''}`;
     
-    return this.vehicleInfrastructureService.proxyRequest('GET', url, null, {
+    return this.vehicleInfrastructureService.proxyRequestCached('GET', url, CACHE_KEYS.VEHICLE.VEHICULO_LIST(page, size), CACHE_TTL.SHORT, null, {
       Authorization: `Bearer ${token}`,
     });
   }
 
   getVehicleById(id: string, token: string): Observable<any> {
-    return this.vehicleInfrastructureService.proxyRequest('GET', `/vehiculo/${id}`, null, {
+    return this.vehicleInfrastructureService.proxyRequestCached('GET', `/vehiculo/${id}`, CACHE_KEYS.VEHICLE.VEHICULO_BY_ID(id), CACHE_TTL.SHORT, null, {
       Authorization: `Bearer ${token}`,
     });
   }
@@ -57,12 +57,11 @@ export class VehicleService {
   }
 
   listVehiclesByClientId(clientId: string, token: string): Observable<any> {
-    return this.vehicleInfrastructureService.proxyRequest('GET', `/vehiculo/cliente/${clientId}`, null, {
+    return this.vehicleInfrastructureService.proxyRequestCached('GET', `/vehiculo/cliente/${clientId}`, CACHE_KEYS.VEHICLE.VEHICULOS_BY_CLIENT(clientId), CACHE_TTL.SHORT, null, {
       Authorization: `Bearer ${token}`,
     });
   }
 
-  // Marcas
   createMarca(data: CreateCatalogoDto, token: string): Observable<any> {
     return this.vehicleInfrastructureService.proxyRequest('POST', '/marca', data, {
       Authorization: `Bearer ${token}`,
@@ -71,13 +70,13 @@ export class VehicleService {
   }
 
   listMarcas(token: string): Observable<any> {
-    return this.vehicleInfrastructureService.proxyRequest('GET', '/marca', null, {
+    return this.vehicleInfrastructureService.proxyRequestCached('GET', '/marca', CACHE_KEYS.VEHICLE.MARCA_LIST, CACHE_TTL.EXTRA_LONG, null, {
       Authorization: `Bearer ${token}`,
     });
   }
 
   getMarcaById(id: string, token: string): Observable<any> {
-    return this.vehicleInfrastructureService.proxyRequest('GET', `/marca/${id}`, null, {
+    return this.vehicleInfrastructureService.proxyRequestCached('GET', `/marca/${id}`, CACHE_KEYS.VEHICLE.MARCA_BY_ID(id), CACHE_TTL.EXTRA_LONG, null, {
       Authorization: `Bearer ${token}`,
     });
   }
@@ -95,7 +94,6 @@ export class VehicleService {
     });
   }
 
-  // Clases
   createClase(data: CreateCatalogoDto, token: string): Observable<any> {
     return this.vehicleInfrastructureService.proxyRequest('POST', '/clase', data, {
       Authorization: `Bearer ${token}`,
@@ -104,13 +102,13 @@ export class VehicleService {
   }
 
   listClases(token: string): Observable<any> {
-    return this.vehicleInfrastructureService.proxyRequest('GET', '/clase', null, {
+    return this.vehicleInfrastructureService.proxyRequestCached('GET', '/clase', CACHE_KEYS.VEHICLE.CLASE_LIST, CACHE_TTL.EXTRA_LONG, null, {
       Authorization: `Bearer ${token}`,
     });
   }
 
   getClaseById(id: string, token: string): Observable<any> {
-    return this.vehicleInfrastructureService.proxyRequest('GET', `/clase/${id}`, null, {
+    return this.vehicleInfrastructureService.proxyRequestCached('GET', `/clase/${id}`, CACHE_KEYS.VEHICLE.CLASE_BY_ID(id), CACHE_TTL.EXTRA_LONG, null, {
       Authorization: `Bearer ${token}`,
     });
   }
@@ -128,7 +126,6 @@ export class VehicleService {
     });
   }
 
-  // Líneas
   createLinea(data: CreateCatalogoDto, token: string): Observable<any> {
     return this.vehicleInfrastructureService.proxyRequest('POST', '/linea', data, {
       Authorization: `Bearer ${token}`,
@@ -137,13 +134,13 @@ export class VehicleService {
   }
 
   listLineas(token: string): Observable<any> {
-    return this.vehicleInfrastructureService.proxyRequest('GET', '/linea', null, {
+    return this.vehicleInfrastructureService.proxyRequestCached('GET', '/linea', CACHE_KEYS.VEHICLE.LINEA_LIST, CACHE_TTL.EXTRA_LONG, null, {
       Authorization: `Bearer ${token}`,
     });
   }
 
   getLineaById(id: string, token: string): Observable<any> {
-    return this.vehicleInfrastructureService.proxyRequest('GET', `/linea/${id}`, null, {
+    return this.vehicleInfrastructureService.proxyRequestCached('GET', `/linea/${id}`, CACHE_KEYS.VEHICLE.LINEA_BY_ID(id), CACHE_TTL.EXTRA_LONG, null, {
       Authorization: `Bearer ${token}`,
     });
   }
@@ -161,7 +158,6 @@ export class VehicleService {
     });
   }
 
-  // Colores
   createColor(data: CreateCatalogoDto, token: string): Observable<any> {
     return this.vehicleInfrastructureService.proxyRequest('POST', '/color', data, {
       Authorization: `Bearer ${token}`,
@@ -170,13 +166,13 @@ export class VehicleService {
   }
 
   listColores(token: string): Observable<any> {
-    return this.vehicleInfrastructureService.proxyRequest('GET', '/color', null, {
+    return this.vehicleInfrastructureService.proxyRequestCached('GET', '/color', CACHE_KEYS.VEHICLE.COLOR_LIST, CACHE_TTL.EXTRA_LONG, null, {
       Authorization: `Bearer ${token}`,
     });
   }
 
   getColorById(id: string, token: string): Observable<any> {
-    return this.vehicleInfrastructureService.proxyRequest('GET', `/color/${id}`, null, {
+    return this.vehicleInfrastructureService.proxyRequestCached('GET', `/color/${id}`, CACHE_KEYS.VEHICLE.COLOR_BY_ID(id), CACHE_TTL.EXTRA_LONG, null, {
       Authorization: `Bearer ${token}`,
     });
   }
@@ -194,7 +190,6 @@ export class VehicleService {
     });
   }
 
-  // Tipos de Vehículo
   createTipoVehiculo(data: CreateCatalogoDto, token: string): Observable<any> {
     return this.vehicleInfrastructureService.proxyRequest('POST', '/tipo-vehiculo', data, {
       Authorization: `Bearer ${token}`,
@@ -203,13 +198,13 @@ export class VehicleService {
   }
 
   listTiposVehiculo(token: string): Observable<any> {
-    return this.vehicleInfrastructureService.proxyRequest('GET', '/tipo-vehiculo', null, {
+    return this.vehicleInfrastructureService.proxyRequestCached('GET', '/tipo-vehiculo', CACHE_KEYS.VEHICLE.TIPO_VEHICULO_LIST, CACHE_TTL.EXTRA_LONG, null, {
       Authorization: `Bearer ${token}`,
     });
   }
 
   getTipoVehiculoById(id: string, token: string): Observable<any> {
-    return this.vehicleInfrastructureService.proxyRequest('GET', `/tipo-vehiculo/${id}`, null, {
+    return this.vehicleInfrastructureService.proxyRequestCached('GET', `/tipo-vehiculo/${id}`, CACHE_KEYS.VEHICLE.TIPO_VEHICULO_BY_ID(id), CACHE_TTL.EXTRA_LONG, null, {
       Authorization: `Bearer ${token}`,
     });
   }
@@ -227,7 +222,6 @@ export class VehicleService {
     });
   }
 
-  // Tipos de Combustible
   createTipoCombustible(data: CreateCatalogoDto, token: string): Observable<any> {
     return this.vehicleInfrastructureService.proxyRequest('POST', '/tipo-combustible', data, {
       Authorization: `Bearer ${token}`,
@@ -236,13 +230,13 @@ export class VehicleService {
   }
 
   listTiposCombustible(token: string): Observable<any> {
-    return this.vehicleInfrastructureService.proxyRequest('GET', '/tipo-combustible', null, {
+    return this.vehicleInfrastructureService.proxyRequestCached('GET', '/tipo-combustible', CACHE_KEYS.VEHICLE.TIPO_COMBUSTIBLE_LIST, CACHE_TTL.EXTRA_LONG, null, {
       Authorization: `Bearer ${token}`,
     });
   }
 
   getTipoCombustibleById(id: string, token: string): Observable<any> {
-    return this.vehicleInfrastructureService.proxyRequest('GET', `/tipo-combustible/${id}`, null, {
+    return this.vehicleInfrastructureService.proxyRequestCached('GET', `/tipo-combustible/${id}`, CACHE_KEYS.VEHICLE.TIPO_COMBUSTIBLE_BY_ID(id), CACHE_TTL.EXTRA_LONG, null, {
       Authorization: `Bearer ${token}`,
     });
   }
@@ -260,7 +254,6 @@ export class VehicleService {
     });
   }
 
-  // Tipos de Servicio
   createTipoServicio(data: CreateCatalogoDto, token: string): Observable<any> {
     return this.vehicleInfrastructureService.proxyRequest('POST', '/tipo-servicio', data, {
       Authorization: `Bearer ${token}`,
@@ -269,13 +262,13 @@ export class VehicleService {
   }
 
   listTiposServicio(token: string): Observable<any> {
-    return this.vehicleInfrastructureService.proxyRequest('GET', '/tipo-servicio', null, {
+    return this.vehicleInfrastructureService.proxyRequestCached('GET', '/tipo-servicio', CACHE_KEYS.VEHICLE.TIPO_SERVICIO_LIST, CACHE_TTL.EXTRA_LONG, null, {
       Authorization: `Bearer ${token}`,
     });
   }
 
   getTipoServicioById(id: string, token: string): Observable<any> {
-    return this.vehicleInfrastructureService.proxyRequest('GET', `/tipo-servicio/${id}`, null, {
+    return this.vehicleInfrastructureService.proxyRequestCached('GET', `/tipo-servicio/${id}`, CACHE_KEYS.VEHICLE.TIPO_SERVICIO_BY_ID(id), CACHE_TTL.EXTRA_LONG, null, {
       Authorization: `Bearer ${token}`,
     });
   }
