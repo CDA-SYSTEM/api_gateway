@@ -97,7 +97,7 @@ export class VehicleService {
     });
   }
 
-  listVehicles(page?: number, size?: number, token?: string): Observable<any> {
+  listVehicles(page?: number, size?: number, token: string = ''): Observable<any> {
     const queryParams = new URLSearchParams();
     if (page !== undefined) queryParams.append('page', page.toString());
     if (size !== undefined) queryParams.append('size', size.toString());
@@ -107,7 +107,9 @@ export class VehicleService {
     
     return this.vehicleInfrastructureService.proxyRequestCached('GET', url, CACHE_KEYS.VEHICLE.VEHICULO_LIST(page, size), CACHE_TTL.SHORT, null, {
       Authorization: `Bearer ${token}`,
-    });
+    }).pipe(
+      switchMap((res) => this.enrichSafe(res, token)),
+    );
   }
 
   getVehicleById(id: string, token: string): Observable<any> {
