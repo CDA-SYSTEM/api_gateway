@@ -60,6 +60,7 @@ export const CACHE_KEYS = {
     INSPECTIONS_BY_DATE: (start: string, end: string) => `checklist:inspections:date:${start}:${end}`,
     INSPECTIONS_BY_STATUS: (status: string) => `checklist:inspections:status:${status}`,
     INSPECTIONS_BY_VEHICLE: (vehicleId: string) => `checklist:inspections:vehicle:${vehicleId}`,
+    INSPECTIONS_SEARCH: (params: string) => `checklist:inspections:search:${params}`,
     LABRADO_BY_INSPECTION: (id: string) => `checklist:labrado:inspection:${id}`,
   },
   RECEPTION: {
