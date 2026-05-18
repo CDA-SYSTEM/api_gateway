@@ -3,6 +3,8 @@ import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { Observable, map, catchError } from 'rxjs';
 import { AxiosResponse, AxiosError } from 'axios';
+import { CacheInfrastructureService } from '../../cache/infrastructure/cache.service';
+import { CACHE_KEYS, CACHE_TTL } from '../../cache/application/cache-keys.constant';
 
 @Injectable()
 export class ChecklistInfrastructureService {
@@ -11,6 +13,7 @@ export class ChecklistInfrastructureService {
   constructor(
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
+    private readonly cacheService: CacheInfrastructureService,
   ) {
     this.baseUrl = this.configService.get<string>('CHECKLIST_SERVICE_BASE_URL') || '';
     if (!this.baseUrl) {
@@ -41,7 +44,11 @@ export class ChecklistInfrastructureService {
 
   listTemplates(vehicleType: string | undefined, token: string): Observable<any> {
     const path = vehicleType ? `/templates?vehicle_type=${vehicleType}` : '/templates';
-    return this.proxyRequest('GET', path, null, { Authorization: `Bearer ${token}` });
+    const key = CACHE_KEYS.CHECKLIST.TEMPLATES(vehicleType);
+    return this.cacheService.getOrFetch(key, token, () =>
+      this.proxyRequest('GET', path, null, { Authorization: `Bearer ${token}` }),
+      CACHE_TTL.MEDIUM,
+    );
   }
 
   createTemplate(data: any, token: string): Observable<any> {
@@ -52,19 +59,31 @@ export class ChecklistInfrastructureService {
   }
 
   getActiveMotoTemplate(token: string): Observable<any> {
-    return this.proxyRequest('GET', '/templates/motos', null, { Authorization: `Bearer ${token}` });
+    return this.cacheService.getOrFetch(CACHE_KEYS.CHECKLIST.TEMPLATE_MOTO_ACTIVE, token, () =>
+      this.proxyRequest('GET', '/templates/motos', null, { Authorization: `Bearer ${token}` }),
+      CACHE_TTL.MEDIUM,
+    );
   }
 
   getActiveLivianosPesadosTemplate(token: string): Observable<any> {
-    return this.proxyRequest('GET', '/templates/livianos-pesados', null, { Authorization: `Bearer ${token}` });
+    return this.cacheService.getOrFetch(CACHE_KEYS.CHECKLIST.TEMPLATE_LIVIANOS_PESADOS_ACTIVE, token, () =>
+      this.proxyRequest('GET', '/templates/livianos-pesados', null, { Authorization: `Bearer ${token}` }),
+      CACHE_TTL.MEDIUM,
+    );
   }
 
   getActiveTemplateByVehicleType(vehicleType: string, token: string): Observable<any> {
-    return this.proxyRequest('GET', `/templates/active/${vehicleType}`, null, { Authorization: `Bearer ${token}` });
+    return this.cacheService.getOrFetch(CACHE_KEYS.CHECKLIST.TEMPLATE_ACTIVE_BY_TYPE(vehicleType), token, () =>
+      this.proxyRequest('GET', `/templates/active/${vehicleType}`, null, { Authorization: `Bearer ${token}` }),
+      CACHE_TTL.MEDIUM,
+    );
   }
 
   getTemplateById(id: string, token: string): Observable<any> {
-    return this.proxyRequest('GET', `/templates/${id}`, null, { Authorization: `Bearer ${token}` });
+    return this.cacheService.getOrFetch(CACHE_KEYS.CHECKLIST.TEMPLATE_BY_ID(id), token, () =>
+      this.proxyRequest('GET', `/templates/${id}`, null, { Authorization: `Bearer ${token}` }),
+      CACHE_TTL.MEDIUM,
+    );
   }
 
   updateTemplate(id: string, data: any, token: string): Observable<any> {
@@ -79,7 +98,10 @@ export class ChecklistInfrastructureService {
   }
 
   listInspections(token: string): Observable<any> {
-    return this.proxyRequest('GET', '/inspections', null, { Authorization: `Bearer ${token}` });
+    return this.cacheService.getOrFetch(CACHE_KEYS.CHECKLIST.INSPECTIONS, token, () =>
+      this.proxyRequest('GET', '/inspections', null, { Authorization: `Bearer ${token}` }),
+      CACHE_TTL.SHORT,
+    );
   }
 
   createInspection(data: any, token: string): Observable<any> {
@@ -90,7 +112,10 @@ export class ChecklistInfrastructureService {
   }
 
   getInspectionById(id: string, token: string): Observable<any> {
-    return this.proxyRequest('GET', `/inspections/${id}`, null, { Authorization: `Bearer ${token}` });
+    return this.cacheService.getOrFetch(CACHE_KEYS.CHECKLIST.INSPECTION_BY_ID(id), token, () =>
+      this.proxyRequest('GET', `/inspections/${id}`, null, { Authorization: `Bearer ${token}` }),
+      CACHE_TTL.SHORT,
+    );
   }
 
   updateInspection(id: string, data: any, token: string): Observable<any> {
@@ -105,19 +130,31 @@ export class ChecklistInfrastructureService {
   }
 
   getInspectionsByPlate(plate: string, token: string): Observable<any> {
-    return this.proxyRequest('GET', `/inspections/by-plate/${plate}`, null, { Authorization: `Bearer ${token}` });
+    return this.cacheService.getOrFetch(CACHE_KEYS.CHECKLIST.INSPECTIONS_BY_PLATE(plate), token, () =>
+      this.proxyRequest('GET', `/inspections/by-plate/${plate}`, null, { Authorization: `Bearer ${token}` }),
+      CACHE_TTL.SHORT,
+    );
   }
 
   getInspectionsByDate(start: string, end: string, token: string): Observable<any> {
-    return this.proxyRequest('GET', `/inspections/by-date?start=${start}&end=${end}`, null, { Authorization: `Bearer ${token}` });
+    return this.cacheService.getOrFetch(CACHE_KEYS.CHECKLIST.INSPECTIONS_BY_DATE(start, end), token, () =>
+      this.proxyRequest('GET', `/inspections/by-date?start=${start}&end=${end}`, null, { Authorization: `Bearer ${token}` }),
+      CACHE_TTL.SHORT,
+    );
   }
 
   getInspectionsByStatus(status: string, token: string): Observable<any> {
-    return this.proxyRequest('GET', `/inspections/by-status/${status}`, null, { Authorization: `Bearer ${token}` });
+    return this.cacheService.getOrFetch(CACHE_KEYS.CHECKLIST.INSPECTIONS_BY_STATUS(status), token, () =>
+      this.proxyRequest('GET', `/inspections/by-status/${status}`, null, { Authorization: `Bearer ${token}` }),
+      CACHE_TTL.SHORT,
+    );
   }
 
   getInspectionsByVehicle(vehicleId: string, token: string): Observable<any> {
-    return this.proxyRequest('GET', `/inspections/by-vehicle/${vehicleId}`, null, { Authorization: `Bearer ${token}` });
+    return this.cacheService.getOrFetch(CACHE_KEYS.CHECKLIST.INSPECTIONS_BY_VEHICLE(vehicleId), token, () =>
+      this.proxyRequest('GET', `/inspections/by-vehicle/${vehicleId}`, null, { Authorization: `Bearer ${token}` }),
+      CACHE_TTL.SHORT,
+    );
   }
 
   saveDraft(id: string, data: any, token: string): Observable<any> {
@@ -149,7 +186,10 @@ export class ChecklistInfrastructureService {
   }
 
   getLabradoByInspection(inspectionId: string, token: string): Observable<any> {
-    return this.proxyRequest('GET', `/labrado/by-inspection/${inspectionId}`, null, { Authorization: `Bearer ${token}` });
+    return this.cacheService.getOrFetch(CACHE_KEYS.CHECKLIST.LABRADO_BY_INSPECTION(inspectionId), token, () =>
+      this.proxyRequest('GET', `/labrado/by-inspection/${inspectionId}`, null, { Authorization: `Bearer ${token}` }),
+      CACHE_TTL.SHORT,
+    );
   }
 
   updateLabradoByInspection(inspectionId: string, data: any, token: string): Observable<any> {
