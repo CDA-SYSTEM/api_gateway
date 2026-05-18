@@ -1,15 +1,23 @@
 import { Injectable } from '@nestjs/common';
 import { Observable, map } from 'rxjs';
 import { UploadFilesInfrastructureService } from '../infrastructure/upload-files.service';
+import { CacheInfrastructureService } from '../../cache/infrastructure/cache.service';
+import { CACHE_TTL } from '../../cache/application/cache-keys.constant';
 
 @Injectable()
 export class UploadFilesService {
-  constructor(private readonly uploadFilesInfrastructure: UploadFilesInfrastructureService) {}
+  constructor(
+    private readonly uploadFilesInfrastructure: UploadFilesInfrastructureService,
+    private readonly cacheService: CacheInfrastructureService,
+  ) {}
 
   healthCheck(token: string): Observable<any> {
-    return this.uploadFilesInfrastructure.proxyRequest('GET', '/', null, {
-      Authorization: `Bearer ${token}`,
-    });
+    return this.cacheService.getOrFetch('upload:health', token, () =>
+      this.uploadFilesInfrastructure.proxyRequest('GET', '/', null, {
+        Authorization: `Bearer ${token}`,
+      }),
+      CACHE_TTL.SHORT,
+    );
   }
 
   listFiles(limit: number, token: string): Observable<any> {

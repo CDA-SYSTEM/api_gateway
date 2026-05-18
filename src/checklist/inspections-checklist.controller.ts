@@ -7,6 +7,7 @@ import { CreateInspectionChecklistDto } from './application/dtos/create-inspecti
 import { UpdateInspectionChecklistDto } from './application/dtos/update-inspection-checklist.dto';
 import { CloseInspectionChecklistDto } from './application/dtos/close-inspection-checklist.dto';
 import { InspectionQueryDto } from './application/dtos/inspection-query.dto';
+import { SearchInspectionDto } from './application/dtos/search-inspection.dto';
 import type { Request } from 'express';
 
 @ApiTags('checklist-inspections')
@@ -23,6 +24,14 @@ export class InspectionsChecklistController {
   list(@Req() req: Request) {
     const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
     return this.inspectionsService.list(token);
+  }
+
+  @Get('search')
+  @ApiOperation({ summary: 'Buscar inspecciones con filtros y paginacion' })
+  @ApiResponse({ status: 200, description: 'Inspecciones encontradas' })
+  search(@Query() params: SearchInspectionDto, @Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.inspectionsService.search(params, token);
   }
 
   @Post()

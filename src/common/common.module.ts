@@ -7,10 +7,11 @@ import { ReceptionModule } from '../reception/reception.module';
 import { CatalogsModule } from '../catalogs/catalogs.module';
 import { CatalogsCrudModule } from '../catalogs-crud/catalogs-crud.module';
 import { ChecklistModule } from '../checklist/checklist.module';
+import { CacheModule } from '../cache/cache.module';
 
 @Global()
 @Module({
-  imports: [HttpModule, ConfigModule, UploadFilesModule, ReceptionModule, CatalogsModule, CatalogsCrudModule, ChecklistModule],
+  imports: [HttpModule, ConfigModule, UploadFilesModule, ReceptionModule, CatalogsModule, CatalogsCrudModule, ChecklistModule, CacheModule],
   providers: [TokenValidationService],
   exports: [HttpModule, ConfigModule, TokenValidationService, UploadFilesModule, ReceptionModule],
 })

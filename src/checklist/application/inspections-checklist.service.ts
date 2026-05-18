@@ -144,6 +144,12 @@ export class InspectionsChecklistService {
     );
   }
 
+  search(params: Record<string, any>, token: string): Observable<any> {
+    return this.infrastructure.search(params, token).pipe(
+      switchMap(res => this.enrichSafe(res, token)),
+    );
+  }
+
   saveDraft(id: string, data: any, token: string): Observable<any> {
     return this.infrastructure.saveDraft(id, data, token);
   }

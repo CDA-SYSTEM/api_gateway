@@ -1,10 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { AuthInfrastructureService } from '../infrastructure/auth.service';
+import { CacheInfrastructureService } from '../../cache/infrastructure/cache.service';
+import { CACHE_KEYS, CACHE_TTL } from '../../cache/application/cache-keys.constant';
 
 @Injectable()
 export class AuthApplicationService {
-  constructor(private readonly authInfrastructureService: AuthInfrastructureService) {}
+  constructor(
+    private readonly authInfrastructureService: AuthInfrastructureService,
+    private readonly cacheService: CacheInfrastructureService,
+  ) {}
 
   login(data: any): Observable<any> {
     return this.authInfrastructureService.proxyRequest('POST', '/auth/login', data);
@@ -17,15 +22,21 @@ export class AuthApplicationService {
   }
 
   getUsers(role: string, token: string): Observable<any> {
-    return this.authInfrastructureService.proxyRequest('GET', `/auth/users?role=${role}`, null, {
-      Authorization: `Bearer ${token}`,
-    });
+    return this.cacheService.getOrFetch(CACHE_KEYS.AUTH.USERS_BY_ROLE(role), token, () =>
+      this.authInfrastructureService.proxyRequest('GET', `/auth/users?role=${role}`, null, {
+        Authorization: `Bearer ${token}`,
+      }),
+      CACHE_TTL.MEDIUM,
+    );
   }
 
   getUserById(id: string, token: string): Observable<any> {
-    return this.authInfrastructureService.proxyRequest('GET', `/auth/users/${id}`, null, {
-      Authorization: `Bearer ${token}`,
-    });
+    return this.cacheService.getOrFetch(CACHE_KEYS.AUTH.USER_BY_ID(id), token, () =>
+      this.authInfrastructureService.proxyRequest('GET', `/auth/users/${id}`, null, {
+        Authorization: `Bearer ${token}`,
+      }),
+      CACHE_TTL.MEDIUM,
+    );
   }
 
   updateUser(id: string, data: any, token: string): Observable<any> {
@@ -44,15 +55,21 @@ export class AuthApplicationService {
   }
 
   searchUsers(query: string, token: string): Observable<any> {
-    return this.authInfrastructureService.proxyRequest('GET', `/auth/users/search?q=${query}`, null, {
-      Authorization: `Bearer ${token}`,
-    });
+    return this.cacheService.getOrFetch(CACHE_KEYS.AUTH.USERS_SEARCH(query), token, () =>
+      this.authInfrastructureService.proxyRequest('GET', `/auth/users/search?q=${query}`, null, {
+        Authorization: `Bearer ${token}`,
+      }),
+      CACHE_TTL.MEDIUM,
+    );
   }
 
   checkModuleAccess(module: string, token: string): Observable<any> {
-    return this.authInfrastructureService.proxyRequest('GET', `/auth/modules/${module}`, null, {
-      Authorization: `Bearer ${token}`,
-    });
+    return this.cacheService.getOrFetch(CACHE_KEYS.AUTH.MODULE_ACCESS(module), token, () =>
+      this.authInfrastructureService.proxyRequest('GET', `/auth/modules/${module}`, null, {
+        Authorization: `Bearer ${token}`,
+      }),
+      CACHE_TTL.SHORT,
+    );
   }
 
   inactivateUser(id: string, token: string): Observable<any> {
@@ -68,15 +85,21 @@ export class AuthApplicationService {
   }
 
   getInspectors(token: string): Observable<any> {
-    return this.authInfrastructureService.proxyRequest('GET', '/auth/users/inspectors', null, {
-      Authorization: `Bearer ${token}`,
-    });
+    return this.cacheService.getOrFetch(CACHE_KEYS.AUTH.INSPECTORS, token, () =>
+      this.authInfrastructureService.proxyRequest('GET', '/auth/users/inspectors', null, {
+        Authorization: `Bearer ${token}`,
+      }),
+      CACHE_TTL.MEDIUM,
+    );
   }
 
   getOperarios(token: string): Observable<any> {
-    return this.authInfrastructureService.proxyRequest('GET', '/auth/users/operarios', null, {
-      Authorization: `Bearer ${token}`,
-    });
+    return this.cacheService.getOrFetch(CACHE_KEYS.AUTH.OPERARIOS, token, () =>
+      this.authInfrastructureService.proxyRequest('GET', '/auth/users/operarios', null, {
+        Authorization: `Bearer ${token}`,
+      }),
+      CACHE_TTL.MEDIUM,
+    );
   }
 
   logout(refreshToken: string): Observable<any> {
