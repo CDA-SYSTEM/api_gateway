@@ -115,7 +115,9 @@ export class VehicleService {
   getVehicleById(id: string, token: string): Observable<any> {
     return this.vehicleInfrastructureService.proxyRequestCached('GET', `/vehiculo/${id}`, CACHE_KEYS.VEHICLE.VEHICULO_BY_ID(id), CACHE_TTL.SHORT, null, {
       Authorization: `Bearer ${token}`,
-    });
+    }).pipe(
+      switchMap((res) => this.enrichSafe(res, token)),
+    );
   }
 
   updateVehicle(id: string, data: UpdateVehicleDto, token: string): Observable<any> {
