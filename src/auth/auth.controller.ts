@@ -142,6 +142,24 @@ export class AuthController {
     return this.authService.getOperarios(token);
   }
 
+  @Roles(RoleConst.ADMIN, RoleConst.MANAGER)
+  @Get('roles')
+  @ApiOperation({ summary: 'Listar roles disponibles' })
+  @ApiResponse({ status: 200, description: 'Lista de roles' })
+  async listRoles(@Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.authService.listRoles(token);
+  }
+
+  @Roles(RoleConst.ADMIN, RoleConst.MANAGER)
+  @Get('identification-types')
+  @ApiOperation({ summary: 'Listar tipos de identificación' })
+  @ApiResponse({ status: 200, description: 'Lista de tipos de identificación' })
+  async listIdentificationTypes(@Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.authService.listIdentificationTypes(token);
+  }
+
   @Public()
   @Post('logout')
   @ApiOperation({ summary: 'Logout de usuario' })
