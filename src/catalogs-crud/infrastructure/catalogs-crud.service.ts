@@ -3,6 +3,8 @@ import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { Observable, map, catchError } from 'rxjs';
 import { AxiosResponse, AxiosError } from 'axios';
+import { CacheInfrastructureService } from '../../cache/infrastructure/cache.service';
+import { CACHE_KEYS, CACHE_TTL } from '../../cache/application/cache-keys.constant';
 
 const VALID_TYPES = [
   'marcas', 'clases', 'lineas', 'colores',
@@ -26,6 +28,7 @@ export class CatalogsCrudInfrastructureService {
   constructor(
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
+    private readonly cacheService: CacheInfrastructureService,
   ) {
     this.baseUrl = this.configService.get<string>('VEHICLE_SERVICE_BASE_URL') || '';
     if (!this.baseUrl) {
@@ -45,9 +48,10 @@ export class CatalogsCrudInfrastructureService {
 
   list(type: string, token: string): Observable<any> {
     const mapped = this.validateType(type);
-    return this.proxyRequest('GET', `/${mapped}`, null, {
-      Authorization: `Bearer ${token}`,
-    });
+    return this.cacheService.getOrFetch(CACHE_KEYS.CATALOGS_CRUD.LIST(type), token, () =>
+      this.proxyRequest('GET', `/${mapped}`, null, { Authorization: `Bearer ${token}` }),
+      CACHE_TTL.EXTRA_LONG,
+    );
   }
 
   create(type: string, data: any, token: string): Observable<any> {
@@ -60,9 +64,10 @@ export class CatalogsCrudInfrastructureService {
 
   getById(type: string, id: string, token: string): Observable<any> {
     const mapped = this.validateType(type);
-    return this.proxyRequest('GET', `/${mapped}/${id}`, null, {
-      Authorization: `Bearer ${token}`,
-    });
+    return this.cacheService.getOrFetch(CACHE_KEYS.CATALOGS_CRUD.BY_ID(type, id), token, () =>
+      this.proxyRequest('GET', `/${mapped}/${id}`, null, { Authorization: `Bearer ${token}` }),
+      CACHE_TTL.EXTRA_LONG,
+    );
   }
 
   update(type: string, id: string, data: any, token: string): Observable<any> {
