@@ -2,7 +2,7 @@ import { Controller, Post, Get, Patch, Delete, Body, Query, Param, UseGuards, Va
 import { ApiTags, ApiOperation, ApiBody, ApiResponse, ApiQuery, ApiSecurity, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthApplicationService } from './application/auth.service';
 import { LoginDto } from './application/dtos/login.dto';
-import { RegisterDto } from './application/dtos/register.dto';
+import { RegisterPersonnelDto } from './application/dtos/register-personnel.dto';
 import { UpdateUserDto } from './application/dtos/update-user.dto';
 import { ValidateTokenDto } from './application/dtos/validate-token.dto';
 import { RefreshTokenDto } from './application/dtos/refresh-token.dto';
@@ -30,13 +30,13 @@ export class AuthController {
   }
 
   @Roles(RoleConst.ADMIN, RoleConst.MANAGER)
-  @Post('register')
-  @ApiOperation({ summary: 'Registro de usuario (requiere token admin/manager)' })
-  @ApiBody({ type: RegisterDto })
-  @ApiResponse({ status: 201, description: 'Usuario registrado' })
-  async register(@Body() body: RegisterDto, @Req() req: Request) {
+  @Post('admin/personnel/register')
+  @ApiOperation({ summary: 'Registro de personal (admin/manager)' })
+  @ApiBody({ type: RegisterPersonnelDto })
+  @ApiResponse({ status: 201, description: 'Personal registrado' })
+  async registerPersonnel(@Body() body: RegisterPersonnelDto, @Req() req: Request) {
     const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
-    return this.authService.register(body, token);
+    return this.authService.registerPersonnel(body, token);
   }
 
   @Roles(RoleConst.ADMIN, RoleConst.MANAGER)
@@ -97,12 +97,13 @@ export class AuthController {
   }
 
   @Roles(RoleConst.ADMIN, RoleConst.MANAGER, RoleConst.INSPECTOR, RoleConst.OPERARIO)
-  @Get('modules/:module')
-  @ApiOperation({ summary: 'Verificar acceso a módulo' })
+  @Get('modules/*module')
+  @ApiOperation({ summary: 'Verificar acceso a módulo (soporta sub-rutas)' })
+  @ApiQuery({ name: 'module', required: true, description: 'Ruta del módulo (ej: ntc-5375/checklists)' })
   @ApiResponse({ status: 200, description: 'Acceso verificado' })
-  async checkModuleAccess(@Param('module') module: string, @Req() req: Request) {
+  async checkModuleAccess(@Param('module') modulePath: string, @Req() req: Request) {
     const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
-    return this.authService.checkModuleAccess(module, token);
+    return this.authService.checkModuleAccess(modulePath, token);
   }
 
   @Roles(RoleConst.ADMIN, RoleConst.MANAGER)
@@ -139,6 +140,24 @@ export class AuthController {
   async getOperarios(@Req() req: Request) {
     const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
     return this.authService.getOperarios(token);
+  }
+
+  @Roles(RoleConst.ADMIN, RoleConst.MANAGER)
+  @Get('roles')
+  @ApiOperation({ summary: 'Listar roles disponibles' })
+  @ApiResponse({ status: 200, description: 'Lista de roles' })
+  async listRoles(@Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.authService.listRoles(token);
+  }
+
+  @Roles(RoleConst.ADMIN, RoleConst.MANAGER)
+  @Get('identification-types')
+  @ApiOperation({ summary: 'Listar tipos de identificación' })
+  @ApiResponse({ status: 200, description: 'Lista de tipos de identificación' })
+  async listIdentificationTypes(@Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.authService.listIdentificationTypes(token);
   }
 
   @Public()
