@@ -10,12 +10,12 @@
 
 ## Institución / Institution
 
-**UniPutuamyo** — Mocoa, Putumayo, Colombia  
+**UniPutumayo** — Mocoa, Putumayo, Colombia  
 Programa de Ingeniería de Sistemas / Systems Engineering Program
 
 ## Agradecimientos / Acknowledgments
 
-A la Universidad UniPutuamyo por facilitar los recursos académicos
+A la Universidad UniPutumayo por facilitar los recursos académicos
 y tecnológicos para el desarrollo de este proyecto.
 
 ---

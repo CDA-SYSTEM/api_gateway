@@ -386,7 +386,7 @@ Por favor, asegúrate de:
 | **Kevin Chanchi** | Desarrollador de frontend |
 | **Oscar Chavez** | Desarrollador de infraestructura |
 
-**UniPutuamyo — Mocoa, Putumayo, Colombia**
+**UniPutumayo — Mocoa, Putumayo, Colombia**
 
 ---
 
@@ -407,5 +407,5 @@ Ver el archivo [LICENSE](LICENSE) para los términos completos.
 ---
 
 <p align="center">
-  <sub>Proyecto académico — UniPutuamyo, Mocoa Putumayo</sub>
+  <sub>Proyecto académico — UniPutumayo, Mocoa Putumayo</sub>
 </p>

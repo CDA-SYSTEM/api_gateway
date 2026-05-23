@@ -19,7 +19,7 @@ Para reportar errores o solicitar características:
 
 ### Contacto
 
-Este es un proyecto académico de **UniPutuamyo — Mocoa, Putumayo**.
+Este es un proyecto académico de **UniPutumayo — Mocoa, Putumayo**.
 Para consultas académicas o técnicas, contacta a los autores a
 través del repositorio oficial.
 
@@ -44,6 +44,6 @@ To report bugs or request features:
 
 ### Contact
 
-This is an academic project from **UniPutuamyo — Mocoa, Putumayo**.
+This is an academic project from **UniPutumayo — Mocoa, Putumayo**.
 For academic or technical inquiries, contact the authors through
 the official repository.

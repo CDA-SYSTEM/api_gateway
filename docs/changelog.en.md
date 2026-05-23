@@ -22,7 +22,7 @@ All notable changes to this project will be documented in this file.
 - Vehicle enrichment with cached `client` data via optional `transform` parameter in `proxyRequestCached`
 - `ChecklistModule` imported in `ReceptionModule` (exports `TemplatesChecklistService`, `InspectionsChecklistService`, `ChecklistInfrastructureService`)
 - `AuthModule` imported in `ChecklistModule` for inspector enrichment
-- `LICENSE` file with All Rights Reserved for Andres Iles, Emerson Iles, Audino Pantoja, Kevin Chanchi, Oscar Chavez from UniPutuamyo
+- `LICENSE` file with All Rights Reserved for Andres Iles, Emerson Iles, Audino Pantoja, Kevin Chanchi, Oscar Chavez from UniPutumayo
 - Full `README.md` with architecture diagram, tech stack, setup instructions, and authors
 - Detailed supported document types in `docs/services/storage-service.md` / `.en.md` (MIME types, extensions, size limits, response examples)
 - Updated copyright in `mkdocs.yml`
