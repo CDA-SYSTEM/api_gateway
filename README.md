@@ -1,5 +1,14 @@
 <p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
+  <img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" />
+</p>
+
+<h1 align="center">CDA System — API Gateway</h1>
+
+<p align="center">
+  Sistema de inspección vehicular con arquitectura de microservicios.
+  <br />
+  Punto de entrada único para autenticación, formularios, checklist NTC 5375,
+  almacenamiento de archivos y gestión de clientes/vehículos.
 </p>
 
 <p align="center">
@@ -7,101 +16,130 @@
     <img src="https://img.shields.io/badge/Documentación-📖-teal?style=for-the-badge" alt="Documentación" />
   </a>
   <a href="https://cda-system.github.io/api_gateway/en/" target="_blank">
-    <img src="https://img.shields.io/badge/Docs-📖-teal?style=for-the-badge" alt="Docs" />
+    <img src="https://img.shields.io/badge/Docs-📖-teal?style=for-the-badge" alt="Docs EN" />
+  </a>
+  <a href="https://github.com/CDA-SYSTEM/api_gateway">
+    <img src="https://img.shields.io/badge/Repositorio-GitHub-181717?style=for-the-badge&logo=github" alt="GitHub" />
   </a>
 </p>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+---
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Arquitectura
 
-## Description
+```
+                    ┌──────────────┐
+                    │  Cliente Web │
+                    │  / Mobile    │
+                    └──────┬───────┘
+                           │
+                    ┌──────▼───────┐
+                    │  API Gateway │ :3600
+                    │   (NestJS)   │
+                    └──┬───┬───┬───┘
+                       │   │   │
+          ┌────────────┘   │   └────────────┐
+          ▼                ▼                ▼
+   ┌──────────┐    ┌──────────────┐  ┌──────────────┐
+   │   Auth   │    │    Form      │  │   Storage    │
+   │ :3001    │    │   :7500      │  │   :7000      │
+   │ NestJS   │    │   NestJS     │  │   NestJS     │
+   │ PostgreSQL│   │   MongoDB    │  │  Cassandra   │
+   └──────────┘    └──┬───┬───────┘  └──────────────┘
+                      │   │
+          ┌───────────┘   └───────────┐
+          ▼                           ▼
+   ┌──────────────┐          ┌──────────────┐
+   │   Clients    │          │   Vehicles   │
+   │   :8080      │          │   :9000      │
+   │  Spring Boot │          │  Spring Boot │
+   │  PostgreSQL  │          │  PostgreSQL  │
+   └──────────────┘          └──────────────┘
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-## Project setup
-
-```bash
-$ npm install
+   ┌──────────────────┐
+   │   Checklist      │
+   │   :8000          │
+   │  Django / Python │
+   │     MongoDB      │
+   └──────────────────┘
 ```
 
-## Compile and run the project
+## Stack Tecnológico
+
+| Componente | Tecnología |
+|------------|------------|
+| API Gateway | NestJS 11 / TypeScript |
+| Auth Service | NestJS 11 / PostgreSQL + Redis |
+| Clients Service | Spring Boot 4 / Java 17 / PostgreSQL |
+| Vehicles Service | Spring Boot 4 / Java 17 / PostgreSQL |
+| Form Service | NestJS 11 / MongoDB |
+| Storage Service | NestJS 11 / Apache Cassandra |
+| Checklist Service | Django 6.0.3 / Python 3.12 / MongoDB |
+| Documentación | MkDocs con tema Material |
+
+## Prerrequisitos
+
+- Node.js 20+
+- npm 10+
+- Docker y Docker Compose
+- Python 3.12+ (solo para checklist-service y documentación)
+
+## Instalación
 
 ```bash
-# development
-$ npm run start
+# Clonar el repositorio
+git clone https://github.com/CDA-SYSTEM/api_gateway.git
+cd api_gateway
 
-# watch mode
-$ npm run start:dev
+# Instalar dependencias
+npm install
 
-# production mode
-$ npm run start:prod
+# Configurar variables de entorno
+cp .env.example .env
+# Editar .env con las URLs de los servicios
+
+# Iniciar en modo desarrollo
+npm run start:dev
 ```
 
-## Run tests
+## Scripts Disponibles
+
+| Comando | Descripción |
+|---------|-------------|
+| `npm run start` | Iniciar en producción |
+| `npm run start:dev` | Iniciar en modo desarrollo con hot-reload |
+| `npm run build` | Compilar TypeScript |
+| `npm run lint` | Ejecutar ESLint |
+| `npm run format` | Formatear con Prettier |
+| `npm run test` | Ejecutar pruebas unitarias |
+| `npm run test:e2e` | Ejecutar pruebas e2e |
+| `npm run docs:serve` | Servir documentación localmente |
+
+## Documentación
+
+La documentación completa está disponible en:
+
+- **Español:** https://cda-system.github.io/api_gateway/
+- **English:** https://cda-system.github.io/api_gateway/en/
+
+Para servir la documentación localmente:
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+python -m mkdocs serve
 ```
 
-## Deployment
+## Autores
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+- **Andres Iles**
+- **Emerson Iles**
+- **Audino Pantoja**
+- **Kevin Chanchi**
+- **Oscar Chavez**
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+**UniPutuamyo — Mocoa, Putumayo**
 
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
+## Licencia
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+Todos los derechos reservados. Ver el archivo [LICENSE](LICENSE) para más información.
 
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+Copyright © 2026 Andres Iles, Emerson Iles, Audino Pantoja, Kevin Chanchi, Oscar Chavez
