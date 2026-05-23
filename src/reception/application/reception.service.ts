@@ -82,7 +82,65 @@ export class ReceptionService {
         return this.infrastructure.proxyRequest('POST', '/api/inspections', payload, {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
-        });
+        }).pipe(
+          switchMap((created) => {
+            const inspectionData = created?.data ?? created;
+            const inspectionId = inspectionData?.id;
+            const vehicleId = dto.vehicle_id;
+            if (!vehicleId || !inspectionId) return of(created);
+
+            return forkJoin({
+              vehicle: this.vehicleService.getVehicleById(vehicleId, token).pipe(catchError(() => of(null))),
+              motoTemplate: this.checklistTemplateService.getActiveMotoTemplate(token).pipe(catchError(() => of(null))),
+              livianosTemplate: this.checklistTemplateService.getActiveLivianosPesadosTemplate(token).pipe(catchError(() => of(null))),
+            }).pipe(
+              switchMap(({ vehicle, motoTemplate, livianosTemplate }) => {
+                const tipo = (vehicle?.tipoVehiculo?.nombre ?? vehicle?.data?.tipoVehiculo?.nombre ?? '').toLowerCase();
+                const plate = vehicle?.placa ?? vehicle?.data?.placa ?? '';
+
+                let vehicleType: string;
+                let templateId: string;
+
+                if (tipo === 'moto') {
+                  vehicleType = 'MOTO';
+                  templateId = motoTemplate?.id ?? motoTemplate?.data?.id ?? '';
+                } else {
+                  vehicleType = tipo === 'pesado' ? 'PESADO' : 'LIVIANO';
+                  templateId = livianosTemplate?.id ?? livianosTemplate?.data?.id ?? '';
+                }
+
+                if (!templateId || !plate) return of(created);
+
+                const checklistPayload = {
+                  plate,
+                  vehicle_id: Number(vehicleId),
+                  client_id: Number(dto.client_id),
+                  vehicle_type: vehicleType,
+                  template_id: templateId,
+                  inspection_datetime: new Date().toISOString(),
+                  inspector_id: dto.operator_id,
+                  observations: dto.observations ?? '',
+                };
+
+                return this.checklistInfrastructure.createInspection(checklistPayload, token).pipe(
+                  switchMap((checklistResult) => {
+                    const checklistId = checklistResult?.id ?? checklistResult?.data?.id;
+                    if (!checklistId) return of(created);
+
+                    return this.infrastructure.proxyRequest('PATCH', `/api/inspections/${inspectionId}/checklist-id`, { checklistId }, {
+                      Authorization: `Bearer ${token}`,
+                      'Content-Type': 'application/json',
+                    }).pipe(
+                      catchError(() => of(created)),
+                      map(() => created),
+                    );
+                  }),
+                  catchError(() => of(created)),
+                );
+              }),
+            );
+          }),
+        );
       }),
     );
   }
