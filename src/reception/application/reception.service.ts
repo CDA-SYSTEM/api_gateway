@@ -157,7 +157,7 @@ export class ReceptionService {
                         this.logger.log('[DEBUG] PATCH error:', err?.message);
                         return of(created);
                       }),
-                      map(() => created),
+                      map(() => ({ ...created, checklistId })),
                     );
                   }),
                   catchError((err) => {
