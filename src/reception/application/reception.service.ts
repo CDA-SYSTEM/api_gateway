@@ -69,6 +69,7 @@ export class ReceptionService {
           observations: dto.observations,
           signature_url: signatureUrl || dto.signature_url || '',
           photo_reception_url: photoUrl || dto.photo_reception_url || '',
+          checklistId: dto.checklistId,
           checklist: dto.checklist,
           axles: dto.axles,
           tires: dto.tires,
@@ -127,6 +128,7 @@ export class ReceptionService {
           armored_vehicle: dto.armored_vehicle,
           brake_fluid_sight_glass: dto.brake_fluid_sight_glass,
           observations: dto.observations,
+          checklistId: dto.checklistId,
           checklist: dto.checklist,
           axles: dto.axles,
           tires: dto.tires,
@@ -161,6 +163,13 @@ export class ReceptionService {
   healthCheck(token: string): Observable<any> {
     return this.infrastructure.proxyRequest('GET', '/api', null, {
       Authorization: `Bearer ${token}`,
+    });
+  }
+
+  updateChecklistId(id: string, checklistId: string, token: string): Observable<any> {
+    return this.infrastructure.proxyRequest('PATCH', `/api/inspections/${id}/checklist-id`, { checklistId }, {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
     });
   }
 
