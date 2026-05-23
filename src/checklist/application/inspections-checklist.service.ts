@@ -4,6 +4,7 @@ import { map, switchMap, catchError } from 'rxjs';
 import { ChecklistInfrastructureService } from '../infrastructure/checklist.service';
 import { ClientsApplicationService } from '../../clients/application/clients.service';
 import { VehicleService } from '../../vehicle/application/vehicle.service';
+import { AuthApplicationService } from '../../auth/application/auth.service';
 
 @Injectable()
 export class InspectionsChecklistService {
@@ -11,6 +12,7 @@ export class InspectionsChecklistService {
     private readonly infrastructure: ChecklistInfrastructureService,
     private readonly clientService: ClientsApplicationService,
     private readonly vehicleService: VehicleService,
+    private readonly authService: AuthApplicationService,
   ) {}
 
   private enrichItem(item: any, token: string): Observable<any> {
@@ -24,11 +26,16 @@ export class InspectionsChecklistService {
       ? this.vehicleService.getVehicleById(String(item.vehicle_id), token).pipe(catchError(() => of(null)))
       : of(null);
 
-    return forkJoin([clientReq, vehicleReq]).pipe(
-      map(([clientRaw, vehicleRaw]) => ({
+    const inspectorReq = item.inspector_id
+      ? this.authService.getUserById(String(item.inspector_id), token).pipe(catchError(() => of(null)))
+      : of(null);
+
+    return forkJoin([clientReq, vehicleReq, inspectorReq]).pipe(
+      map(([clientRaw, vehicleRaw, inspectorRaw]) => ({
         ...item,
         client: clientRaw?.data ?? clientRaw ?? null,
         vehicle: vehicleRaw?.data ?? vehicleRaw ?? null,
+        inspector: inspectorRaw?.data ?? inspectorRaw ?? null,
       })),
     );
   }
@@ -38,6 +45,7 @@ export class InspectionsChecklistService {
 
     const clientIds = [...new Set(items.map(i => i.client_id).filter(Boolean))] as string[];
     const vehicleIds = [...new Set(items.map(i => String(i.vehicle_id)).filter(Boolean))] as string[];
+    const inspectorIds = [...new Set(items.map(i => i.inspector_id).filter(Boolean))] as string[];
 
     const clientReqs = clientIds.map(id =>
       this.clientService.getClientById(id, token).pipe(
@@ -53,23 +61,35 @@ export class InspectionsChecklistService {
       ),
     );
 
-    const allReqs = [...clientReqs, ...vehicleReqs];
+    const inspectorReqs = inspectorIds.map(id =>
+      this.authService.getUserById(id, token).pipe(
+        catchError(() => of(null)),
+        map(raw => ({ id, data: raw?.data ?? raw ?? null })),
+      ),
+    );
+
+    const allReqs = [...clientReqs, ...vehicleReqs, ...inspectorReqs];
     if (!allReqs.length) return of(items);
 
     return forkJoin(allReqs).pipe(
       map((results: any[]) => {
         const numClients = clientReqs.length;
+        const numVehicles = vehicleReqs.length;
         const clientMap = new Map(
           results.slice(0, numClients).filter(r => r).map(r => [r.id, r.data]),
         );
         const vehicleMap = new Map(
-          results.slice(numClients).filter(r => r).map(r => [r.id, r.data]),
+          results.slice(numClients, numClients + numVehicles).filter(r => r).map(r => [r.id, r.data]),
+        );
+        const inspectorMap = new Map(
+          results.slice(numClients + numVehicles).filter(r => r).map(r => [r.id, r.data]),
         );
 
         return items.map(item => ({
           ...item,
           client: item.client_id ? clientMap.get(String(item.client_id)) ?? null : null,
           vehicle: item.vehicle_id ? vehicleMap.get(String(item.vehicle_id)) ?? null : null,
+          inspector: item.inspector_id ? inspectorMap.get(String(item.inspector_id)) ?? null : null,
         }));
       }),
     );

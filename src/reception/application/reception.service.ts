@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, Logger } from '@nestjs/common';
 import { Observable, forkJoin, of, throwError } from 'rxjs';
 import { map, switchMap, catchError } from 'rxjs';
 import { ReceptionInfrastructureService } from '../infrastructure/reception.service';
@@ -6,6 +6,8 @@ import { ClientsApplicationService } from '../../clients/application/clients.ser
 import { VehicleService } from '../../vehicle/application/vehicle.service';
 import { AuthApplicationService } from '../../auth/application/auth.service';
 import { UploadFilesService } from '../../upload-files/application/upload-files.service';
+import { TemplatesChecklistService } from '../../checklist/application/templates-checklist.service';
+import { ChecklistInfrastructureService } from '../../checklist/infrastructure/checklist.service';
 import { InspectionItem } from './dtos/inspection-item.interface';
 import { InspectionsResponse } from './dtos/inspections-response.interface';
 import { CreateInspectionDto } from './dtos/create-inspection.dto';
@@ -14,12 +16,15 @@ import { mapInspectionItem, mapInspectionsResponse } from './mappers/inspection.
 
 @Injectable()
 export class ReceptionService {
+  private readonly logger = new Logger(ReceptionService.name);
   constructor(
     private readonly infrastructure: ReceptionInfrastructureService,
     private readonly clientService: ClientsApplicationService,
     private readonly vehicleService: VehicleService,
     private readonly authService: AuthApplicationService,
     private readonly uploadFilesService: UploadFilesService,
+    private readonly checklistTemplateService: TemplatesChecklistService,
+    private readonly checklistInfrastructure: ChecklistInfrastructureService,
   ) {}
 
   deleteInspectionById(id: string, token: string): Observable<any> {
@@ -69,6 +74,7 @@ export class ReceptionService {
           observations: dto.observations,
           signature_url: signatureUrl || dto.signature_url || '',
           photo_reception_url: photoUrl || dto.photo_reception_url || '',
+          checklistId: dto.checklistId,
           checklist: dto.checklist,
           axles: dto.axles,
           tires: dto.tires,
@@ -77,7 +83,92 @@ export class ReceptionService {
         return this.infrastructure.proxyRequest('POST', '/api/inspections', payload, {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
-        });
+        }).pipe(
+          switchMap((created) => {
+            this.logger.log('[DEBUG] POST /api/inspections response:', JSON.stringify(created));
+            const inspectionData = created?.data ?? created;
+            const inspectionId = inspectionData?.id;
+            const vehicleId = dto.vehicle_id;
+            this.logger.log('[DEBUG] inspectionId:', inspectionId, 'vehicleId:', vehicleId);
+            if (!vehicleId || !inspectionId) {
+              this.logger.log('[DEBUG] SKIP checklist — missing vehicleId or inspectionId');
+              return of(created);
+            }
+
+            this.logger.log('[DEBUG] Fetching vehicle + templates in parallel...');
+            return forkJoin({
+              vehicle: this.vehicleService.getVehicleById(vehicleId, token).pipe(catchError((err) => { this.logger.log('[DEBUG] vehicle error:', err?.message); return of(null); })),
+              motoTemplate: this.checklistTemplateService.getActiveMotoTemplate(token).pipe(catchError((err) => { this.logger.log('[DEBUG] motoTemplate error:', err?.message); return of(null); })),
+              livianosTemplate: this.checklistTemplateService.getActiveLivianosPesadosTemplate(token).pipe(catchError((err) => { this.logger.log('[DEBUG] livianosTemplate error:', err?.message); return of(null); })),
+            }).pipe(
+              switchMap(({ vehicle, motoTemplate, livianosTemplate }) => {
+                this.logger.log('[DEBUG] vehicle:', JSON.stringify(vehicle)?.slice(0, 300));
+                this.logger.log('[DEBUG] motoTemplate:', JSON.stringify(motoTemplate)?.slice(0, 200));
+                this.logger.log('[DEBUG] livianosTemplate:', JSON.stringify(livianosTemplate)?.slice(0, 200));
+
+                const tipo = (vehicle?.tipoVehiculo?.nombre ?? vehicle?.data?.tipoVehiculo?.nombre ?? '').toLowerCase();
+                const plate = vehicle?.placa ?? vehicle?.data?.placa ?? '';
+                this.logger.log('[DEBUG] tipo:', tipo, 'plate:', plate);
+
+                let vehicleType: string;
+                let templateId: string;
+
+                if (tipo === 'moto') {
+                  vehicleType = 'MOTO';
+                  templateId = motoTemplate?.id ?? motoTemplate?.data?.id ?? '';
+                } else {
+                  vehicleType = tipo === 'pesado' ? 'PESADO' : 'LIVIANO';
+                  templateId = livianosTemplate?.id ?? livianosTemplate?.data?.id ?? '';
+                }
+                this.logger.log('[DEBUG] vehicleType:', vehicleType, 'templateId:', templateId);
+
+                if (!templateId || !plate) {
+                  this.logger.log('[DEBUG] SKIP checklist — no templateId or plate');
+                  return of(created);
+                }
+
+                const checklistPayload = {
+                  plate,
+                  vehicle_id: Number(vehicleId),
+                  client_id: Number(dto.client_id),
+                  vehicle_type: vehicleType,
+                  template_id: templateId,
+                  inspection_datetime: new Date().toISOString(),
+                  inspector_id: dto.operator_id,
+                  observations: dto.observations ?? '',
+                };
+                this.logger.log('[DEBUG] Creating checklist inspection:', JSON.stringify(checklistPayload));
+
+                return this.checklistInfrastructure.createInspection(checklistPayload, token).pipe(
+                  switchMap((checklistResult) => {
+                    this.logger.log('[DEBUG] checklist create response:', JSON.stringify(checklistResult)?.slice(0, 200));
+                    const checklistId = checklistResult?.id ?? checklistResult?.data?.id;
+                    if (!checklistId) {
+                      this.logger.log('[DEBUG] SKIP PATCH — no checklistId in response');
+                      return of(created);
+                    }
+
+                    this.logger.log('[DEBUG] PATCH checklistId:', checklistId, 'on inspection:', inspectionId);
+                    return this.infrastructure.proxyRequest('PATCH', `/api/inspections/${inspectionId}/checklist-id`, { checklistId }, {
+                      Authorization: `Bearer ${token}`,
+                      'Content-Type': 'application/json',
+                    }).pipe(
+                      catchError((err) => {
+                        this.logger.log('[DEBUG] PATCH error:', err?.message);
+                        return of(created);
+                      }),
+                      map(() => ({ ...created, checklistId })),
+                    );
+                  }),
+                  catchError((err) => {
+                    this.logger.log('[DEBUG] createInspection checklist error:', err?.message);
+                    return of(created);
+                  }),
+                );
+              }),
+            );
+          }),
+        );
       }),
     );
   }
@@ -127,6 +218,7 @@ export class ReceptionService {
           armored_vehicle: dto.armored_vehicle,
           brake_fluid_sight_glass: dto.brake_fluid_sight_glass,
           observations: dto.observations,
+          checklistId: dto.checklistId,
           checklist: dto.checklist,
           axles: dto.axles,
           tires: dto.tires,
@@ -161,6 +253,13 @@ export class ReceptionService {
   healthCheck(token: string): Observable<any> {
     return this.infrastructure.proxyRequest('GET', '/api', null, {
       Authorization: `Bearer ${token}`,
+    });
+  }
+
+  updateChecklistId(id: string, checklistId: string, token: string): Observable<any> {
+    return this.infrastructure.proxyRequest('PATCH', `/api/inspections/${id}/checklist-id`, { checklistId }, {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
     });
   }
 

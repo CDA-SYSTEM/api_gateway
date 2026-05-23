@@ -135,6 +135,38 @@ Encabezados comunes usados por todas las peticiones:
     }).then(r => r.json()).then(console.log);
     ```
 
+### Actualizar checklistId de inspección
+
+=== "cURL"
+    ```bash
+    curl -s -X PATCH http://localhost:3600/api/v1/inspections/<id>/checklist-id \
+      -H 'x-api-key: your-frontend-api-key' \
+      -H 'Authorization: Bearer <token>' \
+      -H 'Content-Type: application/json' \
+      -d '{"checklistId": "6651a8e2f1b2c3d4e5f6a7b8"}'
+    ```
+=== "Python"
+    ```python
+    import requests
+
+    url = "http://localhost:3600/api/v1/inspections/<id>/checklist-id"
+    headers = {"x-api-key": "your-frontend-api-key", "Authorization": "Bearer <token>", "Content-Type": "application/json"}
+    data = {"checklistId": "6651a8e2f1b2c3d4e5f6a7b8"}
+    response = requests.patch(url, json=data, headers=headers)
+    print(response.json())
+    ```
+=== "JavaScript"
+    ```javascript
+    fetch('http://localhost:3600/api/v1/inspections/<id>/checklist-id', {
+      method: 'PATCH',
+      headers: {'x-api-key': 'your-frontend-api-key', 'Authorization': 'Bearer <token>', 'Content-Type': 'application/json'},
+      body: JSON.stringify({checklistId: '6651a8e2f1b2c3d4e5f6a7b8'})
+    }).then(r => r.json()).then(console.log);
+    ```
+
+!!! tip "Nota"
+    Este endpoint es utilizado internamente por el gateway para asociar el checklist creado automáticamente con la inspección de recepción. También puede usarse manualmente si se necesita vincular una inspección de checklist existente.
+
 ### Listar inspecciones
 
 === "cURL"

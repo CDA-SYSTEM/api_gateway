@@ -6,8 +6,26 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 - `POST /auth/login` returned HTTP 201 instead of 200 due to NestJS 11 default for POST routes; added explicit `@HttpCode(200)` override
+- Create inspection response now includes `checklistId` after PATCH via spread `{ ...created, checklistId }`
+- Replaced `console.log` with `this.logger.log` (NestJS Logger) in auto-checklist flow
 
 ### Added
+- Auto checklist creation on inspection create (`POST /api/v1/inspections`):
+  - Fetches vehicle and determines type (`MOTO`/`LIVIANO`/`PESADO`)
+  - Looks up active template (`getActiveMotoTemplate` / `getActiveLivianosPesadosTemplate`)
+  - Creates record in checklist-service via `POST /api/v1/checklist/inspections`
+  - Assigns resulting `checklistId` back to reception inspection via `PATCH /api/v1/inspections/{id}/checklist-id`
+  - Errors in checklist flow do not block inspection creation (`catchError` with `of(created)`)
+- `PATCH /api/v1/inspections/{id}/checklist-id` endpoint in reception controller to update checklistId
+- `checklistId` field in `CreateInspectionDto` and `UpdateInspectionDto`
+- `inspector` enrichment on checklist inspection reads (using `AuthApplicationService`)
+- Vehicle enrichment with cached `client` data via optional `transform` parameter in `proxyRequestCached`
+- `ChecklistModule` imported in `ReceptionModule` (exports `TemplatesChecklistService`, `InspectionsChecklistService`, `ChecklistInfrastructureService`)
+- `AuthModule` imported in `ChecklistModule` for inspector enrichment
+- `LICENSE` file with All Rights Reserved for Andres Iles, Emerson Iles, Audino Pantoja, Kevin Chanchi, Oscar Chavez from UniPutumayo
+- Full `README.md` with architecture diagram, tech stack, setup instructions, and authors
+- Detailed supported document types in `docs/services/storage-service.md` / `.en.md` (MIME types, extensions, size limits, response examples)
+- Updated copyright in `mkdocs.yml`
 - Checklist module documentation (architecture, endpoints, DTOs, enrichment) in `docs/services/checklist-service.md`
 - cURL/Python/JavaScript usage examples for all checklist endpoints in `docs/examples.md`
 - Standard response format and HTTP status code documentation in `docs/services/api-gateway.md`

@@ -10,9 +10,10 @@ import { LabradoChecklistService } from './application/labrado-checklist.service
 import { ChecklistInfrastructureService } from './infrastructure/checklist.service';
 import { ClientsModule } from '../clients/clients.module';
 import { VehicleModule } from '../vehicle/vehicle.module';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
-  imports: [HttpModule, ConfigModule, ClientsModule, VehicleModule],
+  imports: [HttpModule, ConfigModule, ClientsModule, VehicleModule, AuthModule],
   controllers: [
     TemplatesChecklistController,
     InspectionsChecklistController,
@@ -24,7 +25,7 @@ import { VehicleModule } from '../vehicle/vehicle.module';
     LabradoChecklistService,
     ChecklistInfrastructureService,
   ],
-  exports: [],
+  exports: [TemplatesChecklistService, InspectionsChecklistService, ChecklistInfrastructureService],
 })
 export class ChecklistModule {}
 
