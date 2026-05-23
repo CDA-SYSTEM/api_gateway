@@ -172,4 +172,31 @@ export class ReceptionController {
     const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
     return this.receptionService.updateInspection(id, dto, signatureFile, photoFile, token);
   }
+
+  @Patch('inspections/:id/checklist-id')
+  @ApiOperation({ summary: 'Actualizar solo el checklistId de una inspección' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      required: ['checklistId'],
+      properties: {
+        checklistId: {
+          type: 'string',
+          description: 'Nuevo ID del checklist',
+        },
+      },
+    },
+  })
+  @ApiResponse({ status: 200, description: 'checklistId actualizado' })
+  async updateInspectionChecklistId(
+    @Param('id') id: string,
+    @Body('checklistId') checklistId: string,
+    @Req() req: Request,
+  ) {
+    if (!checklistId) {
+      throw new BadRequestException('El campo checklistId es requerido');
+    }
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.receptionService.updateChecklistId(id, checklistId, token);
+  }
 }
