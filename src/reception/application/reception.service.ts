@@ -6,6 +6,8 @@ import { ClientsApplicationService } from '../../clients/application/clients.ser
 import { VehicleService } from '../../vehicle/application/vehicle.service';
 import { AuthApplicationService } from '../../auth/application/auth.service';
 import { UploadFilesService } from '../../upload-files/application/upload-files.service';
+import { TemplatesChecklistService } from '../../checklist/application/templates-checklist.service';
+import { ChecklistInfrastructureService } from '../../checklist/infrastructure/checklist.service';
 import { InspectionItem } from './dtos/inspection-item.interface';
 import { InspectionsResponse } from './dtos/inspections-response.interface';
 import { CreateInspectionDto } from './dtos/create-inspection.dto';
@@ -20,6 +22,8 @@ export class ReceptionService {
     private readonly vehicleService: VehicleService,
     private readonly authService: AuthApplicationService,
     private readonly uploadFilesService: UploadFilesService,
+    private readonly checklistTemplateService: TemplatesChecklistService,
+    private readonly checklistInfrastructure: ChecklistInfrastructureService,
   ) {}
 
   deleteInspectionById(id: string, token: string): Observable<any> {
