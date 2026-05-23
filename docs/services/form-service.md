@@ -8,7 +8,7 @@
 
 ## Propósito
 
-Gestión de formularios de recepción de vehículos. Crea, lista, actualiza y elimina de forma suave las inspecciones de vehículos. Valida la existencia del cliente y del vehículo mediante RabbitMQ RPC antes de persistir. Aplica reglas de negocio por tipo de vehículo.
+Gestión de formularios de recepción de vehículos. Crea, lista, actualiza y elimina de forma suave las inspecciones de vehículos. Valida la existencia del cliente y del vehículo mediante RabbitMQ RPC antes de persistir. Al crear una inspección, automáticamente crea un registro de checklist asociado en checklist-service. Aplica reglas de negocio por tipo de vehículo.
 
 ## Reglas de Negocio
 
@@ -37,17 +37,20 @@ Gestión de formularios de recepción de vehículos. Crea, lista, actualiza y el
 
 | Método | Ruta | Descripción |
 |--------|------|-------------|
-| `POST` | `/api/inspections` | Crear (valida cliente/vehículo via RabbitMQ) |
+| `POST` | `/api/inspections` | Crear (valida cliente/vehículo via RabbitMQ, crea checklist automáticamente) |
 | `GET` | `/api/inspections` | Listar con filtros (includeDeleted, vehicle_id, page, size) |
 | `GET` | `/api/inspections/:id` | Obtener por ID |
 | `PATCH` | `/api/inspections/:id` | Actualizar (re-valida reglas de tipo de vehículo) |
+| `PATCH` | `/api/inspections/:id/checklist-id` | Actualizar solo el `checklistId` (desde checklist-service) |
 | `DELETE` | `/api/inspections/:id` | Eliminación suave |
 
 ## Integración
 
 - **RabbitMQ RPC** — Valida `customer_id` contra `client-service-queue` y `vehicle_id` contra `vehicle-service-queue` antes de guardar inspecciones
+- **Checklist Service** — Al crear una inspección (`POST /api/inspections`), obtiene el vehículo, determina la plantilla activa según el tipo (`MOTO`/`LIVIANO`/`PESADO`) y crea automáticamente un registro de checklist via checklist-service API. El `checklistId` resultante se asigna en la inspección de recepción
+- **PATCH /checklist-id** — Endpoint interno para que checklist-service notifique el ID creado sin depender del flujo automático
 - **Eliminación Suave** — Establece timestamp `deleted_at` en lugar de eliminación física
 
 ## Arquitectura
 
-Modular con `CatalogsModule`, `InspectionModule` y `RabbitMQModule`. Usa enums TypeScript compartidos para valores de catálogo. Script de siembra disponible via `seed:inspection`.
+Modular con `CatalogsModule`, `InspectionModule` y `RabbitMQModule`. Usa enums TypeScript compartidos para valores de catálogo. Importa `ChecklistModule` para la creación automática de checklists. Script de siembra disponible via `seed:inspection`.

@@ -8,7 +8,7 @@
 
 ## Purpose
 
-Vehicle reception form management. Creates, lists, updates, and soft-deletes vehicle inspections. Validates client and vehicle existence via RabbitMQ RPC before persisting. Enforces business rules per vehicle type.
+Vehicle reception form management. Creates, lists, updates, and soft-deletes vehicle inspections. Validates client and vehicle existence via RabbitMQ RPC before persisting. On creation, automatically creates an associated checklist record in checklist-service. Enforces business rules per vehicle type.
 
 ## Business Rules
 
@@ -37,17 +37,20 @@ Vehicle reception form management. Creates, lists, updates, and soft-deletes veh
 
 | Method | Path | Description |
 |--------|------|-------------|
-| `POST` | `/api/inspections` | Create (validates client/vehicle via RabbitMQ) |
+| `POST` | `/api/inspections` | Create (validates client/vehicle via RabbitMQ, auto-creates checklist) |
 | `GET` | `/api/inspections` | List with filters (includeDeleted, vehicle_id, page, size) |
 | `GET` | `/api/inspections/:id` | Get by ID |
 | `PATCH` | `/api/inspections/:id` | Update (re-validates vehicle type rules) |
+| `PATCH` | `/api/inspections/:id/checklist-id` | Update only the `checklistId` (from checklist-service) |
 | `DELETE` | `/api/inspections/:id` | Soft delete |
 
 ## Integration
 
-- **RabbitMQ RPC** ÔÇö Validates `customer_id` against `client-service-queue` and `vehicle_id` against `vehicle-service-queue` before saving inspections
-- **Soft Delete** ÔÇö Sets `deleted_at` timestamp instead of physical deletion
+- **RabbitMQ RPC** — Validates `customer_id` against `client-service-queue` and `vehicle_id` against `vehicle-service-queue` before saving inspections
+- **Checklist Service** — On create (`POST /api/inspections`), fetches the vehicle, determines the active template by type (`MOTO`/`LIVIANO`/`PESADO`), and auto-creates a checklist record via checklist-service API. The resulting `checklistId` is assigned back to the reception inspection
+- **PATCH /checklist-id** — Internal endpoint for checklist-service to notify the created ID without relying on the auto-flow
+- **Soft Delete** — Sets `deleted_at` timestamp instead of physical deletion
 
 ## Architecture
 
-Modular with `CatalogsModule`, `InspectionModule`, and `RabbitMQModule`. Uses shared TypeScript enums for catalog values. Seed script available via `seed:inspection`.
+Modular with `CatalogsModule`, `InspectionModule`, and `RabbitMQModule`. Uses shared TypeScript enums for catalog values. Imports `ChecklistModule` for automatic checklist creation. Seed script available via `seed:inspection`.

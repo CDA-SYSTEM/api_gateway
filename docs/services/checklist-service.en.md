@@ -37,7 +37,7 @@ src/checklist/
 | Feature | Description |
 |---|---|
 | **Generic proxy** | `proxyRequest(method, path, data?, headers?)` forwards to checklist-service |
-| **Enrichment** | Inspection reads auto-enrich `client` and `vehicle` data from clients/vehicles services |
+| **Enrichment** | Inspection reads auto-enrich `client`, `vehicle`, and `inspector` data from clients, vehicles, and auth services |
 | **Batch enrichment** | Deduplicates IDs in lists — one call per unique ID |
 | **Graceful degradation** | If enrichment fails, response returns unenriched (`enrichSafe`) |
 | **Error sanitization** | HTML error pages from upstream become clean JSON messages |
@@ -93,7 +93,7 @@ src/checklist/
 
 ### Enrichment
 
-**Read** endpoints for inspections auto-enrich the response with client and vehicle data:
+**Read** endpoints for inspections auto-enrich the response with client, vehicle, and inspector data:
 
 ```json
 {
@@ -102,10 +102,13 @@ src/checklist/
     "plate": "ABC123",
     "client": { "id": 1, "name": "Juan Pérez", ... },
     "vehicle": { "id": 1, "plate": "ABC123", "brand": "Toyota", ... },
+    "inspector": { "id": "uuid", "name": "Carlos López", "email": "...", ... },
     ...
   }
 }
 ```
+
+Inspector enrichment uses `AuthApplicationService` to fetch data from the auth service. If it fails, the inspection is returned without the `inspector` field enriched (graceful degradation).
 
 **Write** endpoints (`POST`, `PUT`, `PATCH`, `DELETE`) do NOT perform enrichment.
 

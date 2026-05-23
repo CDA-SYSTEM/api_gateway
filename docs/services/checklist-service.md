@@ -37,7 +37,7 @@ src/checklist/
 | Característica | Descripción |
 |---|---|
 | **Proxy genérico** | `proxyRequest(method, path, data?, headers?)` que reenvía al checklist-service |
-| **Enriquecimiento** | Las lecturas de inspecciones enriquecen automáticamente `client` y `vehicle` desde los servicios de clientes y vehículos |
+| **Enriquecimiento** | Las lecturas de inspecciones enriquecen automáticamente `client`, `vehicle` e `inspector` desde los servicios de clientes, vehículos y autenticación |
 | **Enriquecimiento batch** | Para listados, agrupa IDs duplicados y hace una llamada por ID único |
 | **Degradación gradual** | Si falla el enriquecimiento, la respuesta se devuelve sin enriquecer (`enrichSafe`) |
 | **Sanitización de errores** | Las respuestas HTML del upstream se convierten en mensajes limpios |
@@ -93,7 +93,7 @@ src/checklist/
 
 ### Enriquecimiento
 
-Los endpoints de **lectura** de inspecciones enriquecen automáticamente la respuesta con datos del cliente y vehículo:
+Los endpoints de **lectura** de inspecciones enriquecen automáticamente la respuesta con datos del cliente, vehículo e inspector:
 
 ```json
 {
@@ -102,10 +102,13 @@ Los endpoints de **lectura** de inspecciones enriquecen automáticamente la resp
     "plate": "ABC123",
     "client": { "id": 1, "nombre": "Juan Pérez", ... },
     "vehicle": { "id": 1, "placa": "ABC123", "marca": "Toyota", ... },
+    "inspector": { "id": "uuid", "nombre": "Carlos López", "email": "...", ... },
     ...
   }
 }
 ```
+
+El enriquecimiento del inspector utiliza `AuthApplicationService` para obtener los datos desde el servicio de autenticación. Si falla, la inspección se devuelve sin el campo `inspector` enriquecido (degradación gradual).
 
 Los endpoints de **escritura** (`POST`, `PUT`, `PATCH`, `DELETE`) NO realizan enriquecimiento.
 
