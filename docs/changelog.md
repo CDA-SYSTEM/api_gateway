@@ -6,8 +6,26 @@ Todos los cambios notables de este proyecto se documentarán en este archivo.
 
 ### Corregido
 - `POST /auth/login` retornaba HTTP 201 en lugar de 200 por el default de NestJS 11 para rutas POST; se agregó `@HttpCode(200)` explícito
+- Respuesta de creación de inspección ahora incluye `checklistId` después del PATCH via spread `{ ...created, checklistId }`
+- Reemplazo de `console.log` por `this.logger.log` (NestJS Logger) en el flujo de checklist automático
 
 ### Agregado
+- Creación automática de checklist al crear una inspección (`POST /api/v1/inspections`):
+  - Obtiene el vehículo y determina el tipo (`MOTO`/`LIVIANO`/`PESADO`)
+  - Busca la plantilla activa correspondiente (`getActiveMotoTemplate` / `getActiveLivianosPesadosTemplate`)
+  - Crea registro en checklist-service via `POST /api/v1/checklist/inspections`
+  - Asigna el `checklistId` resultante en la inspección de recepción via `PATCH /api/v1/inspections/{id}/checklist-id`
+  - Errores en el flujo de checklist no bloquean la creación de la inspección (`catchError` con `of(created)`)
+- Endpoint `PATCH /api/v1/inspections/{id}/checklist-id` en reception controller para actualizar el checklistId
+- Campo `checklistId` en `CreateInspectionDto` y `UpdateInspectionDto`
+- Enriquecimiento de `inspector` en lecturas de inspecciones de checklist (usando `AuthApplicationService`)
+- Enriquecimiento de vehículos con datos de `client` cacheado via `transform` opcional en `proxyRequestCached`
+- Importación de `ChecklistModule` en `ReceptionModule` (exporta `TemplatesChecklistService`, `InspectionsChecklistService`, `ChecklistInfrastructureService`)
+- Importación de `AuthModule` en `ChecklistModule` para enriquecimiento de inspector
+- Archivo `LICENSE` con todos los derechos reservados para Andres Iles, Emerson Iles, Audino Pantoja, Kevin Chanchi, Oscar Chavez de UniPutuamyo
+- `README.md` completo con arquitectura, stack tecnológico, instrucciones de instalación y autores
+- Documentación detallada de tipos de documentos soportados en `docs/services/storage-service.md` (MIME types, extensiones, tamaños máximos, ejemplos de respuesta)
+- Derechos de autor actualizados en `mkdocs.yml`
 - Documentación del módulo de checklist (arquitectura, endpoints, DTOs, enriquecimiento) en `docs/services/checklist-service.md`
 - Ejemplos de uso con cURL/Python/JavaScript para todos los endpoints de checklist en `docs/examples.md`
 - Documentación del formato de respuesta estándar y manejo de códigos HTTP en `docs/services/api-gateway.md`
