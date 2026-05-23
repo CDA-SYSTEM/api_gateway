@@ -24,7 +24,7 @@ import { VehicleModule } from '../vehicle/vehicle.module';
     LabradoChecklistService,
     ChecklistInfrastructureService,
   ],
-  exports: [],
+  exports: [TemplatesChecklistService, InspectionsChecklistService, ChecklistInfrastructureService],
 })
 export class ChecklistModule {}
 
