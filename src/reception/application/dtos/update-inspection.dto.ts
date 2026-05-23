@@ -50,6 +50,9 @@ export class UpdateInspectionDto {
   @ApiPropertyOptional({ example: 'https://ejemplo.com/foto.png', description: 'URL de la foto de recepción' })
   photo_reception_url?: string;
 
+  @ApiPropertyOptional({ example: 'clh123abc', description: 'ID del checklist asociado' })
+  checklistId?: string;
+
   @ApiPropertyOptional({ type: ChecklistDto, description: 'Checklist de inspección' })
   checklist?: ChecklistDto;
 
