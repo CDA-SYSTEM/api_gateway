@@ -4,6 +4,7 @@ import { map, switchMap, catchError } from 'rxjs';
 import { ChecklistInfrastructureService } from '../infrastructure/checklist.service';
 import { ClientsApplicationService } from '../../clients/application/clients.service';
 import { VehicleService } from '../../vehicle/application/vehicle.service';
+import { AuthApplicationService } from '../../auth/application/auth.service';
 
 @Injectable()
 export class InspectionsChecklistService {
@@ -11,6 +12,7 @@ export class InspectionsChecklistService {
     private readonly infrastructure: ChecklistInfrastructureService,
     private readonly clientService: ClientsApplicationService,
     private readonly vehicleService: VehicleService,
+    private readonly authService: AuthApplicationService,
   ) {}
 
   private enrichItem(item: any, token: string): Observable<any> {
