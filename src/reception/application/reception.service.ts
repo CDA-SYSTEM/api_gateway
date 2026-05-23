@@ -84,19 +84,30 @@ export class ReceptionService {
           'Content-Type': 'application/json',
         }).pipe(
           switchMap((created) => {
+            console.log('[DEBUG] POST /api/inspections response:', JSON.stringify(created));
             const inspectionData = created?.data ?? created;
             const inspectionId = inspectionData?.id;
             const vehicleId = dto.vehicle_id;
-            if (!vehicleId || !inspectionId) return of(created);
+            console.log('[DEBUG] inspectionId:', inspectionId, 'vehicleId:', vehicleId);
+            if (!vehicleId || !inspectionId) {
+              console.log('[DEBUG] SKIP checklist — missing vehicleId or inspectionId');
+              return of(created);
+            }
 
+            console.log('[DEBUG] Fetching vehicle + templates in parallel...');
             return forkJoin({
-              vehicle: this.vehicleService.getVehicleById(vehicleId, token).pipe(catchError(() => of(null))),
-              motoTemplate: this.checklistTemplateService.getActiveMotoTemplate(token).pipe(catchError(() => of(null))),
-              livianosTemplate: this.checklistTemplateService.getActiveLivianosPesadosTemplate(token).pipe(catchError(() => of(null))),
+              vehicle: this.vehicleService.getVehicleById(vehicleId, token).pipe(catchError((err) => { console.log('[DEBUG] vehicle error:', err?.message); return of(null); })),
+              motoTemplate: this.checklistTemplateService.getActiveMotoTemplate(token).pipe(catchError((err) => { console.log('[DEBUG] motoTemplate error:', err?.message); return of(null); })),
+              livianosTemplate: this.checklistTemplateService.getActiveLivianosPesadosTemplate(token).pipe(catchError((err) => { console.log('[DEBUG] livianosTemplate error:', err?.message); return of(null); })),
             }).pipe(
               switchMap(({ vehicle, motoTemplate, livianosTemplate }) => {
+                console.log('[DEBUG] vehicle:', JSON.stringify(vehicle)?.slice(0, 300));
+                console.log('[DEBUG] motoTemplate:', JSON.stringify(motoTemplate)?.slice(0, 200));
+                console.log('[DEBUG] livianosTemplate:', JSON.stringify(livianosTemplate)?.slice(0, 200));
+
                 const tipo = (vehicle?.tipoVehiculo?.nombre ?? vehicle?.data?.tipoVehiculo?.nombre ?? '').toLowerCase();
                 const plate = vehicle?.placa ?? vehicle?.data?.placa ?? '';
+                console.log('[DEBUG] tipo:', tipo, 'plate:', plate);
 
                 let vehicleType: string;
                 let templateId: string;
@@ -108,8 +119,12 @@ export class ReceptionService {
                   vehicleType = tipo === 'pesado' ? 'PESADO' : 'LIVIANO';
                   templateId = livianosTemplate?.id ?? livianosTemplate?.data?.id ?? '';
                 }
+                console.log('[DEBUG] vehicleType:', vehicleType, 'templateId:', templateId);
 
-                if (!templateId || !plate) return of(created);
+                if (!templateId || !plate) {
+                  console.log('[DEBUG] SKIP checklist — no templateId or plate');
+                  return of(created);
+                }
 
                 const checklistPayload = {
                   plate,
@@ -121,21 +136,33 @@ export class ReceptionService {
                   inspector_id: dto.operator_id,
                   observations: dto.observations ?? '',
                 };
+                console.log('[DEBUG] Creating checklist inspection:', JSON.stringify(checklistPayload));
 
                 return this.checklistInfrastructure.createInspection(checklistPayload, token).pipe(
                   switchMap((checklistResult) => {
+                    console.log('[DEBUG] checklist create response:', JSON.stringify(checklistResult)?.slice(0, 200));
                     const checklistId = checklistResult?.id ?? checklistResult?.data?.id;
-                    if (!checklistId) return of(created);
+                    if (!checklistId) {
+                      console.log('[DEBUG] SKIP PATCH — no checklistId in response');
+                      return of(created);
+                    }
 
+                    console.log('[DEBUG] PATCH checklistId:', checklistId, 'on inspection:', inspectionId);
                     return this.infrastructure.proxyRequest('PATCH', `/api/inspections/${inspectionId}/checklist-id`, { checklistId }, {
                       Authorization: `Bearer ${token}`,
                       'Content-Type': 'application/json',
                     }).pipe(
-                      catchError(() => of(created)),
+                      catchError((err) => {
+                        console.log('[DEBUG] PATCH error:', err?.message);
+                        return of(created);
+                      }),
                       map(() => created),
                     );
                   }),
-                  catchError(() => of(created)),
+                  catchError((err) => {
+                    console.log('[DEBUG] createInspection checklist error:', err?.message);
+                    return of(created);
+                  }),
                 );
               }),
             );
