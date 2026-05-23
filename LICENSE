@@ -1,11 +1,208 @@
-All Rights Reserved
+LICENCIA DE SOFTWARE — DERECHOS RESERVADOS
+SOFTWARE LICENSE — ALL RIGHTS RESERVED
 
-Copyright (c) 2026 Andres Iles, Emerson Iles, Audino Pantoja, Kevin Chanchi, Oscar Chavez
+Título / Title:           CDA System — API Gateway
+Versión / Version:        1.0.0
+Fecha / Date:             2026
 
-UniPutuamyo - Mocoa, Putumayo
+Titulares / Copyright Holders:
+  • Andres Iles
+  • Emerson Iles
+  • Audino Pantoja
+  • Kevin Chanchi
+  • Oscar Chavez
 
-Permission is hereby NOT granted to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, or to permit persons to whom the Software is furnished to do so.
+Institución / Institution: UniPutuamyo — Mocoa, Putumayo, Colombia
 
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+─────────────────────────────────────────────────────────────────
+1. DESCRIPCIÓN DEL SISTEMA / SYSTEM DESCRIPTION
+─────────────────────────────────────────────────────────────────
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+El presente software constituye un API Gateway central para un
+sistema integral de inspección vehicular (en adelante, "el Sistema")
+diseñado para centros de diagnóstico automotor (CDA). El Sistema
+se compone de los siguientes microservicios interconectados:
+
+  a) API Gateway (NestJS 11 / TypeScript)
+     ─ Puerto 3600, punto de entrada único con enrutamiento,
+       autenticación JWT, control de roles y sanitización.
+
+  b) Auth Service (NestJS 11 / PostgreSQL + Redis)
+     ─ Puerto 3001, gestión de usuarios, roles (admin, operator,
+       inspector), login, refresh token, logout y validación.
+
+  c) Clients Service (Spring Boot 4 / Java 17 / PostgreSQL)
+     ─ Puerto 8080, CRUD de clientes, tipos de documento y persona,
+       paginación, borrado lógico y reactivación.
+
+  d) Vehicles Service (Spring Boot 4 / Java 17 / PostgreSQL)
+     ─ Puerto 9000, CRUD de vehículos, marcas, líneas, colores,
+       clases, tipos de vehículo, combustible y servicio.
+
+  e) Form Service / Reception (NestJS 11 / MongoDB)
+     ─ Puerto 7500, formularios de recepción de vehículos con
+       validación RabbitMQ RPC, carga de archivos multiparte,
+       creación automática de checklist y reglas de negocio por
+       tipo de vehículo (MOTOCICLETA, LIVIANO, PESADO).
+
+  f) Storage Service (NestJS 11 / Apache Cassandra)
+     ─ Puerto 7000, almacenamiento binario de fotos, firmas y
+       documentos PDF con eliminación suave y streaming.
+
+  g) Checklist Service (Django 6.0.3 / Python 3.12 / MongoDB)
+     ─ Puerto 8000, inspecciones NTC 5375, plantillas por tipo de
+       vehículo, medición de labrado y cierre con resultado.
+
+El Sistema incluye además:
+  • Infraestructura de documentación con MkDocs y tema Material
+    (bilingüe español/inglés, desplegada en GitHub Pages).
+  • Pipelines CI/CD basados en GitHub Actions con despliegue
+    Docker y Tailscale VPN.
+  • Postman collection para pruebas de integración.
+  • Catálogos unificados con CRUD dinámico.
+  • Enriquecimiento cruzado de datos entre servicios (cliente,
+    vehículo, inspector).
+  · Cache de respuestas con indicador de origen (cache/service).
+
+─────────────────────────────────────────────────────────────────
+2. DERECHOS DE AUTOR / COPYRIGHT
+─────────────────────────────────────────────────────────────────
+
+Copyright © 2026 Andres Iles, Emerson Iles, Audino Pantoja,
+Kevin Chanchi, Oscar Chavez.
+
+Todos los derechos reservados / All Rights Reserved.
+
+Este software y toda su documentación asociada, incluyendo pero no
+limitado a código fuente, archivos de configuración, scripts de
+base de datos, documentación técnica, diagramas de arquitectura,
+colecciones de Postman, flujos CI/CD y archivos de infraestructura
+(en adelante, "el Software"), están protegidos por las leyes de
+propiedad intelectual de la República de Colombia y por tratados
+internacionales de derechos de autor.
+
+─────────────────────────────────────────────────────────────────
+3. TÉRMINOS Y CONDICIONES / TERMS AND CONDITIONS
+─────────────────────────────────────────────────────────────────
+
+3.1. Concesión Limitada de Uso / Limited Grant of Use
+──────────────────────────────────────────────────────
+
+Se concede permiso únicamente a los titulares del copyright y a
+personas expresamente autorizadas por escrito para:
+
+  a) Ejecutar el Software con fines de evaluación académica
+     dentro de la institución UniPutuamyo.
+  b) Realizar copias del Software únicamente con fines de
+     respaldo (backup) y seguridad.
+
+3.2. Restricciones / Restrictions
+──────────────────────────────────
+
+Queda ESTRICTAMENTE PROHIBIDO, sin el consentimiento previo y por
+escrito de todos los titulares del copyright:
+
+  a) La reproducción, distribución o publicación del Software,
+     total o parcial, en cualquier medio o formato.
+  b) La modificación, adaptación, traducción, ingeniería inversa,
+     descompilación o desensamblaje del Software.
+  c) La incorporación del Software, total o parcial, en otro
+     producto o servicio, ya sea comercial o gratuito.
+  d) El uso del Software con fines comerciales, de lucro o
+     productivos fuera del ámbito académico de UniPutuamyo.
+  e) La sublicencia, arrendamiento, préstamo, alquiler o cesión
+     del Software a terceros.
+  f) La eliminación o alteración de cualquier aviso de derechos
+     de autor, marcas registradas u otros avisos de propiedad
+     contenidos en el Software.
+  g) El uso del nombre "UniPutuamyo", "CDA System" o los nombres
+     de los autores para promocionar productos derivados sin
+     autorización expresa.
+
+3.3. Propiedad Intelectual / Intellectual Property
+───────────────────────────────────────────────────
+
+Todos los derechos, títulos e intereses sobre el Software,
+incluyendo pero no limitado a los derechos de autor, secretos
+comerciales, patentes y cualquier otra propiedad intelectual,
+pertenecen exclusivamente a los titulares del copyright. El
+Software está licenciado, no vendido.
+
+─────────────────────────────────────────────────────────────────
+4. DESCARGO DE RESPONSABILIDAD / DISCLAIMER OF WARRANTY
+─────────────────────────────────────────────────────────────────
+
+EL SOFTWARE SE PROPORCIONA "TAL CUAL", SIN GARANTÍA DE NINGÚN
+TIPO, YA SEA EXPRESA O IMPLÍCITA, INCLUYENDO PERO NO LIMITADO A
+GARANTÍAS DE COMERCIABILIDAD, IDONEIDAD PARA UN PROPÓSITO
+PARTICULAR Y NO INFRACCIÓN. LOS AUTORES NO GARANTIZAN QUE EL
+FUNCIONAMIENTO DEL SOFTWARE SEA ININTERRUMPIDO O LIBRE DE ERRORES.
+
+EL SOFTWARE HA SIDO DESARROLLADO CON FINES ACADÉMICOS Y DE
+EVALUACIÓN EN EL MARCO DE UN PROYECTO UNIVERSITARIO. NO ESTÁ
+DISEÑADO NI GARANTIZADO PARA SU USO EN ENTORNOS DE PRODUCCIÓN
+CRÍTICOS DONDE FALLOS PODRÍAN CAUSAR DAÑOS MATERIALES, PÉRDIDA
+DE DATOS O LESIONES PERSONALES.
+
+EL USUARIO ASUME TODOS LOS RIESGOS ASOCIADOS AL USO DEL SOFTWARE,
+INCLUYENDO LA PRECISIÓN DE LOS RESULTADOS DE LAS INSPECCIONES
+VEHICULARES, LA INTEGRIDAD DE LOS DATOS ALMACENADOS Y LA
+SEGURIDAD DE LA INFORMACIÓN TRANSMITIDA A TRAVÉS DE LA RED.
+
+─────────────────────────────────────────────────────────────────
+5. LIMITACIÓN DE RESPONSABILIDAD / LIMITATION OF LIABILITY
+─────────────────────────────────────────────────────────────────
+
+EN NINGÚN CASO LOS TITULARES DEL COPYRIGHT O LA INSTITUCIÓN
+UNIPUTUAMYO SERÁN RESPONSABLES ANTE TERCEROS POR DAÑOS DIRECTOS,
+INDIRECTOS, INCIDENTALES, ESPECIALES, EJEMPLARES O
+CONSECUENCIALES (INCLUYENDO, PERO NO LIMITADO A, LA OBTENCIÓN DE
+BIENES O SERVICIOS SUSTITUTOS, LA PÉRDIDA DE USO, DE DATOS O DE
+BENEFICIOS, O LA INTERRUPCIÓN DEL NEGOCIO) DERIVADOS DEL USO O LA
+IMPLEMENTACIÓN DEL SOFTWARE, INCLUSO SI SE HA ADVERTIDO DE LA
+POSIBILIDAD DE TALES DAÑOS.
+
+EN JURISDICCIONES QUE NO PERMITAN LA EXCLUSIÓN O LIMITACIÓN DE
+GARANTÍAS O RESPONSABILIDAD, LA RESPONSABILIDAD MÁXIMA ACUMULADA
+DE LOS TITULARES DEL COPYRIGHT NO EXCEDERÁ DE CIEN MIL PESOS
+COLOMBIANOS ($100.000 COP).
+
+─────────────────────────────────────────────────────────────────
+6. LEGISLACIÓN APLICABLE / GOVERNING LAW
+─────────────────────────────────────────────────────────────────
+
+Esta licencia se regirá e interpretará de acuerdo con las leyes
+de la República de Colombia, específicamente la Ley 23 de 1982
+(Derechos de Autor), la Decisión 351 de la Comunidad Andina, y
+el Código Civil Colombiano. Cualquier disputa relacionada con
+esta licencia será sometida a la jurisdicción de los juzgados
+de Mocoa, Putumayo, Colombia.
+
+─────────────────────────────────────────────────────────────────
+7. CONTACTO / CONTACT
+─────────────────────────────────────────────────────────────────
+
+Para solicitar autorizaciones, reportar infracciones o realizar
+consultas relacionadas con esta licencia, contactar a:
+
+  UniPutuamyo — Programa de Ingeniería de Sistemas
+  Mocoa, Putumayo, Colombia
+  Attn: Andres Iles, Emerson Iles, Audino Pantoja,
+        Kevin Chanchi, Oscar Chavez
+
+  Repositorio oficial: https://github.com/CDA-SYSTEM/api_gateway
+
+─────────────────────────────────────────────────────────────────
+8. VIGENCIA / TERM
+─────────────────────────────────────────────────────────────────
+
+Esta licencia entra en vigor a partir de la fecha de creación
+del Software (2026) y permanecerá vigente hasta que los titulares
+del copyright decidan liberar el Software bajo una licencia
+diferente, momento en el cual los términos de la nueva licencia
+reemplazarán a los presentes.
+
+─────────────────────────────────────────────────────────────────
+© 2026 Andres Iles, Emerson Iles, Audino Pantoja, Kevin Chanchi,
+  Oscar Chavez. Todos los derechos reservados.
+  UniPutuamyo — Mocoa, Putumayo, Colombia.
