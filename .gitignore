@@ -4,6 +4,7 @@
 /build
 /postman
 /site
+/docs-endpoint
 
 # Logs
 logs

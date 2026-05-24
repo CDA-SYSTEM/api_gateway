@@ -7,6 +7,8 @@ import { UpdateUserDto } from './application/dtos/update-user.dto';
 import { ValidateTokenDto } from './application/dtos/validate-token.dto';
 import { RefreshTokenDto } from './application/dtos/refresh-token.dto';
 import { LogoutDto } from './application/dtos/logout.dto';
+import { ChangePasswordDto } from './application/dtos/change-password.dto';
+import { ResetPasswordDto } from './application/dtos/reset-password.dto';
 import { Public } from '../common/decorators/public.decorator';
 import { Roles } from '../common/decorators/roles.decorator';
 import { Roles as RoleConst } from '../common/constants/roles.constant';
@@ -167,5 +169,53 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'Logout exitoso' })
   async logout(@Body() body: LogoutDto) {
     return this.authService.logout(body.refreshToken);
+  }
+
+  @Roles(RoleConst.ADMIN, RoleConst.MANAGER)
+  @Get('users/options')
+  @ApiOperation({ summary: 'Obtener opciones de usuarios por rol para dropdowns' })
+  @ApiQuery({ name: 'role', required: true, description: 'Rol (operario/inspector)' })
+  @ApiResponse({ status: 200, description: 'Opciones de usuarios' })
+  async getUserOptions(@Query('role') role: string, @Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.authService.getUserOptions(role, token);
+  }
+
+  @Roles(RoleConst.ADMIN, RoleConst.MANAGER, RoleConst.INSPECTOR, RoleConst.OPERARIO)
+  @Get('me')
+  @ApiOperation({ summary: 'Obtener perfil del usuario autenticado' })
+  @ApiResponse({ status: 200, description: 'Perfil del usuario' })
+  async getProfile(@Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.authService.getProfile(token);
+  }
+
+  @Roles(RoleConst.ADMIN, RoleConst.MANAGER, RoleConst.INSPECTOR, RoleConst.OPERARIO)
+  @Patch('change-password')
+  @ApiOperation({ summary: 'Cambiar contraseña del usuario autenticado' })
+  @ApiBody({ type: ChangePasswordDto })
+  @ApiResponse({ status: 200, description: 'Contraseña actualizada correctamente' })
+  async changePassword(@Body() body: ChangePasswordDto, @Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.authService.changePassword(body, token);
+  }
+
+  @Roles(RoleConst.ADMIN, RoleConst.MANAGER)
+  @Get('admin/personnel/auth-accounts')
+  @ApiOperation({ summary: 'Listar cuentas de autenticacion del sistema' })
+  @ApiResponse({ status: 200, description: 'Lista de cuentas de autenticacion' })
+  async getAuthAccounts(@Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.authService.getAuthAccounts(token);
+  }
+
+  @Roles(RoleConst.ADMIN, RoleConst.MANAGER)
+  @Patch('admin/personnel/:id/reset-password')
+  @ApiOperation({ summary: 'Restablecer contraseña de una cuenta de autenticacion' })
+  @ApiBody({ type: ResetPasswordDto })
+  @ApiResponse({ status: 200, description: 'Contraseña restablecida correctamente' })
+  async resetPassword(@Param('id') id: string, @Body() body: ResetPasswordDto, @Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.authService.resetPassword(id, body, token);
   }
 }

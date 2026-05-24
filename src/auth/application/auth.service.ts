@@ -130,4 +130,36 @@ export class AuthApplicationService {
   logout(refreshToken: string): Observable<any> {
     return this.authInfrastructureService.proxyRequest('POST', '/auth/logout', { refreshToken });
   }
+
+  getUserOptions(role: string, token: string): Observable<any> {
+    return this.authInfrastructureService.proxyRequest('GET', `/auth/users/options?role=${role}`, null, {
+      Authorization: `Bearer ${token}`,
+    });
+  }
+
+  getProfile(token: string): Observable<any> {
+    return this.authInfrastructureService.proxyRequest('GET', '/auth/me', null, {
+      Authorization: `Bearer ${token}`,
+    });
+  }
+
+  changePassword(data: any, token: string): Observable<any> {
+    return this.authInfrastructureService.proxyRequest('PATCH', '/auth/change-password', data, {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    });
+  }
+
+  getAuthAccounts(token: string): Observable<any> {
+    return this.authInfrastructureService.proxyRequest('GET', '/admin/personnel/auth-accounts', null, {
+      Authorization: `Bearer ${token}`,
+    });
+  }
+
+  resetPassword(id: string, data: any, token: string): Observable<any> {
+    return this.authInfrastructureService.proxyRequest('PATCH', `/admin/personnel/${id}/reset-password`, data, {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    });
+  }
 }
