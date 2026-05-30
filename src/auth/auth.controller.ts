@@ -9,6 +9,9 @@ import { RefreshTokenDto } from './application/dtos/refresh-token.dto';
 import { LogoutDto } from './application/dtos/logout.dto';
 import { ChangePasswordDto } from './application/dtos/change-password.dto';
 import { ResetPasswordDto } from './application/dtos/reset-password.dto';
+import { OAuthGoogleDto } from './application/dtos/oauth-google.dto';
+import { ChangeRoleDto } from './application/dtos/change-role.dto';
+import { UpdateRolePermissionsDto } from './application/dtos/update-role-permissions.dto';
 import { Public } from '../common/decorators/public.decorator';
 import { Roles } from '../common/decorators/roles.decorator';
 import { Roles as RoleConst } from '../common/constants/roles.constant';
@@ -29,6 +32,16 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'Login exitoso' })
   async login(@Body() body: LoginDto) {
     return this.authService.login(body);
+  }
+
+  @Public()
+  @Post('oauth/google')
+  @HttpCode(200)
+  @ApiOperation({ summary: 'Iniciar sesion o registrarse con Google OAuth 2.0' })
+  @ApiBody({ type: OAuthGoogleDto })
+  @ApiResponse({ status: 200, description: 'Autenticacion con Google exitosa' })
+  async oauthGoogle(@Body() body: OAuthGoogleDto) {
+    return this.authService.oauthGoogle(body);
   }
 
   @Roles(RoleConst.ADMIN, RoleConst.MANAGER)
@@ -68,6 +81,16 @@ export class AuthController {
   async updateUser(@Param('id') id: string, @Body() body: UpdateUserDto, @Req() req: Request) {
     const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
     return this.authService.updateUser(id, body, token);
+  }
+
+  @Roles(RoleConst.ADMIN)
+  @Patch('users/:id/role')
+  @ApiOperation({ summary: 'Cambiar rol de un usuario' })
+  @ApiBody({ type: ChangeRoleDto })
+  @ApiResponse({ status: 200, description: 'Rol actualizado correctamente' })
+  async changeUserRole(@Param('id') id: string, @Body() body: ChangeRoleDto, @Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.authService.changeUserRole(id, body, token);
   }
 
   @Public()
@@ -151,6 +174,16 @@ export class AuthController {
   async listRoles(@Req() req: Request) {
     const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
     return this.authService.listRoles(token);
+  }
+
+  @Roles(RoleConst.ADMIN)
+  @Patch('roles/:code')
+  @ApiOperation({ summary: 'Actualizar permisos y alcance de un rol' })
+  @ApiBody({ type: UpdateRolePermissionsDto })
+  @ApiResponse({ status: 200, description: 'Rol actualizado correctamente' })
+  async updateRolePermissions(@Param('code') code: string, @Body() body: UpdateRolePermissionsDto, @Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.authService.updateRolePermissions(code, body, token);
   }
 
   @Roles(RoleConst.ADMIN, RoleConst.MANAGER)

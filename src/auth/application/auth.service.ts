@@ -1,11 +1,13 @@
-import { Injectable } from '@nestjs/common';
-import { Observable } from 'rxjs';
+import { Injectable, Logger } from '@nestjs/common';
+import { Observable, tap } from 'rxjs';
 import { AuthInfrastructureService } from '../infrastructure/auth.service';
 import { CacheInfrastructureService } from '../../cache/infrastructure/cache.service';
 import { CACHE_KEYS, CACHE_TTL } from '../../cache/application/cache-keys.constant';
 
 @Injectable()
 export class AuthApplicationService {
+  private readonly logger = new Logger(AuthApplicationService.name);
+
   constructor(
     private readonly authInfrastructureService: AuthInfrastructureService,
     private readonly cacheService: CacheInfrastructureService,
@@ -25,7 +27,12 @@ export class AuthApplicationService {
     return this.authInfrastructureService.proxyRequest('POST', '/admin/personnel/register', data, {
       Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json',
-    });
+    }).pipe(
+      tap({
+        next: () => this.invalidateUsersCache(token),
+        error: () => {},
+      }),
+    );
   }
 
   getUsers(role: string, token: string): Observable<any> {
@@ -50,7 +57,17 @@ export class AuthApplicationService {
     return this.authInfrastructureService.proxyRequest('PATCH', `/auth/users/${id}`, data, {
       Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json',
-    });
+    }).pipe(
+      tap({
+        next: () => {
+          this.invalidateUsersCache(token);
+          this.cacheService.deleteByKey(CACHE_KEYS.AUTH.USER_BY_ID(id), token).subscribe({
+            error: (err) => this.logger.error(`Error invalidating cache for user ${id}`, err),
+          });
+        },
+        error: () => {},
+      }),
+    );
   }
 
   validateToken(token: string): Observable<any> {
@@ -82,13 +99,39 @@ export class AuthApplicationService {
   inactivateUser(id: string, token: string): Observable<any> {
     return this.authInfrastructureService.proxyRequest('PATCH', `/auth/users/${id}/inactivate`, null, {
       Authorization: `Bearer ${token}`,
-    });
+    }).pipe(
+      tap({
+        next: () => {
+          this.invalidateUsersCache(token);
+          this.cacheService.deleteByKey(CACHE_KEYS.AUTH.USER_BY_ID(id), token).subscribe({
+            error: (err) => this.logger.error(`Error invalidating cache for user ${id}`, err),
+          });
+          this.cacheService.deleteByPrefix('oauth:*', token).subscribe({
+            error: (err) => this.logger.error(`Error invalidating OAuth cache for user ${id}`, err),
+          });
+        },
+        error: () => {},
+      }),
+    );
   }
 
   deleteUser(id: string, token: string): Observable<any> {
     return this.authInfrastructureService.proxyRequest('DELETE', `/auth/users/${id}`, null, {
       Authorization: `Bearer ${token}`,
-    });
+    }).pipe(
+      tap({
+        next: () => {
+          this.invalidateUsersCache(token);
+          this.cacheService.deleteByKey(CACHE_KEYS.AUTH.USER_BY_ID(id), token).subscribe({
+            error: (err) => this.logger.error(`Error invalidating cache for user ${id}`, err),
+          });
+          this.cacheService.deleteByPrefix('oauth:*', token).subscribe({
+            error: (err) => this.logger.error(`Error invalidating OAuth cache for user ${id}`, err),
+          });
+        },
+        error: () => {},
+      }),
+    );
   }
 
   getInspectors(token: string): Observable<any> {
@@ -160,6 +203,58 @@ export class AuthApplicationService {
     return this.authInfrastructureService.proxyRequest('PATCH', `/admin/personnel/${id}/reset-password`, data, {
       Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json',
+    });
+  }
+
+  oauthGoogle(data: any): Observable<any> {
+    return this.authInfrastructureService.proxyRequest('POST', '/auth/oauth/google', data);
+  }
+
+  changeUserRole(id: string, data: any, token: string): Observable<any> {
+    return this.authInfrastructureService.proxyRequest('PATCH', `/auth/users/${id}/role`, data, {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    }).pipe(
+      tap({
+        next: () => {
+          this.invalidateUsersCache(token);
+          this.cacheService.deleteByKey(CACHE_KEYS.AUTH.USER_BY_ID(id), token).subscribe({
+            error: (err) => this.logger.error(`Error invalidating cache after role change for user ${id}`, err),
+          });
+          this.cacheService.deleteByKey(CACHE_KEYS.AUTH.ROLES, token).subscribe({
+            error: (err) => this.logger.error('Error invalidating roles cache after role change', err),
+          });
+          this.cacheService.deleteByPrefix('auth:modules:*', token).subscribe({
+            error: (err) => this.logger.error('Error invalidating module access cache after role change', err),
+          });
+        },
+        error: () => {},
+      }),
+    );
+  }
+
+  updateRolePermissions(code: string, data: any, token: string): Observable<any> {
+    return this.authInfrastructureService.proxyRequest('PATCH', `/auth/roles/${code}`, data, {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    }).pipe(
+      tap({
+        next: () => {
+          this.cacheService.deleteByKey(CACHE_KEYS.AUTH.ROLES, token).subscribe({
+            error: (err) => this.logger.error('Error invalidating roles cache after permission update', err),
+          });
+          this.cacheService.deleteByPrefix('auth:modules:*', token).subscribe({
+            error: (err) => this.logger.error('Error invalidating module access cache after permission update', err),
+          });
+        },
+        error: () => {},
+      }),
+    );
+  }
+
+  private invalidateUsersCache(token: string): void {
+    this.cacheService.deleteByPrefix('auth:users:*', token).subscribe({
+      error: (err) => this.logger.error('Error invalidating users cache', err),
     });
   }
 }
