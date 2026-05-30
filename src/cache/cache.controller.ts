@@ -1,5 +1,5 @@
-import { Controller, Post, Get, Delete, Body, Param, Req, UsePipes, ValidationPipe, HttpCode } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiBody, ApiResponse, ApiSecurity, ApiBearerAuth } from '@nestjs/swagger';
+import { Controller, Post, Get, Delete, Body, Param, Req, UsePipes, ValidationPipe, HttpCode, Query } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiBody, ApiResponse, ApiQuery, ApiSecurity, ApiBearerAuth } from '@nestjs/swagger';
 import { CacheInfrastructureService } from './infrastructure/cache.service';
 import { SaveCacheDto } from './application/dtos/save-cache.dto';
 import type { Request } from 'express';
@@ -36,5 +36,15 @@ export class CacheController {
   deleteByKey(@Param('key') key: string, @Req() req: Request) {
     const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
     return this.cacheService.deleteByKey(key, token);
+  }
+
+  @Delete()
+  @HttpCode(200)
+  @ApiOperation({ summary: 'Invalidar cache por prefijo/patron (ej: auth:users:*, oauth:*, clients:all)' })
+  @ApiQuery({ name: 'prefix', required: true, description: 'Prefijo para eliminar multiples keys por patron' })
+  @ApiResponse({ status: 200, description: 'Cache invalidado por prefijo' })
+  deleteByPrefix(@Query('prefix') prefix: string, @Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.cacheService.deleteByPrefix(prefix, token);
   }
 }

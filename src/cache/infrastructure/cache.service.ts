@@ -55,6 +55,12 @@ export class CacheInfrastructureService {
     return this.proxyRequest('DELETE', `/cache/${key}`, null, { Authorization: `Bearer ${token}` });
   }
 
+  deleteByPrefix(prefix: string, token: string): Observable<any> {
+    return this.proxyRequest('DELETE', `/cache?prefix=${encodeURIComponent(prefix)}`, null, {
+      Authorization: `Bearer ${token}`,
+    });
+  }
+
   getOrFetch<T>(key: string, token: string, fetchFn: () => Observable<T>, ttlSeconds: number): Observable<T> {
     return this.getByKey(key, token).pipe(
       switchMap((cached) => {

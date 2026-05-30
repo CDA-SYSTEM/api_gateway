@@ -9,6 +9,9 @@ import { RefreshTokenDto } from './application/dtos/refresh-token.dto';
 import { LogoutDto } from './application/dtos/logout.dto';
 import { ChangePasswordDto } from './application/dtos/change-password.dto';
 import { ResetPasswordDto } from './application/dtos/reset-password.dto';
+import { OAuthGoogleDto } from './application/dtos/oauth-google.dto';
+import { UpdateUserRoleDto } from './application/dtos/change-role.dto';
+import { UpdateRoleDto } from './application/dtos/update-role-permissions.dto';
 import { Public } from '../common/decorators/public.decorator';
 import { Roles } from '../common/decorators/roles.decorator';
 import { Roles as RoleConst } from '../common/constants/roles.constant';
@@ -29,6 +32,16 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'Login exitoso' })
   async login(@Body() body: LoginDto) {
     return this.authService.login(body);
+  }
+
+  @Public()
+  @Post('oauth/google')
+  @HttpCode(200)
+  @ApiOperation({ summary: 'Iniciar sesion o registrarse con Google OAuth 2.0' })
+  @ApiBody({ type: OAuthGoogleDto })
+  @ApiResponse({ status: 200, description: 'Autenticacion con Google exitosa' })
+  async oauthGoogle(@Body() body: OAuthGoogleDto) {
+    return this.authService.oauthGoogle(body);
   }
 
   @Roles(RoleConst.ADMIN, RoleConst.MANAGER)
@@ -52,6 +65,44 @@ export class AuthController {
   }
 
   @Roles(RoleConst.ADMIN, RoleConst.MANAGER)
+  @Get('users/search')
+  @ApiOperation({ summary: 'Buscar usuarios' })
+  @ApiQuery({ name: 'q', required: true, description: 'Término de búsqueda' })
+  @ApiResponse({ status: 200, description: 'Resultados de búsqueda' })
+  async searchUsers(@Query('q') query: string, @Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.authService.searchUsers(query, token);
+  }
+
+  @Roles(RoleConst.ADMIN, RoleConst.MANAGER)
+  @Get('users/inspectors')
+  @ApiOperation({ summary: 'Listar inspectores para dropdown' })
+  @ApiResponse({ status: 200, description: 'Lista de inspectores' })
+  async getInspectors(@Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.authService.getInspectors(token);
+  }
+
+  @Roles(RoleConst.ADMIN, RoleConst.MANAGER)
+  @Get('users/operarios')
+  @ApiOperation({ summary: 'Listar operarios para dropdown' })
+  @ApiResponse({ status: 200, description: 'Lista de operarios' })
+  async getOperarios(@Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.authService.getOperarios(token);
+  }
+
+  @Roles(RoleConst.ADMIN, RoleConst.MANAGER, RoleConst.INSPECTOR, RoleConst.OPERARIO)
+  @Get('users/options')
+  @ApiOperation({ summary: 'Obtener opciones de usuarios por rol para dropdowns' })
+  @ApiQuery({ name: 'role', required: true, description: 'Rol (operario/inspector)' })
+  @ApiResponse({ status: 200, description: 'Opciones de usuarios' })
+  async getUserOptions(@Query('role') role: string, @Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.authService.getUserOptions(role, token);
+  }
+
+  @Roles(RoleConst.ADMIN, RoleConst.MANAGER)
   @Get('users/:id')
   @ApiOperation({ summary: 'Obtener usuario por ID' })
   @ApiResponse({ status: 200, description: 'Usuario encontrado' })
@@ -70,6 +121,16 @@ export class AuthController {
     return this.authService.updateUser(id, body, token);
   }
 
+  @Roles(RoleConst.SUPERADMIN)
+  @Patch('users/:id/role')
+  @ApiOperation({ summary: 'Cambiar rol de un usuario' })
+  @ApiBody({ type: UpdateUserRoleDto })
+  @ApiResponse({ status: 200, description: 'Rol actualizado correctamente' })
+  async changeUserRole(@Param('id') id: string, @Body() body: UpdateUserRoleDto, @Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.authService.changeUserRole(id, body, token);
+  }
+
   @Public()
   @Post('validate-token')
   @ApiOperation({ summary: 'Validar token JWT' })
@@ -86,16 +147,6 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'Nuevos tokens generados' })
   async refreshToken(@Body() body: RefreshTokenDto) {
     return this.authService.refreshToken(body.refreshToken);
-  }
-
-  @Roles(RoleConst.ADMIN, RoleConst.MANAGER)
-  @Get('users/search')
-  @ApiOperation({ summary: 'Buscar usuarios' })
-  @ApiQuery({ name: 'q', required: true, description: 'Término de búsqueda' })
-  @ApiResponse({ status: 200, description: 'Resultados de búsqueda' })
-  async searchUsers(@Query('q') query: string, @Req() req: Request) {
-    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
-    return this.authService.searchUsers(query, token);
   }
 
   @Roles(RoleConst.ADMIN, RoleConst.MANAGER, RoleConst.INSPECTOR, RoleConst.OPERARIO)
@@ -127,30 +178,22 @@ export class AuthController {
   }
 
   @Roles(RoleConst.ADMIN, RoleConst.MANAGER)
-  @Get('users/inspectors')
-  @ApiOperation({ summary: 'Listar inspectores para dropdown' })
-  @ApiResponse({ status: 200, description: 'Lista de inspectores' })
-  async getInspectors(@Req() req: Request) {
-    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
-    return this.authService.getInspectors(token);
-  }
-
-  @Roles(RoleConst.ADMIN, RoleConst.MANAGER)
-  @Get('users/operarios')
-  @ApiOperation({ summary: 'Listar operarios para dropdown' })
-  @ApiResponse({ status: 200, description: 'Lista de operarios' })
-  async getOperarios(@Req() req: Request) {
-    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
-    return this.authService.getOperarios(token);
-  }
-
-  @Roles(RoleConst.ADMIN, RoleConst.MANAGER)
   @Get('roles')
   @ApiOperation({ summary: 'Listar roles disponibles' })
   @ApiResponse({ status: 200, description: 'Lista de roles' })
   async listRoles(@Req() req: Request) {
     const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
     return this.authService.listRoles(token);
+  }
+
+  @Roles(RoleConst.SUPERADMIN)
+  @Patch('roles/:code')
+  @ApiOperation({ summary: 'Actualizar permisos y alcance de un rol' })
+  @ApiBody({ type: UpdateRoleDto })
+  @ApiResponse({ status: 200, description: 'Rol actualizado correctamente' })
+  async updateRolePermissions(@Param('code') code: string, @Body() body: UpdateRoleDto, @Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.authService.updateRolePermissions(code, body, token);
   }
 
   @Roles(RoleConst.ADMIN, RoleConst.MANAGER)
@@ -169,16 +212,6 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'Logout exitoso' })
   async logout(@Body() body: LogoutDto) {
     return this.authService.logout(body.refreshToken);
-  }
-
-  @Roles(RoleConst.ADMIN, RoleConst.MANAGER)
-  @Get('users/options')
-  @ApiOperation({ summary: 'Obtener opciones de usuarios por rol para dropdowns' })
-  @ApiQuery({ name: 'role', required: true, description: 'Rol (operario/inspector)' })
-  @ApiResponse({ status: 200, description: 'Opciones de usuarios' })
-  async getUserOptions(@Query('role') role: string, @Req() req: Request) {
-    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
-    return this.authService.getUserOptions(role, token);
   }
 
   @Roles(RoleConst.ADMIN, RoleConst.MANAGER, RoleConst.INSPECTOR, RoleConst.OPERARIO)

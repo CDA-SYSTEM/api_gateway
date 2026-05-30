@@ -9,6 +9,12 @@ export const CACHE_KEYS = {
     ROLES: 'auth:roles',
     IDENTIFICATION_TYPES: 'auth:identification-types',
   },
+  OAUTH: {
+    STATE: (state: string) => `oauth:state:${state}`,
+    GOOGLE_USER: (googleId: string) => `oauth:google:user:${googleId}`,
+    TOKEN: (userId: string) => `oauth:token:${userId}`,
+    GOOGLE_AUTH_URL: 'oauth:google:auth-url',
+  },
   VEHICLE: {
     MARCA_LIST: 'vehicle:marcas',
     MARCA_BY_ID: (id: string) => `vehicle:marcas:${id}`,
