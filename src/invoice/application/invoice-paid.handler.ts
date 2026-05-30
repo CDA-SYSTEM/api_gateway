@@ -4,6 +4,7 @@ import { map, switchMap, catchError } from 'rxjs';
 import { StatusService } from '../../status/application/status.service';
 import { ReceptionInfrastructureService } from '../../reception/infrastructure/reception.service';
 import { ChecklistInfrastructureService } from '../../checklist/infrastructure/checklist.service';
+import { VehicleService } from '../../vehicle/application/vehicle.service';
 
 @Injectable()
 export class InvoicePaidHandler {
@@ -13,6 +14,7 @@ export class InvoicePaidHandler {
     private readonly statusService: StatusService,
     private readonly receptionInfra: ReceptionInfrastructureService,
     private readonly checklistInfra: ChecklistInfrastructureService,
+    private readonly vehicleService: VehicleService,
   ) {}
 
   private fetchPaidStatusId = (token: string): Observable<string> =>
@@ -38,9 +40,7 @@ export class InvoicePaidHandler {
     );
 
   private fetchVehicle = (vehicleId: string, token: string): Observable<any> =>
-    this.receptionInfra.proxyRequest('GET', `/api/vehicle/${vehicleId}`, null, {
-      Authorization: `Bearer ${token}`,
-    }).pipe(
+    this.vehicleService.getVehicleById(vehicleId, token).pipe(
       map((res) => res?.data ?? res),
       catchError(() => of(null)),
     );
