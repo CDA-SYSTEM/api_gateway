@@ -65,6 +65,44 @@ export class AuthController {
   }
 
   @Roles(RoleConst.ADMIN, RoleConst.MANAGER)
+  @Get('users/search')
+  @ApiOperation({ summary: 'Buscar usuarios' })
+  @ApiQuery({ name: 'q', required: true, description: 'Término de búsqueda' })
+  @ApiResponse({ status: 200, description: 'Resultados de búsqueda' })
+  async searchUsers(@Query('q') query: string, @Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.authService.searchUsers(query, token);
+  }
+
+  @Roles(RoleConst.ADMIN, RoleConst.MANAGER)
+  @Get('users/inspectors')
+  @ApiOperation({ summary: 'Listar inspectores para dropdown' })
+  @ApiResponse({ status: 200, description: 'Lista de inspectores' })
+  async getInspectors(@Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.authService.getInspectors(token);
+  }
+
+  @Roles(RoleConst.ADMIN, RoleConst.MANAGER)
+  @Get('users/operarios')
+  @ApiOperation({ summary: 'Listar operarios para dropdown' })
+  @ApiResponse({ status: 200, description: 'Lista de operarios' })
+  async getOperarios(@Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.authService.getOperarios(token);
+  }
+
+  @Roles(RoleConst.ADMIN, RoleConst.MANAGER, RoleConst.INSPECTOR, RoleConst.OPERARIO)
+  @Get('users/options')
+  @ApiOperation({ summary: 'Obtener opciones de usuarios por rol para dropdowns' })
+  @ApiQuery({ name: 'role', required: true, description: 'Rol (operario/inspector)' })
+  @ApiResponse({ status: 200, description: 'Opciones de usuarios' })
+  async getUserOptions(@Query('role') role: string, @Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.authService.getUserOptions(role, token);
+  }
+
+  @Roles(RoleConst.ADMIN, RoleConst.MANAGER)
   @Get('users/:id')
   @ApiOperation({ summary: 'Obtener usuario por ID' })
   @ApiResponse({ status: 200, description: 'Usuario encontrado' })
@@ -111,16 +149,6 @@ export class AuthController {
     return this.authService.refreshToken(body.refreshToken);
   }
 
-  @Roles(RoleConst.ADMIN, RoleConst.MANAGER)
-  @Get('users/search')
-  @ApiOperation({ summary: 'Buscar usuarios' })
-  @ApiQuery({ name: 'q', required: true, description: 'Término de búsqueda' })
-  @ApiResponse({ status: 200, description: 'Resultados de búsqueda' })
-  async searchUsers(@Query('q') query: string, @Req() req: Request) {
-    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
-    return this.authService.searchUsers(query, token);
-  }
-
   @Roles(RoleConst.ADMIN, RoleConst.MANAGER, RoleConst.INSPECTOR, RoleConst.OPERARIO)
   @Get('modules/*module')
   @ApiOperation({ summary: 'Verificar acceso a módulo (soporta sub-rutas)' })
@@ -147,24 +175,6 @@ export class AuthController {
   async deleteUser(@Param('id') id: string, @Req() req: Request) {
     const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
     return this.authService.deleteUser(id, token);
-  }
-
-  @Roles(RoleConst.ADMIN, RoleConst.MANAGER)
-  @Get('users/inspectors')
-  @ApiOperation({ summary: 'Listar inspectores para dropdown' })
-  @ApiResponse({ status: 200, description: 'Lista de inspectores' })
-  async getInspectors(@Req() req: Request) {
-    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
-    return this.authService.getInspectors(token);
-  }
-
-  @Roles(RoleConst.ADMIN, RoleConst.MANAGER)
-  @Get('users/operarios')
-  @ApiOperation({ summary: 'Listar operarios para dropdown' })
-  @ApiResponse({ status: 200, description: 'Lista de operarios' })
-  async getOperarios(@Req() req: Request) {
-    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
-    return this.authService.getOperarios(token);
   }
 
   @Roles(RoleConst.ADMIN, RoleConst.MANAGER)
@@ -202,16 +212,6 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'Logout exitoso' })
   async logout(@Body() body: LogoutDto) {
     return this.authService.logout(body.refreshToken);
-  }
-
-  @Roles(RoleConst.ADMIN, RoleConst.MANAGER, RoleConst.INSPECTOR, RoleConst.OPERARIO)
-  @Get('users/options/list')
-  @ApiOperation({ summary: 'Obtener opciones de usuarios por rol para dropdowns' })
-  @ApiQuery({ name: 'role', required: true, description: 'Rol (operario/inspector)' })
-  @ApiResponse({ status: 200, description: 'Opciones de usuarios' })
-  async getUserOptions(@Query('role') role: string, @Req() req: Request) {
-    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
-    return this.authService.getUserOptions(role, token);
   }
 
   @Roles(RoleConst.ADMIN, RoleConst.MANAGER, RoleConst.INSPECTOR, RoleConst.OPERARIO)
