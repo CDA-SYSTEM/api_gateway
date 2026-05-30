@@ -1,15 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsArray, IsOptional, IsString } from 'class-validator';
+import { IsOptional, IsString } from 'class-validator';
 
-export class UpdateRolePermissionsDto {
-  @ApiProperty({ example: ['users:read', 'users:write'], description: 'Permisos del rol' })
-  @IsArray()
-  @IsString({ each: true })
-  @IsOptional()
-  permissions?: string[];
-
-  @ApiProperty({ example: 'all', description: 'Alcance del rol' })
+export class UpdateRoleDto {
+  @ApiProperty({ example: 'Control Total del Sistema', description: 'Nuevo nombre/alcance del rol' })
   @IsString()
   @IsOptional()
   scope?: string;
+
+  @ApiProperty({ example: 'Gestion de usuarios, configuracion global, auditoria completa.', description: 'Nueva descripcion de permisos del rol' })
+  @IsString()
+  @IsOptional()
+  permissions?: string;
 }
