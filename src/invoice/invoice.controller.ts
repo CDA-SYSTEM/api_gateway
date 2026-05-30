@@ -1,6 +1,8 @@
 import { Controller, Get, Post, Patch, Delete, Param, Query, Body, Req } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiQuery, ApiResponse, ApiSecurity, ApiBearerAuth } from '@nestjs/swagger';
 import { InvoiceService } from './application/invoice.service';
+import { Roles } from '../common/decorators/roles.decorator';
+import { Roles as RoleConst } from '../common/constants/roles.constant';
 import type { Request } from 'express';
 
 @ApiTags('invoice')
@@ -23,15 +25,21 @@ export class InvoiceController {
   @ApiQuery({ name: 'invoice_number', required: false, type: String })
   @ApiQuery({ name: 'statusId', required: false, type: String })
   @ApiQuery({ name: 'inspection_id', required: false, type: String })
+  @ApiQuery({ name: 'includeDeleted', required: false, type: String })
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'size', required: false, type: Number })
   @ApiResponse({ status: 200, description: 'Lista de facturas' })
   findAll(
     @Query('invoice_number') invoiceNumber: string,
     @Query('statusId') statusId: string,
     @Query('inspection_id') inspectionId: string,
+    @Query('includeDeleted') includeDeleted: string,
+    @Query('page') page: number,
+    @Query('size') size: number,
     @Req() req: Request,
   ) {
     const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
-    return this.invoiceService.findAll(token, invoiceNumber, statusId, inspectionId);
+    return this.invoiceService.findAll(token, invoiceNumber, statusId, inspectionId, includeDeleted, page, size);
   }
 
   @Get(':id')
@@ -50,8 +58,9 @@ export class InvoiceController {
     return this.invoiceService.update(id, data, token);
   }
 
+  @Roles(RoleConst.ADMIN)
   @Delete(':id')
-  @ApiOperation({ summary: 'Eliminar factura (soft delete)' })
+  @ApiOperation({ summary: 'Eliminar factura (soft delete) - solo admin' })
   @ApiResponse({ status: 200, description: 'Factura eliminada' })
   remove(@Param('id') id: string, @Req() req: Request) {
     const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
