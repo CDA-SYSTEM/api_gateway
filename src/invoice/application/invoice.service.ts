@@ -13,11 +13,22 @@ export class InvoiceService {
     });
   }
 
-  findAll(token: string, invoiceNumber?: string, statusId?: string, inspectionId?: string): Observable<any> {
+  findAll(
+    token: string,
+    invoiceNumber?: string,
+    statusId?: string,
+    inspectionId?: string,
+    includeDeleted?: string,
+    page?: number,
+    size?: number,
+  ): Observable<any> {
     const params = new URLSearchParams();
     if (invoiceNumber) params.append('invoice_number', invoiceNumber);
     if (statusId) params.append('statusId', statusId);
     if (inspectionId) params.append('inspection_id', inspectionId);
+    if (includeDeleted) params.append('includeDeleted', includeDeleted);
+    if (page !== undefined) params.append('page', page.toString());
+    if (size !== undefined) params.append('size', size.toString());
     const qs = params.toString();
     return this.infrastructure.proxyRequest('GET', `/api/invoices${qs ? '?' + qs : ''}`, null, {
       Authorization: `Bearer ${token}`,
