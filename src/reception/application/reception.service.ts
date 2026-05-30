@@ -256,6 +256,13 @@ export class ReceptionService {
     });
   }
 
+  updateInspectionStatus(id: string, statusId: string, token: string): Observable<any> {
+    return this.infrastructure.proxyRequest('PATCH', `/api/inspections/${id}/status`, { statusId }, {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    });
+  }
+
   updateChecklistId(id: string, checklistId: string, token: string): Observable<any> {
     return this.infrastructure.proxyRequest('PATCH', `/api/inspections/${id}/checklist-id`, { checklistId }, {
       Authorization: `Bearer ${token}`,
