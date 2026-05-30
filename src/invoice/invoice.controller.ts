@@ -22,14 +22,16 @@ export class InvoiceController {
   @ApiOperation({ summary: 'Listar facturas con filtros opcionales' })
   @ApiQuery({ name: 'invoice_number', required: false, type: String })
   @ApiQuery({ name: 'statusId', required: false, type: String })
+  @ApiQuery({ name: 'inspection_id', required: false, type: String })
   @ApiResponse({ status: 200, description: 'Lista de facturas' })
   findAll(
     @Query('invoice_number') invoiceNumber: string,
     @Query('statusId') statusId: string,
+    @Query('inspection_id') inspectionId: string,
     @Req() req: Request,
   ) {
     const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
-    return this.invoiceService.findAll(token, invoiceNumber, statusId);
+    return this.invoiceService.findAll(token, invoiceNumber, statusId, inspectionId);
   }
 
   @Get(':id')
