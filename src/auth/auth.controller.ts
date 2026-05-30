@@ -205,7 +205,7 @@ export class AuthController {
   }
 
   @Roles(RoleConst.ADMIN, RoleConst.MANAGER, RoleConst.INSPECTOR, RoleConst.OPERARIO)
-  @Get('users/options')
+  @Get('users/options/list')
   @ApiOperation({ summary: 'Obtener opciones de usuarios por rol para dropdowns' })
   @ApiQuery({ name: 'role', required: true, description: 'Rol (operario/inspector)' })
   @ApiResponse({ status: 200, description: 'Opciones de usuarios' })
