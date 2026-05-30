@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Patch, Delete, Param, Query, Body, Req } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiQuery, ApiResponse, ApiSecurity, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBody, ApiQuery, ApiResponse, ApiSecurity, ApiBearerAuth } from '@nestjs/swagger';
 import { InvoiceService } from './application/invoice.service';
 import { Roles } from '../common/decorators/roles.decorator';
 import { Roles as RoleConst } from '../common/constants/roles.constant';
