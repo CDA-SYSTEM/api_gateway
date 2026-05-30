@@ -4,11 +4,14 @@ import { ConfigModule } from '@nestjs/config';
 import { InvoiceController } from './invoice.controller';
 import { InvoiceService } from './application/invoice.service';
 import { InvoiceInfrastructureService } from './infrastructure/invoice.service';
+import { InvoicePaidHandler } from './application/invoice-paid.handler';
+import { StatusModule } from '../status/status.module';
+import { ChecklistModule } from '../checklist/checklist.module';
 
 @Module({
-  imports: [HttpModule, ConfigModule],
+  imports: [HttpModule, ConfigModule, StatusModule, ChecklistModule],
   controllers: [InvoiceController],
-  providers: [InvoiceService, InvoiceInfrastructureService],
+  providers: [InvoiceService, InvoiceInfrastructureService, InvoicePaidHandler],
   exports: [InvoiceService, InvoiceInfrastructureService],
 })
 export class InvoiceModule {}
