@@ -113,12 +113,14 @@ export class ReceptionService {
               ).subscribe();
             }
 
-            return this.createChecklistForInspection(dto, inspectionId, vehicleId, token, created).pipe(
-              catchError((err) => {
-                this.logger.error(`Checklist creation failed: ${err.message}`);
-                return of(created);
-              }),
-            );
+            // CHECKLIST AHORA SE CREA AL PAGAR LA FACTURA (InvoicePaidHandler)
+            // this.createChecklistForInspection(dto, inspectionId, vehicleId, token, created).pipe(
+            //   catchError((err) => {
+            //     this.logger.error(`Checklist creation failed: ${err.message}`);
+            //     return of(created);
+            //   }),
+            // );
+            return of(created);
           }),
         );
       }),
