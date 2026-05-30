@@ -14,6 +14,40 @@ export class InvoiceController {
 
   @Post()
   @ApiOperation({ summary: 'Crear una factura (genera número auto, calcula subtotal+IVA+total)' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      required: ['client', 'items', 'statusId', 'inspection_id'],
+      properties: {
+        client: {
+          type: 'object',
+          required: ['document', 'name'],
+          properties: {
+            document: { type: 'string', example: '1234567890', description: 'Documento del cliente' },
+            name: { type: 'string', example: 'Carlos Perez', description: 'Nombre del cliente' },
+            address: { type: 'string', example: 'Calle 123 #45-67' },
+            phone: { type: 'string', example: '3001234567' },
+            email: { type: 'string', example: 'carlos@email.com' },
+          },
+        },
+        items: {
+          type: 'array',
+          items: {
+            type: 'object',
+            required: ['concept', 'quantity', 'unitPrice'],
+            properties: {
+              concept: { type: 'string', example: 'Revisión TECNICO_MECANICA - LIVIANO', description: 'Concepto' },
+              quantity: { type: 'number', example: 1, description: 'Cantidad' },
+              unitPrice: { type: 'number', example: 150000, description: 'Precio unitario' },
+            },
+          },
+        },
+        statusId: { type: 'string', example: 'STATUS_ID', description: 'ID del estado (PENDING)' },
+        inspection_id: { type: 'string', example: 'INSPECTION_ID', description: 'ID de la inspección relacionada' },
+        observations: { type: 'string', example: 'Observaciones opcionales' },
+      },
+    },
+  })
   @ApiResponse({ status: 201, description: 'Factura creada' })
   create(@Body() data: any, @Req() req: Request) {
     const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
