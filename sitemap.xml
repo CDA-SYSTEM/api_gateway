@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+    <url>
+        <loc>https://cda-system.github.io/api_gateway/</loc>
+        <lastmod>2026-05-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://cda-system.github.io/api_gateway/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://cda-system.github.io/api_gateway/en/"/>
+    </url>
+    <url>
+        <loc>https://cda-system.github.io/api_gateway/changelog/</loc>
+        <lastmod>2026-05-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://cda-system.github.io/api_gateway/changelog/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://cda-system.github.io/api_gateway/en/changelog/"/>
+    </url>
+    <url>
+        <loc>https://cda-system.github.io/api_gateway/examples/</loc>
+        <lastmod>2026-05-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://cda-system.github.io/api_gateway/examples/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://cda-system.github.io/api_gateway/en/examples/"/>
+    </url>
+    <url>
+        <loc>https://cda-system.github.io/api_gateway/backend/</loc>
+        <lastmod>2026-05-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://cda-system.github.io/api_gateway/backend/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://cda-system.github.io/api_gateway/en/backend/"/>
+    </url>
+    <url>
+        <loc>https://cda-system.github.io/api_gateway/backend/configuration/</loc>
+        <lastmod>2026-05-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://cda-system.github.io/api_gateway/backend/configuration/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://cda-system.github.io/api_gateway/en/backend/configuration/"/>
+    </url>
+    <url>
+        <loc>https://cda-system.github.io/api_gateway/backend/controllers/</loc>
+        <lastmod>2026-05-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://cda-system.github.io/api_gateway/backend/controllers/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://cda-system.github.io/api_gateway/en/backend/controllers/"/>
+    </url>
+    <url>
+        <loc>https://cda-system.github.io/api_gateway/backend/entities/</loc>
+        <lastmod>2026-05-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://cda-system.github.io/api_gateway/backend/entities/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://cda-system.github.io/api_gateway/en/backend/entities/"/>
+    </url>
+    <url>
+        <loc>https://cda-system.github.io/api_gateway/backend/guards/</loc>
+        <lastmod>2026-05-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://cda-system.github.io/api_gateway/backend/guards/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://cda-system.github.io/api_gateway/en/backend/guards/"/>
+    </url>
+    <url>
+        <loc>https://cda-system.github.io/api_gateway/backend/how-it-works/</loc>
+        <lastmod>2026-05-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://cda-system.github.io/api_gateway/backend/how-it-works/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://cda-system.github.io/api_gateway/en/backend/how-it-works/"/>
+    </url>
+    <url>
+        <loc>https://cda-system.github.io/api_gateway/backend/interceptors/</loc>
+        <lastmod>2026-05-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://cda-system.github.io/api_gateway/backend/interceptors/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://cda-system.github.io/api_gateway/en/backend/interceptors/"/>
+    </url>
+    <url>
+        <loc>https://cda-system.github.io/api_gateway/backend/middleware/</loc>
+        <lastmod>2026-05-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://cda-system.github.io/api_gateway/backend/middleware/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://cda-system.github.io/api_gateway/en/backend/middleware/"/>
+    </url>
+    <url>
+        <loc>https://cda-system.github.io/api_gateway/backend/modules/</loc>
+        <lastmod>2026-05-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://cda-system.github.io/api_gateway/backend/modules/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://cda-system.github.io/api_gateway/en/backend/modules/"/>
+    </url>
+    <url>
+        <loc>https://cda-system.github.io/api_gateway/backend/services/</loc>
+        <lastmod>2026-05-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://cda-system.github.io/api_gateway/backend/services/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://cda-system.github.io/api_gateway/en/backend/services/"/>
+    </url>
+    <url>
+        <loc>https://cda-system.github.io/api_gateway/database/overview/</loc>
+        <lastmod>2026-05-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://cda-system.github.io/api_gateway/database/overview/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://cda-system.github.io/api_gateway/en/database/overview/"/>
+    </url>
+    <url>
+        <loc>https://cda-system.github.io/api_gateway/guides/deployment/</loc>
+        <lastmod>2026-05-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://cda-system.github.io/api_gateway/guides/deployment/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://cda-system.github.io/api_gateway/en/guides/deployment/"/>
+    </url>
+    <url>
+        <loc>https://cda-system.github.io/api_gateway/guides/local-development/</loc>
+        <lastmod>2026-05-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://cda-system.github.io/api_gateway/guides/local-development/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://cda-system.github.io/api_gateway/en/guides/local-development/"/>
+    </url>
+    <url>
+        <loc>https://cda-system.github.io/api_gateway/guides/network-architecture/</loc>
+        <lastmod>2026-05-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://cda-system.github.io/api_gateway/guides/network-architecture/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://cda-system.github.io/api_gateway/en/guides/network-architecture/"/>
+    </url>
+    <url>
+        <loc>https://cda-system.github.io/api_gateway/guides/troubleshooting/</loc>
+        <lastmod>2026-05-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://cda-system.github.io/api_gateway/guides/troubleshooting/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://cda-system.github.io/api_gateway/en/guides/troubleshooting/"/>
+    </url>
+    <url>
+        <loc>https://cda-system.github.io/api_gateway/services/api-gateway/</loc>
+        <lastmod>2026-05-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://cda-system.github.io/api_gateway/services/api-gateway/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://cda-system.github.io/api_gateway/en/services/api-gateway/"/>
+    </url>
+    <url>
+        <loc>https://cda-system.github.io/api_gateway/services/auth-service/</loc>
+        <lastmod>2026-05-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://cda-system.github.io/api_gateway/services/auth-service/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://cda-system.github.io/api_gateway/en/services/auth-service/"/>
+    </url>
+    <url>
+        <loc>https://cda-system.github.io/api_gateway/services/checklist-service/</loc>
+        <lastmod>2026-05-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://cda-system.github.io/api_gateway/services/checklist-service/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://cda-system.github.io/api_gateway/en/services/checklist-service/"/>
+    </url>
+    <url>
+        <loc>https://cda-system.github.io/api_gateway/services/clients-service/</loc>
+        <lastmod>2026-05-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://cda-system.github.io/api_gateway/services/clients-service/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://cda-system.github.io/api_gateway/en/services/clients-service/"/>
+    </url>
+    <url>
+        <loc>https://cda-system.github.io/api_gateway/services/form-service/</loc>
+        <lastmod>2026-05-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://cda-system.github.io/api_gateway/services/form-service/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://cda-system.github.io/api_gateway/en/services/form-service/"/>
+    </url>
+    <url>
+        <loc>https://cda-system.github.io/api_gateway/services/storage-service/</loc>
+        <lastmod>2026-05-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://cda-system.github.io/api_gateway/services/storage-service/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://cda-system.github.io/api_gateway/en/services/storage-service/"/>
+    </url>
+    <url>
+        <loc>https://cda-system.github.io/api_gateway/services/vehicles-service/</loc>
+        <lastmod>2026-05-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://cda-system.github.io/api_gateway/services/vehicles-service/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://cda-system.github.io/api_gateway/en/services/vehicles-service/"/>
+    </url>
+    <url>
+        <loc>https://cda-system.github.io/api_gateway/en/</loc>
+        <lastmod>2026-05-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://cda-system.github.io/api_gateway/en/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://cda-system.github.io/api_gateway/"/>
+    </url>
+    <url>
+        <loc>https://cda-system.github.io/api_gateway/en/changelog/</loc>
+        <lastmod>2026-05-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://cda-system.github.io/api_gateway/en/changelog/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://cda-system.github.io/api_gateway/changelog/"/>
+    </url>
+    <url>
+        <loc>https://cda-system.github.io/api_gateway/en/examples/</loc>
+        <lastmod>2026-05-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://cda-system.github.io/api_gateway/en/examples/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://cda-system.github.io/api_gateway/examples/"/>
+    </url>
+    <url>
+        <loc>https://cda-system.github.io/api_gateway/en/backend/</loc>
+        <lastmod>2026-05-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://cda-system.github.io/api_gateway/en/backend/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://cda-system.github.io/api_gateway/backend/"/>
+    </url>
+    <url>
+        <loc>https://cda-system.github.io/api_gateway/en/backend/configuration/</loc>
+        <lastmod>2026-05-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://cda-system.github.io/api_gateway/en/backend/configuration/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://cda-system.github.io/api_gateway/backend/configuration/"/>
+    </url>
+    <url>
+        <loc>https://cda-system.github.io/api_gateway/en/backend/controllers/</loc>
+        <lastmod>2026-05-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://cda-system.github.io/api_gateway/en/backend/controllers/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://cda-system.github.io/api_gateway/backend/controllers/"/>
+    </url>
+    <url>
+        <loc>https://cda-system.github.io/api_gateway/en/backend/entities/</loc>
+        <lastmod>2026-05-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://cda-system.github.io/api_gateway/en/backend/entities/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://cda-system.github.io/api_gateway/backend/entities/"/>
+    </url>
+    <url>
+        <loc>https://cda-system.github.io/api_gateway/en/backend/guards/</loc>
+        <lastmod>2026-05-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://cda-system.github.io/api_gateway/en/backend/guards/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://cda-system.github.io/api_gateway/backend/guards/"/>
+    </url>
+    <url>
+        <loc>https://cda-system.github.io/api_gateway/en/backend/how-it-works/</loc>
+        <lastmod>2026-05-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://cda-system.github.io/api_gateway/en/backend/how-it-works/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://cda-system.github.io/api_gateway/backend/how-it-works/"/>
+    </url>
+    <url>
+        <loc>https://cda-system.github.io/api_gateway/en/backend/interceptors/</loc>
+        <lastmod>2026-05-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://cda-system.github.io/api_gateway/en/backend/interceptors/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://cda-system.github.io/api_gateway/backend/interceptors/"/>
+    </url>
+    <url>
+        <loc>https://cda-system.github.io/api_gateway/en/backend/middleware/</loc>
+        <lastmod>2026-05-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://cda-system.github.io/api_gateway/en/backend/middleware/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://cda-system.github.io/api_gateway/backend/middleware/"/>
+    </url>
+    <url>
+        <loc>https://cda-system.github.io/api_gateway/en/backend/modules/</loc>
+        <lastmod>2026-05-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://cda-system.github.io/api_gateway/en/backend/modules/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://cda-system.github.io/api_gateway/backend/modules/"/>
+    </url>
+    <url>
+        <loc>https://cda-system.github.io/api_gateway/en/backend/services/</loc>
+        <lastmod>2026-05-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://cda-system.github.io/api_gateway/en/backend/services/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://cda-system.github.io/api_gateway/backend/services/"/>
+    </url>
+    <url>
+        <loc>https://cda-system.github.io/api_gateway/en/database/overview/</loc>
+        <lastmod>2026-05-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://cda-system.github.io/api_gateway/en/database/overview/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://cda-system.github.io/api_gateway/database/overview/"/>
+    </url>
+    <url>
+        <loc>https://cda-system.github.io/api_gateway/en/guides/deployment/</loc>
+        <lastmod>2026-05-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://cda-system.github.io/api_gateway/en/guides/deployment/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://cda-system.github.io/api_gateway/guides/deployment/"/>
+    </url>
+    <url>
+        <loc>https://cda-system.github.io/api_gateway/en/guides/local-development/</loc>
+        <lastmod>2026-05-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://cda-system.github.io/api_gateway/en/guides/local-development/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://cda-system.github.io/api_gateway/guides/local-development/"/>
+    </url>
+    <url>
+        <loc>https://cda-system.github.io/api_gateway/en/guides/network-architecture/</loc>
+        <lastmod>2026-05-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://cda-system.github.io/api_gateway/en/guides/network-architecture/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://cda-system.github.io/api_gateway/guides/network-architecture/"/>
+    </url>
+    <url>
+        <loc>https://cda-system.github.io/api_gateway/en/guides/troubleshooting/</loc>
+        <lastmod>2026-05-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://cda-system.github.io/api_gateway/en/guides/troubleshooting/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://cda-system.github.io/api_gateway/guides/troubleshooting/"/>
+    </url>
+    <url>
+        <loc>https://cda-system.github.io/api_gateway/en/services/api-gateway/</loc>
+        <lastmod>2026-05-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://cda-system.github.io/api_gateway/en/services/api-gateway/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://cda-system.github.io/api_gateway/services/api-gateway/"/>
+    </url>
+    <url>
+        <loc>https://cda-system.github.io/api_gateway/en/services/auth-service/</loc>
+        <lastmod>2026-05-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://cda-system.github.io/api_gateway/en/services/auth-service/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://cda-system.github.io/api_gateway/services/auth-service/"/>
+    </url>
+    <url>
+        <loc>https://cda-system.github.io/api_gateway/en/services/checklist-service/</loc>
+        <lastmod>2026-05-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://cda-system.github.io/api_gateway/en/services/checklist-service/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://cda-system.github.io/api_gateway/services/checklist-service/"/>
+    </url>
+    <url>
+        <loc>https://cda-system.github.io/api_gateway/en/services/clients-service/</loc>
+        <lastmod>2026-05-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://cda-system.github.io/api_gateway/en/services/clients-service/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://cda-system.github.io/api_gateway/services/clients-service/"/>
+    </url>
+    <url>
+        <loc>https://cda-system.github.io/api_gateway/en/services/form-service/</loc>
+        <lastmod>2026-05-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://cda-system.github.io/api_gateway/en/services/form-service/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://cda-system.github.io/api_gateway/services/form-service/"/>
+    </url>
+    <url>
+        <loc>https://cda-system.github.io/api_gateway/en/services/storage-service/</loc>
+        <lastmod>2026-05-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://cda-system.github.io/api_gateway/en/services/storage-service/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://cda-system.github.io/api_gateway/services/storage-service/"/>
+    </url>
+    <url>
+        <loc>https://cda-system.github.io/api_gateway/en/services/vehicles-service/</loc>
+        <lastmod>2026-05-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://cda-system.github.io/api_gateway/en/services/vehicles-service/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://cda-system.github.io/api_gateway/services/vehicles-service/"/>
+    </url>
+</urlset>
