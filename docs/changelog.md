@@ -8,16 +8,20 @@ Todos los cambios notables de este proyecto se documentarán en este archivo.
 - `POST /auth/login` retornaba HTTP 201 en lugar de 200 por el default de NestJS 11 para rutas POST; se agregó `@HttpCode(200)` explícito
 - Respuesta de creación de inspección ahora incluye `checklistId` después del PATCH via spread `{ ...created, checklistId }`
 - Reemplazo de `console.log` por `this.logger.log` (NestJS Logger) en el flujo de checklist automático
+- `InvoicePaidHandler.fetchVehicle` usaba `receptionInfra.proxyRequest` a form-service (sin endpoint `/api/vehicle`) → 404 → null → no creaba checklist. Corregido usando `VehicleService.getVehicleById`
 
 ### Agregado
-- Creación automática de checklist al crear una inspección (`POST /api/v1/inspections`):
-  - Obtiene el vehículo y determina el tipo (`MOTO`/`LIVIANO`/`PESADO`)
-  - Busca la plantilla activa correspondiente (`getActiveMotoTemplate` / `getActiveLivianosPesadosTemplate`)
-  - Crea registro en checklist-service via `POST /api/v1/checklist/inspections`
-  - Asigna el `checklistId` resultante en la inspección de recepción via `PATCH /api/v1/inspections/{id}/checklist-id`
-  - Errores en el flujo de checklist no bloquean la creación de la inspección (`catchError` con `of(created)`)
-- Endpoint `PATCH /api/v1/inspections/{id}/checklist-id` en reception controller para actualizar el checklistId
-- Campo `checklistId` en `CreateInspectionDto` y `UpdateInspectionDto`
+- **Módulo Status** (`/api/v1/statuses`): CRUD proxy para estados de factura/inspección
+- **Módulo Price** (`/api/v1/prices`): CRUD proxy para precios por tipo de vehículo y revisión
+- **Módulo Invoice** (`/api/v1/invoices`): CRUD proxy para facturas con filtros (`invoice_number`, `statusId`, `inspection_id`, `includeDeleted`, `page`, `size`)
+- **Auto-factura al crear inspección**: `POST /api/v1/inspections` dispara `autoCreateInvoice` (fire-and-forget). Resuelve `vehicle_type` desde vehicle-service si el DTO no lo incluye
+- **Generar factura manual**: `POST /api/v1/inspections/:id/generate-invoice`
+- **InvoicePaidHandler**: Cuando `PATCH /api/v1/invoices/:id` recibe `statusId = PAID`, obtiene vehículo + template, crea checklist en checklist-service y asigna `checklistId` a la inspección
+- **Socket.IO Gateway**: Conexión al form-service namespace `/events`, reenvía `invoice.created` e `inspection.status.updated` al frontend
+- **`PATCH /api/v1/inspections/:id/status`**: Endpoint proxy para actualizar el estado de una inspección
+- **`PATCH /api/v1/inspections/:id/checklist-id`**: Endpoint proxy para actualizar checklistId
+- **DTOs con Swagger**: `CreateInvoiceDto`, `UpdateInvoiceDto`, `CreatePriceDto`, `CreateStatusDto` con decoradores `@ApiProperty`
+- **`x-api-key` en ChecklistInfrastructureService**: Agregado header `x-api-key` a las solicitudes proxy hacia checklist-service
 - Enriquecimiento de `inspector` en lecturas de inspecciones de checklist (usando `AuthApplicationService`)
 - Enriquecimiento de vehículos con datos de `client` cacheado via `transform` opcional en `proxyRequestCached`
 - Importación de `ChecklistModule` en `ReceptionModule` (exporta `TemplatesChecklistService`, `InspectionsChecklistService`, `ChecklistInfrastructureService`)

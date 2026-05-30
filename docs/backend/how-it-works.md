@@ -41,6 +41,8 @@ sequenceDiagram
 3. **Filtrado de payload** — Solo los campos del DTO permitidos se incluyen en el payload (previene rechazos por `forbidNonWhitelisted`)
 4. **Mapeo de operador** — `operator_id` se mapea tanto a `responsible_id` como a `customer_id`
 5. **Validación de negocio** — Form-service valida la cantidad de neumáticos y la integridad del checklist según el tipo de vehículo
+6. **Auto-factura** — Al crear la inspección se dispara `autoCreateInvoice` (fire-and-forget) que resuelve `vehicle_type` desde vehicle-service si el DTO no lo incluye, obtiene el cliente, el precio y el estado PENDING, y crea la factura
+7. **Checklist al pagar** — Cuando se actualiza una factura a PAID, el `InvoicePaidHandler` obtiene vehículo + template, crea el checklist en checklist-service y asigna `checklistId` a la inspección
 
 ## 2. Flujo de Actualización de Inspección
 
@@ -150,6 +152,82 @@ sequenceDiagram
     Gateway->>Gateway: Check @Roles() if present
     Gateway->>Form: Proxied request
 ```
+
+## 7. Flujo de Auto-Factura al Crear Inspección
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Gateway
+    participant Form as Form Service
+    participant Clients as Clients Service
+    participant Vehicles as Vehicles Service
+    participant FormInvoice as Form Service (Invoice)
+
+    Client->>Gateway: POST /api/v1/inspections (multipart)
+    Gateway->>Gateway: Upload files, build payload
+    Gateway->>Form: POST /api/inspections
+    Form-->>Gateway: 201 Created (inspection with statusId=PENDING)
+    par Fire-and-forget: Auto-create invoice
+        Gateway->>Vehicles: GET /vehiculo/{id} (resolve vehicle_type if missing)
+        Gateway->>Clients: GET /clients/{id}
+        Gateway->>FormInvoice: POST /api/invoices (PENDING)
+    end
+    Gateway-->>Client: Standardized response
+```
+
+**Fire-and-forget:** La creación de factura no bloquea la respuesta al cliente. Si falla (ej. falta precio), se loguea el error pero la inspección se crea igual.
+
+## 8. Flujo PAID → Checklist Automático
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Gateway
+    participant Form as Form Service
+    participant Vehicles as Vehicles Service
+    participant Checklist as Checklist Service
+
+    Client->>Gateway: PATCH /api/v1/invoices/{id} { statusId: PAID }
+    Gateway->>Form: PATCH /api/invoices/{id} (update status)
+    Gateway->>Form: GET /api/statuses?code=PAID (resolve PAID id)
+    alt statusId matches PAID
+        par Fire-and-forget: InvoicePaidHandler
+            Gateway->>Form: GET /api/invoices/{id}
+            Gateway->>Form: GET /api/inspections/{inspection_id}
+            Gateway->>Vehicles: GET /vehiculo/{vehicle_id}
+            Gateway->>Checklist: GET /templates/livianos-pesados (or /templates/motos)
+            Gateway->>Checklist: POST /inspections (create checklist)
+            Gateway->>Form: PATCH /api/inspections/{id}/checklist-id
+        end
+    end
+    Gateway-->>Client: Updated invoice
+```
+
+**InvoicePaidHandler:** Obtiene la factura → inspección → vehículo → template activa, crea el checklist en checklist-service y asigna el `checklistId` en la inspección de recepción. Todo es fire-and-forget, no bloquea la respuesta.
+
+## 9. Eventos Socket.IO
+
+```mermaid
+sequenceDiagram
+    participant Frontend
+    participant Gateway
+    participant Form as Form Service (Socket)
+
+    Gateway->>Form: Connect to /events namespace
+
+    alt Invoice created
+        Form-->>Gateway: invoice.created { invoice }
+        Gateway-->>Frontend: invoice.created { invoice }
+    end
+
+    alt Inspection status updated
+        Form-->>Gateway: inspection.status.updated { inspection, statusName }
+        Gateway-->>Frontend: inspection.status.updated { inspection, statusName }
+    end
+```
+
+El gateway se conecta al namespace `/events` del form-service y reenvía los eventos al frontend conectado.
 
 ## Aspectos Transversales
 

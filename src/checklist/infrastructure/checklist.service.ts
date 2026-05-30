@@ -9,6 +9,7 @@ import { CACHE_KEYS, CACHE_TTL } from '../../cache/application/cache-keys.consta
 @Injectable()
 export class ChecklistInfrastructureService {
   private readonly baseUrl: string;
+  private readonly apiKey: string;
 
   constructor(
     private readonly httpService: HttpService,
@@ -16,6 +17,7 @@ export class ChecklistInfrastructureService {
     private readonly cacheService: CacheInfrastructureService,
   ) {
     this.baseUrl = this.configService.get<string>('CHECKLIST_SERVICE_BASE_URL') || '';
+    this.apiKey = process.env.API_KEY || '';
     if (!this.baseUrl) {
       throw new Error('CHECKLIST_SERVICE_BASE_URL is not defined');
     }
@@ -23,7 +25,8 @@ export class ChecklistInfrastructureService {
 
   private proxyRequest(method: string, path: string, data?: any, headers?: any): Observable<any> {
     const url = `${this.baseUrl}${path}`;
-    return this.httpService.request({ method, url, data, headers }).pipe(
+    const mergedHeaders = { 'x-api-key': this.apiKey, ...headers };
+    return this.httpService.request({ method, url, data, headers: mergedHeaders }).pipe(
       map((response: AxiosResponse) => response.data),
       catchError((error: AxiosError) => {
         if (error.code === 'ECONNREFUSED' || error.code === 'ENOTFOUND') {

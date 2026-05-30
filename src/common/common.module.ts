@@ -6,13 +6,17 @@ import { UploadFilesModule } from '../upload-files/upload-files.module';
 import { ReceptionModule } from '../reception/reception.module';
 import { CatalogsModule } from '../catalogs/catalogs.module';
 import { CatalogsCrudModule } from '../catalogs-crud/catalogs-crud.module';
+import { StatusModule } from '../status/status.module';
+import { PriceModule } from '../price/price.module';
+import { InvoiceModule } from '../invoice/invoice.module';
+import { SocketModule } from '../socket/socket.module';
 import { ChecklistModule } from '../checklist/checklist.module';
 import { CacheModule } from '../cache/cache.module';
 
 @Global()
 @Module({
-  imports: [HttpModule, ConfigModule, UploadFilesModule, ReceptionModule, CatalogsModule, CatalogsCrudModule, ChecklistModule, CacheModule],
+  imports: [HttpModule, ConfigModule, UploadFilesModule, ReceptionModule, StatusModule, PriceModule, InvoiceModule, SocketModule, CatalogsModule, CatalogsCrudModule, ChecklistModule, CacheModule],
   providers: [TokenValidationService],
-  exports: [HttpModule, ConfigModule, TokenValidationService, UploadFilesModule, ReceptionModule],
+  exports: [HttpModule, ConfigModule, TokenValidationService, UploadFilesModule, ReceptionModule, StatusModule, PriceModule, InvoiceModule],
 })
 export class CommonModule {}

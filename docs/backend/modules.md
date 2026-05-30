@@ -14,6 +14,10 @@ graph TD
     CommonModule --> ReceptionModule
     CommonModule --> CatalogsModule
     CommonModule --> CatalogsCrudModule
+    CommonModule --> StatusModule
+    CommonModule --> PriceModule
+    CommonModule --> InvoiceModule
+    CommonModule --> ChecklistModule
 ```
 
 ## Registro de Módulos
@@ -38,6 +42,10 @@ Marcado con `@Global()`, este módulo proporciona infraestructura compartida en 
 | `ReceptionModule` | Endpoints de recepción de inspección de vehículos |
 | `CatalogsModule` | Endpoints de catálogo enum de solo lectura (desde form-service) |
 | `CatalogsCrudModule` | Endpoints de catálogo CRUD (desde vehicle service) |
+| `StatusModule` | CRUD de estados de factura/inspección |
+| `PriceModule` | CRUD de precios por tipo de vehículo |
+| `InvoiceModule` | CRUD de facturas con auto-creación de checklist |
+| `ChecklistModule` | CRUD de plantillas, inspecciones y labrado de checklist |
 
 **Providers:** `TokenValidationService`
 
@@ -82,3 +90,27 @@ Endpoints de catálogo de solo lectura para valores enum (tipos de vehículo, ti
 **Archivo:** `src/catalogs-crud/catalogs-crud.module.ts`
 
 CRUD unificado para catálogos de vehículos (marcas, clases, lineas, colores, tipos-*) proxy al vehicle service.
+
+### StatusModule
+
+**Archivo:** `src/status/status.module.ts`
+
+CRUD proxy para estados de factura/inspección (PENDING, PAID, CANCELLED, REFUNDED) proxy al form service.
+
+### PriceModule
+
+**Archivo:** `src/price/price.module.ts`
+
+CRUD proxy para precios por tipo de vehículo y revisión, proxy al form service.
+
+### InvoiceModule
+
+**Archivo:** `src/invoice/invoice.module.ts`
+
+CRUD proxy para facturas. Dispara la creación automática de checklist (`InvoicePaidHandler`) cuando una factura se marca como PAID. Proxy al form service.
+
+### ChecklistModule
+
+**Archivo:** `src/checklist/checklist.module.ts`
+
+CRUD proxy para plantillas, inspecciones y labrado de checklist, proxy al checklist service.

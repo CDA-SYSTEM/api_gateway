@@ -8,7 +8,7 @@
 
 ## Propósito
 
-Gestión de formularios de recepción de vehículos. Crea, lista, actualiza y elimina de forma suave las inspecciones de vehículos. Valida la existencia del cliente y del vehículo mediante RabbitMQ RPC antes de persistir. Al crear una inspección, automáticamente crea un registro de checklist asociado en checklist-service. Aplica reglas de negocio por tipo de vehículo.
+Gestión de formularios de recepción de vehículos, estados, precios y facturas. Crea, lista, actualiza y elimina de forma suave las inspecciones de vehículos. Valida la existencia del cliente y del vehículo mediante RabbitMQ RPC antes de persistir. Al crear una inspección, asigna automáticamente estado PENDING. Incluye módulos de facturación con cálculo automático de IVA y totales, y sincronización de estados entre facturas e inspecciones. Aplica reglas de negocio por tipo de vehículo.
 
 ## Reglas de Negocio
 
@@ -37,20 +37,66 @@ Gestión de formularios de recepción de vehículos. Crea, lista, actualiza y el
 
 | Método | Ruta | Descripción |
 |--------|------|-------------|
-| `POST` | `/api/inspections` | Crear (valida cliente/vehículo via RabbitMQ, crea checklist automáticamente) |
-| `GET` | `/api/inspections` | Listar con filtros (includeDeleted, vehicle_id, page, size) |
+| `POST` | `/api/inspections` | Crear (valida cliente/vehículo via RabbitMQ, asigna estado PENDING automáticamente, auto-crea factura) |
+| `GET` | `/api/inspections` | Listar con filtros (includeDeleted, vehicle_id, page, size). Incluye `statusId` y `statusName` |
 | `GET` | `/api/inspections/:id` | Obtener por ID |
 | `PATCH` | `/api/inspections/:id` | Actualizar (re-valida reglas de tipo de vehículo) |
+| `PATCH` | `/api/inspections/:id/status` | Actualizar estado de la inspección (sincroniza con factura vinculada) |
 | `PATCH` | `/api/inspections/:id/checklist-id` | Actualizar solo el `checklistId` (desde checklist-service) |
 | `DELETE` | `/api/inspections/:id` | Eliminación suave |
+
+### Status
+
+| Método | Ruta | Descripción |
+|--------|------|-------------|
+| `POST` | `/api/statuses` | Crear estado |
+| `GET` | `/api/statuses` | Listar estados (filtro por `code`) |
+| `GET` | `/api/statuses/:id` | Obtener estado por ID |
+| `PATCH` | `/api/statuses/:id` | Actualizar estado |
+| `DELETE` | `/api/statuses/:id` | Soft delete |
+
+**Seed:** 4 estados por defecto: PENDING (Pendiente), PAID (Pagado), CANCELLED (Anulado), REFUNDED (Reembolsado)
+
+### Price
+
+| Método | Ruta | Descripción |
+|--------|------|-------------|
+| `POST` | `/api/prices` | Crear precio |
+| `GET` | `/api/prices` | Listar precios (filtro por `vehicleType`, `revisionType`) |
+| `GET` | `/api/prices/:id` | Obtener precio por ID |
+| `PATCH` | `/api/prices/:id` | Actualizar precio |
+| `DELETE` | `/api/prices/:id` | Soft delete |
+
+**Seed:** 8 combinaciones de precio (LIVIANO, MOTOCICLETA_2_TIEMPOS, MOTOCICLETA_4_TIEMPOS, PESADO × TECNICO_MECANICA, PREVENTIVA)
+
+### Invoice
+
+| Método | Ruta | Descripción |
+|--------|------|-------------|
+| `POST` | `/api/invoices` | Crear factura (genera número auto, calcula subtotal+IVA+total) |
+| `GET` | `/api/invoices` | Listar facturas (filtros: `invoice_number`, `statusId`, `inspection_id`, `includeDeleted`, `page`, `size`) |
+| `GET` | `/api/invoices/:id` | Obtener factura por ID. Incluye `statusName` resuelto |
+| `PATCH` | `/api/invoices/:id` | Actualizar factura (recalcula totales). Si cambia a PAID, sincroniza estado en inspección vinculada |
+| `DELETE` | `/api/invoices/:id` | Soft delete |
+
+**Validación:** Una factura por `inspection_id` (no permite duplicados)
+**Cálculos:** `subtotal` = suma de items, `tax` = 0% (temporal), `total` = subtotal + tax
+
+## Socket.IO
+
+| Namespace | Evento | Descripción |
+|-----------|--------|-------------|
+| `/events` | `invoice.created` | Se emite al crear una factura con el objeto completo |
+| `/events` | `inspection.status.updated` | Se emite al actualizar el estado de una inspección con el objeto completo y el nuevo `statusName` |
 
 ## Integración
 
 - **RabbitMQ RPC** — Valida `customer_id` contra `client-service-queue` y `vehicle_id` contra `vehicle-service-queue` antes de guardar inspecciones
-- **Checklist Service** — Al crear una inspección (`POST /api/inspections`), obtiene el vehículo, determina la plantilla activa según el tipo (`MOTO`/`LIVIANO`/`PESADO`) y crea automáticamente un registro de checklist via checklist-service API. El `checklistId` resultante se asigna en la inspección de recepción
-- **PATCH /checklist-id** — Endpoint interno para que checklist-service notifique el ID creado sin depender del flujo automático
+- **Sync de estados** — Al cambiar el estado de una inspección a PAID/CANCELLED/REFUNDED, sincroniza automáticamente el estado de la factura vinculada y viceversa
+- **Checklist al pagar** — El checklist ya no se crea al crear la inspección, sino cuando la factura se marca como PAID. El `InvoicePaidHandler` en el gateway orquesta el proceso
+- **PATCH /checklist-id** — Endpoint interno para que el gateway asigne el `checklistId` del checklist creado en la inspección de recepción
 - **Eliminación Suave** — Establece timestamp `deleted_at` en lugar de eliminación física
 
 ## Arquitectura
 
-Modular con `CatalogsModule`, `InspectionModule` y `RabbitMQModule`. Usa enums TypeScript compartidos para valores de catálogo. Importa `ChecklistModule` para la creación automática de checklists. Script de siembra disponible via `seed:inspection`.
+Modular con `CatalogsModule`, `InspectionModule`, `StatusModule`, `PriceModule`, `InvoiceModule` y `RabbitMQModule`. Usa enums TypeScript compartidos para valores de catálogo. Scripts de siembra disponibles via `seed:status`, `seed:price` y `seed:all`.

@@ -17,6 +17,10 @@ Cada controlador sigue un patrón consistente: extraer el Bearer token del encab
 | `ReceptionController` | `api/v1` | ReceptionModule |
 | `CatalogsController` | `api/v1/catalogs` | CatalogsModule |
 | `CatalogsCrudController` | `api/v1/catalogs` | CatalogsCrudModule |
+| `StatusController` | `api/v1/statuses` | StatusModule |
+| `PriceController` | `api/v1/prices` | PriceModule |
+| `InvoiceController` | `api/v1/invoices` | InvoiceModule |
+| `SocketGateway` | — | SocketModule |
 
 ## Resumen de Endpoints
 
@@ -26,9 +30,11 @@ Cada controlador sigue un patrón consistente: extraer el Bearer token del encab
 |--------|------|-------------|
 | `GET` | `/api/v1/` | Health check |
 | `GET` | `/api/v1/inspections` | Listar con filtros y paginación |
-| `POST` | `/api/v1/inspections` | Crear (multipart: data + signature + photo) |
-| `GET` | `/api/v1/inspections/:id` | Obtener por ID (enriquecido con cliente/vehículo/operador) |
+| `POST` | `/api/v1/inspections` | Crear (multipart: data + signature + photo). **Auto-crea factura en PENDING** |
+| `GET` | `/api/v1/inspections/:id` | Obtener por ID (enriquecido con cliente/vehículo/operador + `statusName`) |
 | `PATCH` | `/api/v1/inspections/:id` | Actualización parcial (multipart, archivos opcionales) |
+| `PATCH` | `/api/v1/inspections/:id/status` | Actualizar estado de la inspección |
+| `PATCH` | `/api/v1/inspections/:id/checklist-id` | Actualizar checklistId (uso interno) |
 | `DELETE` | `/api/v1/inspections/:id` | Eliminación suave (solo admin) |
 
 ### Archivos
@@ -69,6 +75,43 @@ Cada controlador sigue un patrón consistente: extraer el Bearer token del encab
 | `POST` | `/api/v1/auth/validate-token` | Público | Validación de token |
 | `POST` | `/api/v1/auth/register` | Admin | Registrar usuario |
 | `GET` | `/api/v1/auth/users` | Admin/Manager | Listar usuarios |
+
+### Status
+
+| Método | Ruta | Descripción |
+|--------|------|-------------|
+| `POST` | `/api/v1/statuses` | Crear estado |
+| `GET` | `/api/v1/statuses` | Listar estados (filtro por `code`) |
+| `GET` | `/api/v1/statuses/:id` | Obtener estado por ID |
+| `PATCH` | `/api/v1/statuses/:id` | Actualizar estado |
+| `DELETE` | `/api/v1/statuses/:id` | Eliminación suave |
+
+### Price
+
+| Método | Ruta | Descripción |
+|--------|------|-------------|
+| `POST` | `/api/v1/prices` | Crear precio |
+| `GET` | `/api/v1/prices` | Listar precios (filtro por `vehicleType`, `revisionType`) |
+| `GET` | `/api/v1/prices/:id` | Obtener precio por ID |
+| `PATCH` | `/api/v1/prices/:id` | Actualizar precio |
+| `DELETE` | `/api/v1/prices/:id` | Eliminación suave |
+
+### Invoice
+
+| Método | Ruta | Descripción |
+|--------|------|-------------|
+| `POST` | `/api/v1/invoices` | Crear factura |
+| `GET` | `/api/v1/invoices` | Listar facturas (filtros: `invoice_number`, `statusId`, `inspection_id`, `includeDeleted`, `page`, `size`) |
+| `GET` | `/api/v1/invoices/:id` | Obtener factura por ID |
+| `PATCH` | `/api/v1/invoices/:id` | Actualizar factura. Si `statusId = PAID` dispara `InvoicePaidHandler` |
+| `DELETE` | `/api/v1/invoices/:id` | Eliminación suave (solo admin) |
+
+### Socket.IO
+
+| Namespace | Eventos emitidos |
+|-----------|------------------|
+| `/events` | `invoice.created` — al crear factura |
+|           | `inspection.status.updated` — al cambiar estado de inspección |
 
 ### Clientes
 
