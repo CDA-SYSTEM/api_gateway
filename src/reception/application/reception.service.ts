@@ -97,31 +97,27 @@ export class ReceptionService {
             const vehicleId = dto.vehicle_id;
             this.logger.log('[DEBUG] inspectionId:', inspectionId, 'vehicleId:', vehicleId);
 
-            const checklist$ = this.createChecklistForInspection(dto, inspectionId, vehicleId, token, created).pipe(
+            if (inspectionId) {
+              this.autoCreateInvoice(dto, inspectionId, token).pipe(
+                catchError((err) => {
+                  this.logger.error(`Invoice auto-creation failed: ${err.message}`);
+                  return of(null);
+                }),
+                map((invoiceResult) => {
+                  if (invoiceResult) {
+                    const invoiceId = invoiceResult?.id ?? invoiceResult?.data?.id;
+                    this.logger.log(`[DEBUG] Auto-created invoice ${invoiceId} for inspection ${inspectionId}`);
+                  }
+                  return null;
+                }),
+              ).subscribe();
+            }
+
+            return this.createChecklistForInspection(dto, inspectionId, vehicleId, token, created).pipe(
               catchError((err) => {
                 this.logger.error(`Checklist creation failed: ${err.message}`);
                 return of(created);
               }),
-            );
-
-            const invoice$ = inspectionId
-              ? this.autoCreateInvoice(dto, inspectionId, token).pipe(
-                  catchError((err) => {
-                    this.logger.error(`Invoice auto-creation failed: ${err.message}`);
-                    return of(null);
-                  }),
-                  map((invoiceResult) => {
-                    if (invoiceResult) {
-                      const invoiceId = invoiceResult?.id ?? invoiceResult?.data?.id;
-                      return { ...created, invoiceId };
-                    }
-                    return created;
-                  }),
-                )
-              : of(created);
-
-            return forkJoin([checklist$, invoice$]).pipe(
-              map(([checklistResult, invoiceResult]) => invoiceResult ?? checklistResult),
             );
           }),
         );
@@ -215,101 +211,54 @@ export class ReceptionService {
     );
   }
 
+  private mapVehicleTipoToPriceEnum(tipo: string): string {
+    const normalized = tipo.toLowerCase();
+    if (normalized === 'moto') return 'MOTOCICLETA_4_TIEMPOS';
+    if (normalized === 'pesado') return 'PESADO';
+    return 'LIVIANO';
+  }
+
+  private resolveVehicleType(
+    dtoVehicleType: string | undefined,
+    vehicleId: string,
+    token: string,
+  ): Observable<string> {
+    if (dtoVehicleType) {
+      return of(dtoVehicleType);
+    }
+    return this.vehicleService.getVehicleById(vehicleId, token).pipe(
+      map((vehicle) => {
+        const tipo = (vehicle?.tipoVehiculo?.nombre ?? vehicle?.data?.tipoVehiculo?.nombre ?? '').toLowerCase();
+        return this.mapVehicleTipoToPriceEnum(tipo);
+      }),
+      catchError(() => {
+        this.logger.log('[DEBUG] Could not resolve vehicle type, skipping invoice');
+        return of('');
+      }),
+    );
+  }
+
   private autoCreateInvoice(
     dto: CreateInspectionDto,
     inspectionId: string,
     token: string,
   ): Observable<any> {
-    const vehicleType = dto.vehicle_type;
     const revisionType = dto.revision_type;
 
-    if (!vehicleType || !revisionType) {
-      this.logger.log('[DEBUG] SKIP auto-invoice — missing vehicle_type or revision_type');
+    if (!revisionType) {
+      this.logger.log('[DEBUG] SKIP auto-invoice — missing revision_type');
       return of(null);
     }
 
-    const client$ = this.clientService.getClientById(dto.client_id, token).pipe(
-      catchError(() => of(null)),
-    );
-
-    const status$ = this.statusService.findAll(token, 'PENDING').pipe(
-      map((res) => {
-        const list = Array.isArray(res?.data) ? res.data : (res?.data?.data ?? []);
-        return list?.[0] ?? null;
-      }),
-      catchError(() => of(null)),
-    );
-
-    const price$ = this.priceService.findAll(token, vehicleType, revisionType).pipe(
-      map((res) => {
-        const list = Array.isArray(res?.data) ? res.data : (res?.data?.data ?? []);
-        return list?.[0] ?? null;
-      }),
-      catchError(() => of(null)),
-    );
-
-    return forkJoin({ client: client$, status: status$, price: price$ }).pipe(
-      switchMap(({ client, status, price }) => {
-        if (!client || !status || !price) {
-          this.logger.log('[DEBUG] SKIP auto-invoice — missing client, status or price data');
+    return this.resolveVehicleType(dto.vehicle_type, dto.vehicle_id, token).pipe(
+      switchMap((vehicleType) => {
+        if (!vehicleType) {
+          this.logger.log('[DEBUG] SKIP auto-invoice — could not resolve vehicle type');
           return of(null);
         }
 
-        const clientData = client?.data ?? client;
-        const clientName = [clientData?.nombre, clientData?.apellido].filter(Boolean).join(' ');
-
-        const payload = {
-          inspection_id: inspectionId,
-          client: {
-            document: clientData?.identity ?? '',
-            name: clientName || 'Cliente',
-            address: clientData?.direccion,
-            phone: clientData?.celular,
-            email: clientData?.email,
-          },
-          items: [
-            {
-              concept: `Revisión ${revisionType} - ${vehicleType}`,
-              quantity: 1,
-              unitPrice: price?.amount ?? 0,
-            },
-          ],
-          statusId: status?.id ?? '',
-          observations: dto.observations,
-        };
-
-        this.logger.log(`[DEBUG] Auto-creating invoice for inspection ${inspectionId}`);
-        return this.invoiceService.create(payload, token);
-      }),
-    );
-  }
-
-  generateInvoiceFromInspection(inspectionId: string, token: string): Observable<any> {
-    return this.infrastructure.proxyRequest('GET', `/api/inspections/${inspectionId}`, null, {
-      Authorization: `Bearer ${token}`,
-    }).pipe(
-      switchMap((response: any) => {
-        const inspection = response?.data ?? response;
-
-        if (!inspection) {
-          throw new BadRequestException(`Inspection ${inspectionId} not found`);
-        }
-
-        const vehicleType = inspection.vehicle_type;
-        const revisionType = inspection.revision_type;
-        const clientId = inspection.client_id;
-
-        if (!vehicleType || !revisionType) {
-          throw new BadRequestException('Inspection missing vehicle_type or revision_type');
-        }
-        if (!clientId) {
-          throw new BadRequestException('Inspection missing client_id');
-        }
-
-        const client$ = this.clientService.getClientById(clientId, token).pipe(
-          catchError(() => {
-            throw new BadRequestException(`Client ${clientId} not found`);
-          }),
+        const client$ = this.clientService.getClientById(dto.client_id, token).pipe(
+          catchError(() => of(null)),
         );
 
         const status$ = this.statusService.findAll(token, 'PENDING').pipe(
@@ -317,10 +266,7 @@ export class ReceptionService {
             const list = Array.isArray(res?.data) ? res.data : (res?.data?.data ?? []);
             return list?.[0] ?? null;
           }),
-          switchMap((status) => {
-            if (!status) throw new BadRequestException('PENDING status not found');
-            return of(status);
-          }),
+          catchError(() => of(null)),
         );
 
         const price$ = this.priceService.findAll(token, vehicleType, revisionType).pipe(
@@ -328,14 +274,16 @@ export class ReceptionService {
             const list = Array.isArray(res?.data) ? res.data : (res?.data?.data ?? []);
             return list?.[0] ?? null;
           }),
-          switchMap((price) => {
-            if (!price) throw new BadRequestException(`Price not found for ${vehicleType}/${revisionType}`);
-            return of(price);
-          }),
+          catchError(() => of(null)),
         );
 
         return forkJoin({ client: client$, status: status$, price: price$ }).pipe(
           switchMap(({ client, status, price }) => {
+            if (!client || !status || !price) {
+              this.logger.log('[DEBUG] SKIP auto-invoice — missing client, status or price data');
+              return of(null);
+            }
+
             const clientData = client?.data ?? client;
             const clientName = [clientData?.nombre, clientData?.apellido].filter(Boolean).join(' ');
 
@@ -356,11 +304,104 @@ export class ReceptionService {
                 },
               ],
               statusId: status?.id ?? '',
-              observations: inspection.observations,
+              observations: dto.observations,
             };
 
-            this.logger.log(`[DEBUG] Generating invoice for inspection ${inspectionId}`);
+            this.logger.log(`[DEBUG] Auto-creating invoice for inspection ${inspectionId}`);
             return this.invoiceService.create(payload, token);
+          }),
+        );
+      }),
+    );
+  }
+
+  generateInvoiceFromInspection(inspectionId: string, token: string): Observable<any> {
+    return this.infrastructure.proxyRequest('GET', `/api/inspections/${inspectionId}`, null, {
+      Authorization: `Bearer ${token}`,
+    }).pipe(
+      switchMap((response: any) => {
+        const inspection = response?.data ?? response;
+
+        if (!inspection) {
+          throw new BadRequestException(`Inspection ${inspectionId} not found`);
+        }
+
+        const revisionType = inspection.revision_type;
+        const clientId = inspection.client_id;
+        const vehicleId = inspection.vehicle_id;
+
+        if (!revisionType) {
+          throw new BadRequestException('Inspection missing revision_type');
+        }
+        if (!clientId) {
+          throw new BadRequestException('Inspection missing client_id');
+        }
+
+        const vehicleType$ = this.resolveVehicleType(inspection.vehicle_type, vehicleId, token);
+
+        const client$ = this.clientService.getClientById(clientId, token).pipe(
+          catchError(() => {
+            throw new BadRequestException(`Client ${clientId} not found`);
+          }),
+        );
+
+        const status$ = this.statusService.findAll(token, 'PENDING').pipe(
+          map((res) => {
+            const list = Array.isArray(res?.data) ? res.data : (res?.data?.data ?? []);
+            return list?.[0] ?? null;
+          }),
+          switchMap((status) => {
+            if (!status) throw new BadRequestException('PENDING status not found');
+            return of(status);
+          }),
+        );
+
+        return forkJoin({ vehicleType: vehicleType$, client: client$, status: status$ }).pipe(
+          switchMap(({ vehicleType, client, status }) => {
+            if (!vehicleType) {
+              throw new BadRequestException('Could not resolve vehicle type');
+            }
+
+            const price$ = this.priceService.findAll(token, vehicleType, revisionType).pipe(
+              map((res) => {
+                const list = Array.isArray(res?.data) ? res.data : (res?.data?.data ?? []);
+                return list?.[0] ?? null;
+              }),
+              switchMap((price) => {
+                if (!price) throw new BadRequestException(`Price not found for ${vehicleType}/${revisionType}`);
+                return of(price);
+              }),
+            );
+
+            return price$.pipe(
+              switchMap((price) => {
+                const clientData = client?.data ?? client;
+                const clientName = [clientData?.nombre, clientData?.apellido].filter(Boolean).join(' ');
+
+                const payload = {
+                  inspection_id: inspectionId,
+                  client: {
+                    document: clientData?.identity ?? '',
+                    name: clientName || 'Cliente',
+                    address: clientData?.direccion,
+                    phone: clientData?.celular,
+                    email: clientData?.email,
+                  },
+                  items: [
+                    {
+                      concept: `Revisión ${revisionType} - ${vehicleType}`,
+                      quantity: 1,
+                      unitPrice: price?.amount ?? 0,
+                    },
+                  ],
+                  statusId: status?.id ?? '',
+                  observations: inspection.observations,
+                };
+
+                this.logger.log(`[DEBUG] Generating invoice for inspection ${inspectionId}`);
+                return this.invoiceService.create(payload, token);
+              }),
+            );
           }),
         );
       }),
