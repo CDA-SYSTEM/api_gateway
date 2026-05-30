@@ -165,7 +165,7 @@ Encabezados comunes usados por todas las peticiones:
     ```
 
 !!! tip "Nota"
-    Este endpoint es utilizado internamente por el gateway para asociar el checklist creado automáticamente con la inspección de recepción. También puede usarse manualmente si se necesita vincular una inspección de checklist existente.
+    Este endpoint es utilizado internamente por el gateway para asociar el checklist creado al pagar la factura con la inspección de recepción. También puede usarse manualmente si se necesita vincular una inspección de checklist existente.
 
 ### Listar inspecciones
 
@@ -213,6 +213,34 @@ Encabezados comunes usados por todas las peticiones:
     ```javascript
     fetch('http://localhost:3600/api/v1/inspections/<id>', {
       headers: {'x-api-key': 'your-frontend-api-key', 'Authorization': 'Bearer <token>'}
+    }).then(r => r.json()).then(console.log);
+    ```
+
+### Actualizar estado de inspección
+
+=== "cURL"
+    ```bash
+    curl -s -X PATCH http://localhost:3600/api/v1/inspections/<id>/status \
+      -H 'x-api-key: your-frontend-api-key' \
+      -H 'Authorization: Bearer <token>' \
+      -H 'Content-Type: application/json' \
+      -d '{"statusId": "<status_id>"}'
+    ```
+=== "Python"
+    ```python
+    import requests
+    url = "http://localhost:3600/api/v1/inspections/<id>/status"
+    headers = {"x-api-key": "your-frontend-api-key", "Authorization": "Bearer <token>", "Content-Type": "application/json"}
+    data = {"statusId": "<status_id>"}
+    response = requests.patch(url, json=data, headers=headers)
+    print(response.json())
+    ```
+=== "JavaScript"
+    ```javascript
+    fetch('http://localhost:3600/api/v1/inspections/<id>/status', {
+      method: 'PATCH',
+      headers: {'x-api-key': 'your-frontend-api-key', 'Authorization': 'Bearer <token>', 'Content-Type': 'application/json'},
+      body: JSON.stringify({statusId: '<status_id>'})
     }).then(r => r.json()).then(console.log);
     ```
 
@@ -642,6 +670,225 @@ Encabezados comunes usados por todas las peticiones:
       headers: {'x-api-key': 'your-frontend-api-key', 'Authorization': 'Bearer <token>'}
     }).then(r => r.json()).then(console.log);
     ```
+
+## Status
+
+### Crear estado
+
+=== "cURL"
+    ```bash
+    curl -s -X POST http://localhost:3600/api/v1/statuses \
+      -H 'x-api-key: your-frontend-api-key' \
+      -H 'Authorization: Bearer <token>' \
+      -H 'Content-Type: application/json' \
+      -d '{"code":"IN_PROGRESS","name":"En Progreso","color":"#3B82F6","order":2}'
+    ```
+=== "Python"
+    ```python
+    import requests
+    url = "http://localhost:3600/api/v1/statuses"
+    headers = {"x-api-key": "your-frontend-api-key", "Authorization": "Bearer <token>", "Content-Type": "application/json"}
+    data = {"code": "IN_PROGRESS", "name": "En Progreso", "color": "#3B82F6", "order": 2}
+    response = requests.post(url, json=data, headers=headers)
+    print(response.json())
+    ```
+=== "JavaScript"
+    ```javascript
+    fetch('http://localhost:3600/api/v1/statuses', {
+      method: 'POST',
+      headers: {'x-api-key': 'your-frontend-api-key', 'Authorization': 'Bearer <token>', 'Content-Type': 'application/json'},
+      body: JSON.stringify({code:'IN_PROGRESS',name:'En Progreso',color:'#3B82F6',order:2})
+    }).then(r => r.json()).then(console.log);
+    ```
+
+### Listar estados
+
+=== "cURL"
+    ```bash
+    # Filtro opcional por code
+    curl -s 'http://localhost:3600/api/v1/statuses?code=PAID' \
+      -H 'x-api-key: your-frontend-api-key' \
+      -H 'Authorization: Bearer <token>'
+    ```
+=== "Python"
+    ```python
+    import requests
+    url = "http://localhost:3600/api/v1/statuses"
+    params = {"code": "PAID"}
+    headers = {"x-api-key": "your-frontend-api-key", "Authorization": "Bearer <token>"}
+    response = requests.get(url, params=params, headers=headers)
+    print(response.json())
+    ```
+=== "JavaScript"
+    ```javascript
+    fetch('http://localhost:3600/api/v1/statuses?code=PAID', {
+      headers: {'x-api-key': 'your-frontend-api-key', 'Authorization': 'Bearer <token>'}
+    }).then(r => r.json()).then(console.log);
+    ```
+
+## Price
+
+### Crear precio
+
+=== "cURL"
+    ```bash
+    curl -s -X POST http://localhost:3600/api/v1/prices \
+      -H 'x-api-key: your-frontend-api-key' \
+      -H 'Authorization: Bearer <token>' \
+      -H 'Content-Type: application/json' \
+      -d '{"vehicle_type":"MOTO","revision_type":"TECNICO_MECANICA","amount":80000}'
+    ```
+=== "Python"
+    ```python
+    import requests
+    url = "http://localhost:3600/api/v1/prices"
+    headers = {"x-api-key": "your-frontend-api-key", "Authorization": "Bearer <token>", "Content-Type": "application/json"}
+    data = {"vehicle_type": "MOTO", "revision_type": "TECNICO_MECANICA", "amount": 80000}
+    response = requests.post(url, json=data, headers=headers)
+    print(response.json())
+    ```
+=== "JavaScript"
+    ```javascript
+    fetch('http://localhost:3600/api/v1/prices', {
+      method: 'POST',
+      headers: {'x-api-key': 'your-frontend-api-key', 'Authorization': 'Bearer <token>', 'Content-Type': 'application/json'},
+      body: JSON.stringify({vehicle_type:'MOTO',revision_type:'TECNICO_MECANICA',amount:80000})
+    }).then(r => r.json()).then(console.log);
+    ```
+
+### Listar precios
+
+=== "cURL"
+    ```bash
+    curl -s 'http://localhost:3600/api/v1/prices?vehicle_type=LIVIANO&revision_type=TECNICO_MECANICA' \
+      -H 'x-api-key: your-frontend-api-key' \
+      -H 'Authorization: Bearer <token>'
+    ```
+=== "Python"
+    ```python
+    import requests
+    url = "http://localhost:3600/api/v1/prices"
+    params = {"vehicle_type": "LIVIANO", "revision_type": "TECNICO_MECANICA"}
+    headers = {"x-api-key": "your-frontend-api-key", "Authorization": "Bearer <token>"}
+    response = requests.get(url, params=params, headers=headers)
+    print(response.json())
+    ```
+=== "JavaScript"
+    ```javascript
+    fetch('http://localhost:3600/api/v1/prices?vehicle_type=LIVIANO&revision_type=TECNICO_MECANICA', {
+      headers: {'x-api-key': 'your-frontend-api-key', 'Authorization': 'Bearer <token>'}
+    }).then(r => r.json()).then(console.log);
+    ```
+
+## Invoice
+
+### Crear factura
+
+=== "cURL"
+    ```bash
+    curl -s -X POST http://localhost:3600/api/v1/invoices \
+      -H 'x-api-key: your-frontend-api-key' \
+      -H 'Authorization: Bearer <token>' \
+      -H 'Content-Type: application/json' \
+      -d '{
+        "inspection_id": "<inspection_id>",
+        "client": {"document":"12345678","name":"Juan Pérez","address":"Calle 123","phone":"3001234567","email":"juan@example.com"},
+        "items": [{"concept":"Revisión TECNICO_MECANICA - LIVIANO","quantity":1,"unitPrice":150000}],
+        "statusId": "<pending_status_id>",
+        "observations": "Factura inicial"
+      }'
+    ```
+=== "Python"
+    ```python
+    import requests
+    url = "http://localhost:3600/api/v1/invoices"
+    headers = {"x-api-key": "your-frontend-api-key", "Authorization": "Bearer <token>", "Content-Type": "application/json"}
+    data = {
+        "inspection_id": "<inspection_id>",
+        "client": {"document": "12345678", "name": "Juan Pérez", "address": "Calle 123", "phone": "3001234567", "email": "juan@example.com"},
+        "items": [{"concept": "Revisión TECNICO_MECANICA - LIVIANO", "quantity": 1, "unitPrice": 150000}],
+        "statusId": "<pending_status_id>",
+        "observations": "Factura inicial"
+    }
+    response = requests.post(url, json=data, headers=headers)
+    print(response.json())
+    ```
+=== "JavaScript"
+    ```javascript
+    fetch('http://localhost:3600/api/v1/invoices', {
+      method: 'POST',
+      headers: {'x-api-key': 'your-frontend-api-key', 'Authorization': 'Bearer <token>', 'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        inspection_id: '<inspection_id>',
+        client: {document:'12345678',name:'Juan Pérez',address:'Calle 123',phone:'3001234567',email:'juan@example.com'},
+        items: [{concept:'Revisión TECNICO_MECANICA - LIVIANO',quantity:1,unitPrice:150000}],
+        statusId: '<pending_status_id>',
+        observations: 'Factura inicial'
+      })
+    }).then(r => r.json()).then(console.log);
+    ```
+
+### Listar facturas
+
+=== "cURL"
+    ```bash
+    curl -s 'http://localhost:3600/api/v1/invoices?page=1&size=10&inspection_id=<inspection_id>' \
+      -H 'x-api-key: your-frontend-api-key' \
+      -H 'Authorization: Bearer <token>'
+    ```
+=== "Python"
+    ```python
+    import requests
+    url = "http://localhost:3600/api/v1/invoices"
+    params = {"page": 1, "size": 10, "inspection_id": "<inspection_id>"}
+    headers = {"x-api-key": "your-frontend-api-key", "Authorization": "Bearer <token>"}
+    response = requests.get(url, params=params, headers=headers)
+    print(response.json())
+    ```
+=== "JavaScript"
+    ```javascript
+    fetch('http://localhost:3600/api/v1/invoices?page=1&size=10&inspection_id=<inspection_id>', {
+      headers: {'x-api-key': 'your-frontend-api-key', 'Authorization': 'Bearer <token>'}
+    }).then(r => r.json()).then(console.log);
+    ```
+
+### Marcar factura como PAID (dispara checklist automático)
+
+=== "cURL"
+    ```bash
+    curl -s -X PATCH http://localhost:3600/api/v1/invoices/<id> \
+      -H 'x-api-key: your-frontend-api-key' \
+      -H 'Authorization: Bearer <token>' \
+      -H 'Content-Type: application/json' \
+      -d '{"statusId": "<paid_status_id>"}'
+    ```
+=== "Python"
+    ```python
+    import requests
+    url = "http://localhost:3600/api/v1/invoices/<id>"
+    headers = {"x-api-key": "your-frontend-api-key", "Authorization": "Bearer <token>", "Content-Type": "application/json"}
+    data = {"statusId": "<paid_status_id>"}
+    response = requests.patch(url, json=data, headers=headers)
+    print(response.json())
+    ```
+=== "JavaScript"
+    ```javascript
+    fetch('http://localhost:3600/api/v1/invoices/<id>', {
+      method: 'PATCH',
+      headers: {'x-api-key': 'your-frontend-api-key', 'Authorization': 'Bearer <token>', 'Content-Type': 'application/json'},
+      body: JSON.stringify({statusId: '<paid_status_id>'})
+    }).then(r => r.json()).then(console.log);
+    ```
+
+!!! tip "Flujo completo"
+    El gateway detecta automáticamente cuando `statusId = PAID` y dispara `InvoicePaidHandler`, que:
+    1. Obtiene la factura y la inspección vinculada
+    2. Consulta el vehículo para determinar el tipo
+    3. Busca la plantilla activa en checklist-service
+    4. Crea el checklist
+    5. Asigna el `checklistId` en la inspección
+
+    No se requiere ninguna acción adicional del frontend.
 
 ## Checklist — Plantillas
 

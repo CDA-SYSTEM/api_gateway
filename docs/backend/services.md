@@ -17,13 +17,18 @@ Estos contienen lógica de negocio, orquestación y transformación de datos. Se
 
 | Servicio | Módulo | Responsabilidades Clave |
 |----------|--------|-------------------------|
-| `ReceptionService` | Reception | Crear/actualizar inspecciones con cargas de archivos en paralelo, construir payloads, listar con enriquecimiento de datos |
+| `ReceptionService` | Reception | Crear/actualizar inspecciones con cargas de archivos en paralelo, auto-creación de factura al crear inspección, generar factura manual, listar con enriquecimiento de datos |
 | `UploadFilesService` | UploadFiles | Subir archivos mediante FormData, listar con enriquecimiento de URLs, descargas en streaming |
 | `VehicleService` | Vehicle | CRUD para vehículos y todos los tipos de catálogo |
 | `ClientsApplicationService` | Clients | CRUD para clientes, catálogos de tipos de documento y persona |
 | `AuthApplicationService` | Auth | Inicio de sesión, registro, validación de token, gestión de usuarios |
 | `CatalogsService` | Catalogs | Proxy de catálogo enum de solo lectura |
 | `CatalogsCrudService` | CatalogsCrud | CRUD unificado para catálogos de vehículos |
+| `StatusService` | Status | CRUD proxy para estados de factura/inspección |
+| `PriceService` | Price | CRUD proxy para precios por tipo de vehículo y revisión |
+| `InvoiceService` | Invoice | CRUD proxy para facturas; detecta cambio a PAID y dispara `InvoicePaidHandler` |
+| `InvoicePaidHandler` | Invoice | Obtiene factura → inspección → vehículo → template, crea checklist y asigna `checklistId` a la inspección |
+| `SocketGateway` | Socket | Gateway Socket.IO que escucha eventos del form-service (`invoice.created`, `inspection.status.updated`) y los reemite al frontend |
 
 ### Servicios de Infraestructura
 
@@ -43,6 +48,10 @@ Estos manejan la comunicación HTTP con los microservicios descendentes a travé
 | `AuthInfrastructureService` | `AUTH_SERVICE_BASE_URL` | Auth Service |
 | `CatalogsInfrastructureService` | `RECEPTION_SERVICE_BASE_URL` | Form Service |
 | `CatalogsCrudInfrastructureService` | `VEHICLE_SERVICE_BASE_URL` | Vehicles Service |
+| `InvoiceInfrastructureService` | `RECEPTION_SERVICE_BASE_URL` | Form Service |
+| `StatusInfrastructureService` | `RECEPTION_SERVICE_BASE_URL` | Form Service |
+| `PriceInfrastructureService` | `RECEPTION_SERVICE_BASE_URL` | Form Service |
+| `ChecklistInfrastructureService` | `CHECKLIST_SERVICE_BASE_URL` | Checklist Service |
 
 ### Servicios de Apoyo
 
