@@ -197,6 +197,14 @@ export class ReceptionController {
     return this.receptionService.updateInspectionStatus(id, statusId, token);
   }
 
+  @Post('inspections/:id/generate-invoice')
+  @ApiOperation({ summary: 'Generar factura para una inspección existente (auto-recolecta datos)' })
+  @ApiResponse({ status: 201, description: 'Factura creada' })
+  async generateInvoice(@Param('id') id: string, @Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.receptionService.generateInvoiceFromInspection(id, token);
+  }
+
   @Patch('inspections/:id/checklist-id')
   @ApiOperation({ summary: 'Actualizar solo el checklistId de una inspección' })
   @ApiBody({
