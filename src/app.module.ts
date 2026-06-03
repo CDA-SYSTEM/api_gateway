@@ -9,6 +9,7 @@ import { VehicleModule } from './vehicle/vehicle.module';
 import { ClientsModule } from './clients/clients.module';
 import { CommonModule } from './common/common.module';
 import { FormStatsModule } from './form-stats/form-stats.module';
+import { TrackerModule } from './tracker/tracker.module';
 import { CombinedGuard } from './common/guards/combined.guard';
 
 @Module({
@@ -22,6 +23,7 @@ import { CombinedGuard } from './common/guards/combined.guard';
     VehicleModule,
     ClientsModule,
     FormStatsModule,
+    TrackerModule,
   ],
   controllers: [AppController],
   providers: [
