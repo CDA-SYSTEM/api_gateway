@@ -29,9 +29,11 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
       return;
     }
 
+    const apiKey = this.configService.get<string>('API_KEY') || '';
     this.logger.log(`Connecting to form-service Socket.IO at ${formServiceUrl}/events`);
     this.formServiceSocket = ClientIo(`${formServiceUrl}/events`, {
       transports: ['websocket', 'polling'],
+      auth: { 'x-api-key': apiKey },
     });
 
     this.formServiceSocket.on('connect', () => {
