@@ -181,4 +181,8 @@ export class InspectionsChecklistService {
   close(id: string, data: any, token: string): Observable<any> {
     return this.infrastructure.closeInspection(id, data, token);
   }
+
+  getInspectionStats(token: string): Observable<any> {
+    return this.infrastructure.getInspectionStats(token);
+  }
 }

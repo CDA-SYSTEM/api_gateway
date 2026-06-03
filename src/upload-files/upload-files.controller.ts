@@ -4,6 +4,8 @@ import { ApiTags, ApiOperation, ApiBody, ApiConsumes, ApiParam, ApiQuery, ApiRes
 import { UploadFilesService } from './application/upload-files.service';
 import { Public } from '../common/decorators/public.decorator';
 import { SkipResponseFormat } from '../common/decorators/skip-response-format.decorator';
+import { Roles } from '../common/decorators/roles.decorator';
+import { Roles as RoleConstants } from '../common/constants/roles.constant';
 import { buildErrorResponse } from '../common/utils/error-response.util';
 import { lastValueFrom } from 'rxjs';
 import type { Request, Response } from 'express';
@@ -83,5 +85,14 @@ export class UploadFilesController {
     }
     const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
     return this.uploadFilesService.uploadFile(file, token);
+  }
+
+  @Get('storage/stats')
+  @Roles(RoleConstants.ADMIN, RoleConstants.MANAGER, RoleConstants.SUPERADMIN)
+  @ApiOperation({ summary: 'Estadísticas de almacenamiento' })
+  @ApiResponse({ status: 200, description: 'Estadísticas de almacenamiento' })
+  getStorageStats(@Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.uploadFilesService.getStorageStats(token);
   }
 }

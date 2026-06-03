@@ -55,4 +55,10 @@ export class UploadFilesService {
       Authorization: `Bearer ${token}`,
     });
   }
+
+  getStorageStats(token: string): Observable<any> {
+    return this.uploadFilesInfrastructure.proxyRequest('GET', '/storage/stats', null, {
+      Authorization: `Bearer ${token}`,
+    });
+  }
 }

@@ -5,6 +5,8 @@ import { CreateCatalogoDto } from './application/dtos/create-catalogo.dto';
 import { UpdateCatalogoDto } from './application/dtos/update-catalogo.dto';
 import { CreateVehicleDto } from './application/dtos/create-vehicle.dto';
 import { UpdateVehicleDto } from './application/dtos/update-vehicle.dto';
+import { Roles } from '../common/decorators/roles.decorator';
+import { Roles as RoleConstants } from '../common/constants/roles.constant';
 import type { Request } from 'express';
 
 @ApiTags('vehicle')
@@ -379,5 +381,14 @@ export class VehicleController {
   async listVehicles(@Query('page') page: number, @Query('size') size: number, @Req() req: Request) {
     const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
     return this.vehicleService.listVehicles(page, size, token);
+  }
+
+  @Get('vehiculo/stats')
+  @Roles(RoleConstants.ADMIN, RoleConstants.MANAGER, RoleConstants.SUPERADMIN)
+  @ApiOperation({ summary: 'Estadísticas de vehículos para admin' })
+  @ApiResponse({ status: 200, description: 'Estadísticas de vehículos' })
+  getVehicleStats(@Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.vehicleService.getVehicleStats(token);
   }
 }

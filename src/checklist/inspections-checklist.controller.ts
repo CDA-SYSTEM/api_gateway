@@ -8,6 +8,8 @@ import { UpdateInspectionChecklistDto } from './application/dtos/update-inspecti
 import { CloseInspectionChecklistDto } from './application/dtos/close-inspection-checklist.dto';
 import { InspectionQueryDto } from './application/dtos/inspection-query.dto';
 import { SearchInspectionDto } from './application/dtos/search-inspection.dto';
+import { Roles } from '../common/decorators/roles.decorator';
+import { Roles as RoleConstants } from '../common/constants/roles.constant';
 import type { Request } from 'express';
 
 @ApiTags('checklist-inspections')
@@ -127,5 +129,14 @@ export class InspectionsChecklistController {
   close(@Param('id') id: string, @Body() body: CloseInspectionChecklistDto, @Req() req: Request) {
     const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
     return this.inspectionsService.close(id, body, token);
+  }
+
+  @Get('stats')
+  @Roles(RoleConstants.ADMIN, RoleConstants.MANAGER, RoleConstants.SUPERADMIN)
+  @ApiOperation({ summary: 'Estadísticas de inspecciones checklist' })
+  @ApiResponse({ status: 200, description: 'Estadísticas de inspecciones' })
+  getStats(@Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.inspectionsService.getInspectionStats(token);
   }
 }

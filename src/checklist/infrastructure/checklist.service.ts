@@ -206,6 +206,12 @@ export class ChecklistInfrastructureService {
     });
   }
 
+  getInspectionStats(token: string): Observable<any> {
+    return this.proxyRequest('GET', '/inspections/stats', null, {
+      Authorization: `Bearer ${token}`,
+    });
+  }
+
   createLabrado(data: any, token: string): Observable<any> {
     return this.proxyRequest('POST', '/labrado', data, {
       Authorization: `Bearer ${token}`,

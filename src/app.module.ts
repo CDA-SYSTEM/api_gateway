@@ -8,6 +8,7 @@ import { AuthModule } from './auth/auth.module';
 import { VehicleModule } from './vehicle/vehicle.module';
 import { ClientsModule } from './clients/clients.module';
 import { CommonModule } from './common/common.module';
+import { FormStatsModule } from './form-stats/form-stats.module';
 import { CombinedGuard } from './common/guards/combined.guard';
 
 @Module({
@@ -20,6 +21,7 @@ import { CombinedGuard } from './common/guards/combined.guard';
     AuthModule,
     VehicleModule,
     ClientsModule,
+    FormStatsModule,
   ],
   controllers: [AppController],
   providers: [

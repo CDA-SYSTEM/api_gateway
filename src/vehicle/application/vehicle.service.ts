@@ -358,4 +358,10 @@ export class VehicleService {
       Authorization: `Bearer ${token}`,
     });
   }
+
+  getVehicleStats(token: string): Observable<any> {
+    return this.vehicleInfrastructureService.proxyRequest('GET', '/vehiculo/stats', null, {
+      Authorization: `Bearer ${token}`,
+    });
+  }
 }

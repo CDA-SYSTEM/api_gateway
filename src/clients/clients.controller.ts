@@ -105,4 +105,13 @@ export class ClientsController {
     const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
     return this.clientsService.activateClient(id, token);
   }
+
+  @Get('clients/stats')
+  @Roles(RoleConstants.ADMIN, RoleConstants.MANAGER, RoleConstants.SUPERADMIN)
+  @ApiOperation({ summary: 'Estadísticas de clientes para admin' })
+  @ApiResponse({ status: 200, description: 'Estadísticas de clientes' })
+  getClientStats(@Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.clientsService.getClientStats(token);
+  }
 }

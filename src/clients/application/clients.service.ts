@@ -90,4 +90,10 @@ export class ClientsApplicationService {
       Authorization: `Bearer ${token}`,
     });
   }
+
+  getClientStats(token: string): Observable<any> {
+    return this.clientsInfrastructure.proxyRequest('GET', '/clients/stats', null, {
+      Authorization: `Bearer ${token}`,
+    });
+  }
 }
