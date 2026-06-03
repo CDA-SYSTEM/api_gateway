@@ -28,6 +28,7 @@ export class InvoiceController {
   @ApiQuery({ name: 'invoice_number', required: false, type: String })
   @ApiQuery({ name: 'statusId', required: false, type: String })
   @ApiQuery({ name: 'inspection_id', required: false, type: String })
+  @ApiQuery({ name: 'search', required: false, type: String })
   @ApiQuery({ name: 'includeDeleted', required: false, type: String })
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'size', required: false, type: Number })
@@ -36,13 +37,14 @@ export class InvoiceController {
     @Query('invoice_number') invoiceNumber: string,
     @Query('statusId') statusId: string,
     @Query('inspection_id') inspectionId: string,
+    @Query('search') search: string,
     @Query('includeDeleted') includeDeleted: string,
     @Query('page') page: number,
     @Query('size') size: number,
     @Req() req: Request,
   ) {
     const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
-    return this.invoiceService.findAll(token, invoiceNumber, statusId, inspectionId, includeDeleted, page, size);
+    return this.invoiceService.findAll(token, invoiceNumber, statusId, inspectionId, search, includeDeleted, page, size);
   }
 
   @Get(':id')

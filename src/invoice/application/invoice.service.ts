@@ -27,6 +27,7 @@ export class InvoiceService {
     invoiceNumber?: string,
     statusId?: string,
     inspectionId?: string,
+    search?: string,
     includeDeleted?: string,
     page?: number,
     size?: number,
@@ -35,6 +36,7 @@ export class InvoiceService {
     if (invoiceNumber) params.append('invoice_number', invoiceNumber);
     if (statusId) params.append('statusId', statusId);
     if (inspectionId) params.append('inspection_id', inspectionId);
+    if (search) params.append('search', search);
     if (includeDeleted) params.append('includeDeleted', includeDeleted);
     if (page !== undefined) params.append('page', page.toString());
     if (size !== undefined) params.append('size', size.toString());
