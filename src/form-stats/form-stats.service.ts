@@ -9,23 +9,23 @@ export class FormStatsService {
   getFullStats(token: string): Observable<any> {
     return forkJoin({
       inspectionStats: this.formStatsInfrastructure.proxyRequest(
-        'GET', '/inspections/stats', null, { Authorization: `Bearer ${token}` },
+        'GET', '/api/inspections/stats', null, { Authorization: `Bearer ${token}` },
       ),
       invoiceStats: this.formStatsInfrastructure.proxyRequest(
-        'GET', '/invoices/stats', null, { Authorization: `Bearer ${token}` },
+        'GET', '/api/invoices/stats', null, { Authorization: `Bearer ${token}` },
       ),
     });
   }
 
   getInspectionStats(token: string): Observable<any> {
     return this.formStatsInfrastructure.proxyRequest(
-      'GET', '/inspections/stats', null, { Authorization: `Bearer ${token}` },
+      'GET', '/api/inspections/stats', null, { Authorization: `Bearer ${token}` },
     );
   }
 
   getInvoiceStats(token: string): Observable<any> {
     return this.formStatsInfrastructure.proxyRequest(
-      'GET', '/invoices/stats', null, { Authorization: `Bearer ${token}` },
+      'GET', '/api/invoices/stats', null, { Authorization: `Bearer ${token}` },
     );
   }
 }

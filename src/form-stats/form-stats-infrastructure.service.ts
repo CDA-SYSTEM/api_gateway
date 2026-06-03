@@ -12,7 +12,7 @@ export class FormStatsInfrastructureService {
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
   ) {
-    this.baseUrl = this.configService.get<string>('FORM_SERVICE_BASE_URL') || '';
+    this.baseUrl = this.configService.get<string>('RECEPTION_SERVICE_BASE_URL') || '';
   }
 
   proxyRequest(method: string, path: string, data?: any, headers?: any): Observable<any> {
