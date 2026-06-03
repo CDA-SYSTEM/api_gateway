@@ -53,6 +53,11 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.server.emit('invoice.created', payload);
     });
 
+    this.formServiceSocket.on('invoice.updated', (payload: unknown) => {
+      this.logger.log('Relaying invoice.updated event to frontend clients');
+      this.server.emit('invoice.updated', payload);
+    });
+
     this.formServiceSocket.on('inspection.status.updated', (payload: unknown) => {
       this.logger.log('Relaying inspection.status.updated event to frontend clients');
       this.server.emit('inspection.status.updated', payload);
