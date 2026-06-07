@@ -56,10 +56,11 @@ export class VehicleController {
 
   @Get('vehiculo/cliente/:clienteId')
   @ApiOperation({ summary: 'Listar vehículos por cliente' })
+  @ApiQuery({ name: 'placa', required: false, description: 'Búsqueda parcial por placa', type: String })
   @ApiResponse({ status: 200, description: 'Lista de vehículos del cliente' })
-  async listVehiclesByClientId(@Param('clienteId') clienteId: string, @Req() req: Request) {
+  async listVehiclesByClientId(@Param('clienteId') clienteId: string, @Query('placa') placa: string, @Req() req: Request) {
     const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
-    return this.vehicleService.listVehiclesByClientId(clienteId, token);
+    return this.vehicleService.listVehiclesByClientId(clienteId, placa, token);
   }
 
   // Marcas
@@ -377,10 +378,11 @@ export class VehicleController {
   @ApiOperation({ summary: 'Listar vehículos' })
   @ApiQuery({ name: 'page', required: false, description: 'Número de página', type: Number })
   @ApiQuery({ name: 'size', required: false, description: 'Tamaño de página', type: Number })
+  @ApiQuery({ name: 'placa', required: false, description: 'Búsqueda parcial por placa', type: String })
   @ApiResponse({ status: 200, description: 'Lista de vehículos' })
-  async listVehicles(@Query('page') page: number, @Query('size') size: number, @Req() req: Request) {
+  async listVehicles(@Query('page') page: number, @Query('size') size: number, @Query('placa') placa: string, @Req() req: Request) {
     const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
-    return this.vehicleService.listVehicles(page, size, token);
+    return this.vehicleService.listVehicles(page, size, placa, token);
   }
 
   @Get('vehiculo/stats')

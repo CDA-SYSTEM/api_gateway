@@ -97,10 +97,11 @@ export class VehicleService {
     });
   }
 
-  listVehicles(page?: number, size?: number, token: string = ''): Observable<any> {
+  listVehicles(page?: number, size?: number, placa?: string, token: string = ''): Observable<any> {
     const queryParams = new URLSearchParams();
     if (page !== undefined) queryParams.append('page', page.toString());
     if (size !== undefined) queryParams.append('size', size.toString());
+    if (placa) queryParams.append('placa', placa);
     
     const queryString = queryParams.toString();
     const url = `/vehiculo${queryString ? '?' + queryString : ''}`;
@@ -129,8 +130,12 @@ export class VehicleService {
     });
   }
 
-  listVehiclesByClientId(clientId: string, token: string): Observable<any> {
-    return this.vehicleInfrastructureService.proxyRequestCached('GET', `/vehiculo/cliente/${clientId}`, CACHE_KEYS.VEHICLE.VEHICULOS_BY_CLIENT(clientId), CACHE_TTL.SHORT, null, {
+  listVehiclesByClientId(clientId: string, placa?: string, token: string = ''): Observable<any> {
+    const queryParams = new URLSearchParams();
+    if (placa) queryParams.append('placa', placa);
+    const queryString = queryParams.toString();
+    const url = `/vehiculo/cliente/${clientId}${queryString ? '?' + queryString : ''}`;
+    return this.vehicleInfrastructureService.proxyRequestCached('GET', url, CACHE_KEYS.VEHICLE.VEHICULOS_BY_CLIENT(clientId), CACHE_TTL.SHORT, null, {
       Authorization: `Bearer ${token}`,
     }, (raw, t) => this.enrichSafe(raw, t));
   }
