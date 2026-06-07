@@ -75,6 +75,7 @@ jobs:
               -e CHECKLIST_SERVICE_BASE_URL="${{ secrets.CHECKLIST_SERVICE_BASE_URL }}" \
               -e TRACKER_SERVICE_BASE_URL="${{ secrets.TRACKER_SERVICE_BASE_URL }}" \
               -e SWAGGER_PASS="${{ secrets.SWAGGER_PASS }}" \
+              -e API_GATEWAY_BASE_URL="${{ secrets.API_GATEWAY_BASE_URL }}" \
               --restart unless-stopped \
               ghcr.io/${{ env.REPO_LC }}:latest
 
