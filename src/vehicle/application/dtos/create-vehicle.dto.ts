@@ -1,5 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNumber, IsNotEmpty } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsString, IsNumber, IsNotEmpty, IsOptional } from 'class-validator';
 
 export class CreateVehicleDto {
   @ApiProperty({ example: 'CLI-001', description: 'ID del cliente' })
@@ -52,8 +52,8 @@ export class CreateVehicleDto {
   @IsNotEmpty()
   placa: string;
 
-  @ApiProperty({ example: 'CERT-001', description: 'Número de certificado' })
+  @ApiPropertyOptional({ example: 'CERT-001', description: 'Número de certificado' })
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
-  certificadoNo: string;
+  certificadoNo?: string;
 }
