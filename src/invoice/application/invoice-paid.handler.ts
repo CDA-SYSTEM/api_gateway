@@ -168,7 +168,32 @@ export class InvoicePaidHandler {
                         'Content-Type': 'application/json',
                       },
                     ).pipe(
-                      map(() => checklistId),
+                      switchMap(() =>
+                        this.fetchPaidStatusId(token).pipe(
+                          switchMap((paidStatusId) => {
+                            if (!paidStatusId) {
+                              this.logger.warn(`[InvoicePaid] No PAID status ID found, skipping status update for inspection ${inspectionId}`);
+                              return of(checklistId);
+                            }
+                            this.logger.log(`[InvoicePaid] Updating inspection ${inspectionId} status to PAID (${paidStatusId})`);
+                            return this.receptionInfra.proxyRequest(
+                              'PATCH',
+                              `/api/inspections/${inspectionId}/status`,
+                              { statusId: paidStatusId },
+                              {
+                                Authorization: `Bearer ${token}`,
+                                'Content-Type': 'application/json',
+                              },
+                            ).pipe(
+                              map(() => checklistId),
+                              catchError((err) => {
+                                this.logger.error(`[InvoicePaid] Failed to update inspection status: ${err.message}`);
+                                return of(checklistId);
+                              }),
+                            );
+                          }),
+                        ),
+                      ),
                       catchError((err) => {
                         this.logger.error(`[InvoicePaid] Failed to patch checklistId: ${err.message}`);
                         return of(null);
