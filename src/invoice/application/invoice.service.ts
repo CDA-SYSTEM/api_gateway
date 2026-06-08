@@ -43,7 +43,9 @@ export class InvoiceService implements OnModuleDestroy {
   private getBrowser = async (): Promise<puppeteer.Browser> => {
     if (this.browser) return this.browser;
     if (this.browserReady) return this.browserReady;
+    const executablePath = process.env.PUPPETEER_EXECUTABLE_PATH || undefined;
     this.browserReady = puppeteer.launch({
+      executablePath,
       headless: true,
       args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
     }).then((b) => {
