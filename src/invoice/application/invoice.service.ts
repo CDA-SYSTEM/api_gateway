@@ -229,11 +229,12 @@ export class InvoiceService implements OnModuleDestroy {
                   switchMap((pdfBuffer) => {
                     const secretKey = process.env.API_SECRET_KEY || '';
                     const encryptedBuffer = secretKey ? encrypt(pdfBuffer, secretKey) : pdfBuffer;
+                    const useEncrypted = secretKey && encryptedBuffer !== pdfBuffer;
                     const pdfFile: Express.Multer.File = {
-                      buffer: pdfBuffer,
+                      buffer: encryptedBuffer,
                       originalname: `invoice-${invoice.invoice_number ?? id}.pdf`,
-                      mimetype: 'application/pdf',
-                      size: pdfBuffer.length,
+                      mimetype: useEncrypted ? 'application/octet-stream' : 'application/pdf',
+                      size: encryptedBuffer.length,
                       fieldname: 'file',
                       encoding: '7bit',
                       destination: '',
