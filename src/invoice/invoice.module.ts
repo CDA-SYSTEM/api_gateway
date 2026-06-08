@@ -8,9 +8,10 @@ import { InvoicePaidHandler } from './application/invoice-paid.handler';
 import { StatusModule } from '../status/status.module';
 import { ChecklistModule } from '../checklist/checklist.module';
 import { VehicleModule } from '../vehicle/vehicle.module';
+import { UploadFilesModule } from '../upload-files/upload-files.module';
 
 @Module({
-  imports: [HttpModule, ConfigModule, StatusModule, ChecklistModule, VehicleModule],
+  imports: [HttpModule, ConfigModule, StatusModule, ChecklistModule, VehicleModule, UploadFilesModule],
   controllers: [InvoiceController],
   providers: [InvoiceService, InvoiceInfrastructureService, InvoicePaidHandler],
   exports: [InvoiceService, InvoiceInfrastructureService],

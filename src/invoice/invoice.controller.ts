@@ -47,6 +47,14 @@ export class InvoiceController {
     return this.invoiceService.findAll(token, invoiceNumber, statusId, inspectionId, search, includeDeleted, page, size);
   }
 
+  @Get(':id/document')
+  @ApiOperation({ summary: 'Obtener documento PDF de la factura (genera si no existe)' })
+  @ApiResponse({ status: 200, description: 'URL del documento PDF' })
+  getDocument(@Param('id') id: string, @Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.invoiceService.getDocument(id, token);
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Obtener factura por ID' })
   @ApiResponse({ status: 200, description: 'Factura encontrada' })
