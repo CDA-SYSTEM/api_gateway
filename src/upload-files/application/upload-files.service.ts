@@ -3,7 +3,7 @@ import { Observable, map } from 'rxjs';
 import { UploadFilesInfrastructureService } from '../infrastructure/upload-files.service';
 import { CacheInfrastructureService } from '../../cache/infrastructure/cache.service';
 import { CACHE_TTL } from '../../cache/application/cache-keys.constant';
-import { decrypt } from '../../common/utils/encryption.util';
+import { decrypt, extractMimeType } from '../../common/utils/encryption.util';
 
 @Injectable()
 export class UploadFilesService {
@@ -48,9 +48,10 @@ export class UploadFilesService {
       map((result: any) => {
         const secretKey = process.env.API_SECRET_KEY || '';
         if (secretKey && result.data) {
+          const embeddedMime = extractMimeType(result.data);
           result.data = decrypt(result.data, secretKey);
-          if (result.data[0] === 0x25 && result.data[1] === 0x50 && result.data[2] === 0x44 && result.data[3] === 0x46) {
-            result.contentType = 'application/pdf';
+          if (embeddedMime) {
+            result.contentType = embeddedMime;
           }
         }
         return result;
