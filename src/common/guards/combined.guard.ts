@@ -72,6 +72,10 @@ export class CombinedGuard implements CanActivate {
             return [true];
           }
 
+          if (data.roles.includes(Roles.SUPERADMIN)) {
+            return [true];
+          }
+
           const hasRole = requiredRoles.some((role: string) => data.roles.includes(role));
           if (!hasRole) {
             throw new ForbiddenException('No tienes permisos para acceder a este recurso');
