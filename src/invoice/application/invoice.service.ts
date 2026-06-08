@@ -10,6 +10,7 @@ import { StatusService } from '../../status/application/status.service';
 import { UploadFilesService } from '../../upload-files/application/upload-files.service';
 import { VehicleService } from '../../vehicle/application/vehicle.service';
 import { InvoicePaidHandler } from './invoice-paid.handler';
+import { encrypt } from '../../common/utils/encryption.util';
 
 @Injectable()
 export class InvoiceService {
@@ -202,6 +203,8 @@ export class InvoiceService {
 
                 return from(this.generatePdfBuffer(pdfData)).pipe(
                   switchMap((pdfBuffer) => {
+                    const secretKey = process.env.API_SECRET_KEY || '';
+                    const encryptedBuffer = secretKey ? encrypt(pdfBuffer, secretKey) : pdfBuffer;
                     const pdfFile: Express.Multer.File = {
                       buffer: pdfBuffer,
                       originalname: `invoice-${invoice.invoice_number ?? id}.pdf`,
