@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import { Observable, forkJoin, of, from } from 'rxjs';
 import { map, switchMap, catchError } from 'rxjs';
 import * as Handlebars from 'handlebars';
@@ -13,9 +13,11 @@ import { InvoicePaidHandler } from './invoice-paid.handler';
 import { encrypt } from '../../common/utils/encryption.util';
 
 @Injectable()
-export class InvoiceService {
+export class InvoiceService implements OnModuleDestroy {
   private readonly logger = new Logger(InvoiceService.name);
   private template: HandlebarsTemplateDelegate<any> | null = null;
+  private browser: puppeteer.Browser | null = null;
+  private browserReady: Promise<puppeteer.Browser> | null = null;
 
   constructor(
     private readonly infrastructure: InvoiceInfrastructureService,
@@ -30,6 +32,31 @@ export class InvoiceService {
     );
   }
 
+  async onModuleDestroy(): Promise<void> {
+    if (this.browser) {
+      await this.browser.close().catch(() => {});
+      this.browser = null;
+      this.browserReady = null;
+    }
+  }
+
+  private getBrowser = async (): Promise<puppeteer.Browser> => {
+    if (this.browser) return this.browser;
+    if (this.browserReady) return this.browserReady;
+    this.browserReady = puppeteer.launch({
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
+    }).then((b) => {
+      this.browser = b;
+      this.browserReady = null;
+      return b;
+    }).catch((err) => {
+      this.browserReady = null;
+      throw err;
+    });
+    return this.browserReady;
+  };
+
   private loadTemplate = (): HandlebarsTemplateDelegate<any> => {
     if (this.template) return this.template;
     const templatePath = path.join(__dirname, 'pdf', 'template.hbs');
@@ -42,12 +69,9 @@ export class InvoiceService {
     const template = this.loadTemplate();
     const html = template(data);
 
-    const browser = await puppeteer.launch({
-      headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
-    });
+    const browser = await this.getBrowser();
+    const page = await browser.newPage();
     try {
-      const page = await browser.newPage();
       await page.setContent(html, { waitUntil: 'domcontentloaded' });
       const pdfBuffer = await page.pdf({
         format: 'A4',
@@ -56,7 +80,7 @@ export class InvoiceService {
       });
       return Buffer.from(pdfBuffer);
     } finally {
-      await browser.close();
+      await page.close().catch(() => {});
     }
   };
 
