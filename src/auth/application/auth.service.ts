@@ -252,6 +252,25 @@ export class AuthApplicationService {
     );
   }
 
+  updateAuthAccountRole(id: string, data: any, token: string): Observable<any> {
+    return this.authInfrastructureService.proxyRequest('PATCH', `/admin/personnel/${id}/role`, data, {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    }).pipe(
+      tap({
+        next: () => {
+          this.cacheService.deleteByKey(CACHE_KEYS.AUTH.ROLES, token).subscribe({
+            error: (err) => this.logger.error('Error invalidating roles cache after auth account role change', err),
+          });
+          this.cacheService.deleteByPrefix('auth:users:*', token).subscribe({
+            error: (err) => this.logger.error('Error invalidating users cache after auth account role change', err),
+          });
+        },
+        error: () => {},
+      }),
+    );
+  }
+
   private invalidateUsersCache(token: string): void {
     this.cacheService.deleteByPrefix('auth:users:*', token).subscribe({
       error: (err) => this.logger.error('Error invalidating users cache', err),

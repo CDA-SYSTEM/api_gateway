@@ -11,6 +11,7 @@ import { ChangePasswordDto } from './application/dtos/change-password.dto';
 import { ResetPasswordDto } from './application/dtos/reset-password.dto';
 import { OAuthGoogleDto } from './application/dtos/oauth-google.dto';
 import { UpdateUserRoleDto } from './application/dtos/change-role.dto';
+import { UpdateAuthAccountRoleDto } from './application/dtos/update-auth-account-role.dto';
 import { UpdateRoleDto } from './application/dtos/update-role-permissions.dto';
 import { Public } from '../common/decorators/public.decorator';
 import { Roles } from '../common/decorators/roles.decorator';
@@ -250,5 +251,15 @@ export class AuthController {
   async resetPassword(@Param('id') id: string, @Body() body: ResetPasswordDto, @Req() req: Request) {
     const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
     return this.authService.resetPassword(id, body, token);
+  }
+
+  @Roles(RoleConst.SUPERADMIN, RoleConst.ADMIN)
+  @Patch('admin/personnel/:id/role')
+  @ApiOperation({ summary: 'Cambiar rol de una cuenta de autenticacion' })
+  @ApiBody({ type: UpdateAuthAccountRoleDto })
+  @ApiResponse({ status: 200, description: 'Rol de la cuenta de autenticacion actualizado correctamente' })
+  async updateAuthAccountRole(@Param('id') id: string, @Body() body: UpdateAuthAccountRoleDto, @Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.authService.updateAuthAccountRole(id, body, token);
   }
 }
