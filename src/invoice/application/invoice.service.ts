@@ -59,16 +59,55 @@ export class InvoiceService implements OnModuleDestroy {
     return this.browserReady;
   };
 
-  private loadTemplate = (): HandlebarsTemplateDelegate<any> => {
+  private loadTemplate = (dynamicBody?: string): HandlebarsTemplateDelegate<any> => {
+    if (dynamicBody) {
+      return Handlebars.compile(dynamicBody);
+    }
     if (this.template) return this.template;
     const templatePath = path.join(__dirname, 'pdf', 'template.hbs');
-    const source = fs.readFileSync(templatePath, 'utf-8');
-    this.template = Handlebars.compile(source);
-    return this.template;
+    if (fs.existsSync(templatePath)) {
+      const source = fs.readFileSync(templatePath, 'utf-8');
+      this.template = Handlebars.compile(source);
+      return this.template;
+    }
+    // Deep fallback if no file exists
+    return Handlebars.compile('<html><body><h1>Invoice {{invoice.number}}</h1></body></html>');
   };
 
-  private generatePdfBuffer = async (data: any): Promise<Buffer> => {
-    const template = this.loadTemplate();
+  private mapVariables = (invoice: any, vehicle?: any) => {
+    const createdAt = new Date(invoice.createdAt || new Date());
+    return {
+      invoice: {
+        id: invoice.id,
+        number: invoice.invoice_number,
+        items: invoice.items || [],
+        subtotal: invoice.subtotal,
+        tax: invoice.tax,
+        total: invoice.total,
+        observations: invoice.observations,
+      },
+      client: {
+        name: invoice.client?.name || 'Consumidor Final',
+        document: invoice.client?.document || 'N/A',
+      },
+      vehicle: vehicle ? {
+        plate: vehicle.plate,
+        brand: vehicle.brand,
+        model: vehicle.model,
+        line: vehicle.line,
+        color: vehicle.color,
+      } : null,
+      date: {
+        day: createdAt.getDate().toString().padStart(2, '0'),
+        month: (createdAt.getMonth() + 1).toString().padStart(2, '0'),
+        year: createdAt.getFullYear(),
+        full: this.formatDate(invoice.createdAt),
+      },
+    };
+  };
+
+  private generatePdfBuffer = async (data: any, dynamicTemplate?: string): Promise<Buffer> => {
+    const template = this.loadTemplate(dynamicTemplate);
     const html = template(data);
 
     const browser = await this.getBrowser();
@@ -208,8 +247,17 @@ export class InvoiceService implements OnModuleDestroy {
             )
           : of(null);
 
-        return forkJoin([vehicle$, fetchInspection$]).pipe(
-          switchMap(([vehicleData, fetchedVehicleId]) => {
+        return forkJoin({
+          vehicle: vehicle$,
+          inspectionVehicle: fetchInspection$,
+          template: this.infrastructure.proxyRequest('GET', '/api/invoice-templates/active/INVOICE', null, {
+            Authorization: `Bearer ${token}`,
+          }).pipe(
+            map(res => res?.data || res),
+            catchError(() => of(null))
+          ),
+        }).pipe(
+          switchMap(({ vehicle: vehicleData, inspectionVehicle: fetchedVehicleId, template: templateData }) => {
             const finalVehicleId = vehicleData ? vehicleId : (fetchedVehicleId ?? null);
 
             const vehicleFinal$ = finalVehicleId && !vehicleData
@@ -221,13 +269,10 @@ export class InvoiceService implements OnModuleDestroy {
 
             return vehicleFinal$.pipe(
               switchMap((vehicle) => {
-                const pdfData = {
-                  ...invoice,
-                  date: this.formatDate(invoice.createdAt),
-                  vehicle,
-                };
+                const mappedData = this.mapVariables(invoice, vehicle);
+                const dynamicTemplate = templateData?.body || undefined;
 
-                return from(this.generatePdfBuffer(pdfData)).pipe(
+                return from(this.generatePdfBuffer(mappedData, dynamicTemplate)).pipe(
                   switchMap((pdfBuffer) => {
                     const secretKey = process.env.API_SECRET_KEY || '';
                     const encryptedBuffer = secretKey ? encrypt(pdfBuffer, secretKey, 'application/pdf') : pdfBuffer;
