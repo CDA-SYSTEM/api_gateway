@@ -78,24 +78,29 @@ export class InvoiceService implements OnModuleDestroy {
     const createdAt = new Date(invoice.createdAt || new Date());
     return {
       invoice: {
-        id: invoice.id,
-        number: invoice.invoice_number,
-        items: invoice.items || [],
-        subtotal: invoice.subtotal,
-        tax: invoice.tax,
-        total: invoice.total,
-        observations: invoice.observations,
+        id: invoice.id ?? '',
+        number: invoice.invoice_number ?? '',
+        items: Array.isArray(invoice.items) ? invoice.items.map((item: any) => ({
+          description: item.description ?? '',
+          quantity: item.quantity ?? 0,
+          unitPrice: item.unitPrice ?? 0,
+          total: item.total ?? 0,
+        })) : [],
+        subtotal: invoice.subtotal ?? 0,
+        tax: invoice.tax ?? 0,
+        total: invoice.total ?? 0,
+        observations: invoice.observations ?? '',
       },
       client: {
         name: invoice.client?.name || 'Consumidor Final',
         document: invoice.client?.document || 'N/A',
       },
       vehicle: vehicle ? {
-        plate: vehicle.plate,
-        brand: vehicle.brand,
-        model: vehicle.model,
-        line: vehicle.line,
-        color: vehicle.color,
+        plate: vehicle.plate ?? '',
+        brand: vehicle.brand ?? '',
+        model: vehicle.model ?? '',
+        line: vehicle.line ?? '',
+        color: vehicle.color ?? '',
       } : null,
       date: {
         day: createdAt.getDate().toString().padStart(2, '0'),
