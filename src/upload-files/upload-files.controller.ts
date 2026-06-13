@@ -101,6 +101,16 @@ export class UploadFilesController {
     return this.uploadFilesService.createFolder(name, token);
   }
 
+  @Delete('storage/folders/:id')
+  @ApiOperation({ summary: 'Eliminar carpeta (solo si está vacía)' })
+  @ApiParam({ name: 'id', required: true, type: String, description: 'ID de la carpeta' })
+  @ApiResponse({ status: 200, description: 'Carpeta eliminada' })
+  @ApiResponse({ status: 400, description: 'La carpeta contiene archivos activos' })
+  deleteFolder(@Param('id') id: string, @Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.uploadFilesService.deleteFolder(id, token);
+  }
+
   @Get('storage/folders')
   @ApiOperation({ summary: 'Listar todas las carpetas' })
   @ApiQuery({ name: 'search', required: false, type: String, description: 'Filtrar por nombre de carpeta' })

@@ -78,6 +78,12 @@ export class UploadFilesService {
     });
   }
 
+  deleteFolder(id: string, token: string): Observable<any> {
+    return this.uploadFilesInfrastructure.proxyRequest('DELETE', `/storage/folders/${id}`, null, {
+      Authorization: `Bearer ${token}`,
+    });
+  }
+
   listFolders(token: string, search?: string): Observable<any> {
     const url = search ? `/storage/folders?search=${encodeURIComponent(search)}` : '/storage/folders';
     return this.uploadFilesInfrastructure.proxyRequest('GET', url, null, {
