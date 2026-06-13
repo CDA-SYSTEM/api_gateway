@@ -75,6 +75,7 @@ export class UploadFilesController {
       type: 'object',
       properties: {
         file: { type: 'string', format: 'binary', description: 'Archivo a subir' },
+        folder_id: { type: 'string', format: 'uuid', description: 'ID de carpeta (opcional)' },
       },
     },
   })
@@ -84,7 +85,36 @@ export class UploadFilesController {
       throw new BadRequestException('No se proporcionó ningún archivo');
     }
     const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
-    return this.uploadFilesService.uploadFile(file, token);
+    const folderId = req.body?.['folder_id'] as string | undefined;
+    return this.uploadFilesService.uploadFile(file, token, folderId);
+  }
+
+  @Post('storage/folders')
+  @ApiOperation({ summary: 'Crear una carpeta' })
+  @ApiResponse({ status: 201, description: 'Carpeta creada exitosamente' })
+  createFolder(@Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    const { name } = req.body ?? {};
+    if (!name) {
+      throw new BadRequestException('El nombre de la carpeta es requerido');
+    }
+    return this.uploadFilesService.createFolder(name, token);
+  }
+
+  @Get('storage/folders')
+  @ApiOperation({ summary: 'Listar todas las carpetas' })
+  @ApiResponse({ status: 200, description: 'Listado de carpetas' })
+  listFolders(@Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.uploadFilesService.listFolders(token);
+  }
+
+  @Get('storage/folders/:id/files')
+  @ApiOperation({ summary: 'Listar archivos por carpeta' })
+  @ApiResponse({ status: 200, description: 'Archivos de la carpeta' })
+  listFilesByFolder(@Param('id') id: string, @Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.uploadFilesService.listFilesByFolder(id, token);
   }
 
   @Get('storage/stats')

@@ -16,7 +16,7 @@ import { InspectionsResponse } from './dtos/inspections-response.interface';
 import { CreateInspectionDto } from './dtos/create-inspection.dto';
 import { UpdateInspectionDto } from './dtos/update-inspection.dto';
 import { mapInspectionItem, mapInspectionsResponse } from './mappers/inspection.mapper';
-import { isValidUUID } from '../../../common/utils/uuid.util';
+import { isValidUUID } from '../../common/utils/uuid.util';
 
 @Injectable()
 export class ReceptionService {
