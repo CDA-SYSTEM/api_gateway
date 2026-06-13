@@ -114,6 +114,15 @@ export class InvoiceService implements OnModuleDestroy {
     const page = await browser.newPage();
     try {
       await page.setContent(html, { waitUntil: 'domcontentloaded' });
+      await page.evaluate(() => Promise.allSettled(
+        Array.from(document.images).map((img) => {
+          if (img.complete) return Promise.resolve();
+          return new Promise<void>((resolve) => {
+            img.onload = () => resolve();
+            img.onerror = () => resolve();
+          });
+        }),
+      ));
       const pdfBuffer = await page.pdf({
         format: 'A4',
         margin: { top: '20px', bottom: '20px', left: '20px', right: '20px' },
