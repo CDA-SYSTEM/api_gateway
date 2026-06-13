@@ -72,14 +72,25 @@ export class UploadFilesService {
     });
   }
 
-  createFolder(name: string, token: string): Observable<any> {
-    return this.uploadFilesInfrastructure.proxyRequest('POST', '/storage/folders', { name }, {
+  createFolder(name: string, token: string, parentId?: string): Observable<any> {
+    const body: any = { name };
+    if (parentId) body.parent_id = parentId;
+    return this.uploadFilesInfrastructure.proxyRequest('POST', '/storage/folders', body, {
       Authorization: `Bearer ${token}`,
     });
   }
 
   deleteFolder(id: string, token: string): Observable<any> {
     return this.uploadFilesInfrastructure.proxyRequest('DELETE', `/storage/folders/${id}`, null, {
+      Authorization: `Bearer ${token}`,
+    });
+  }
+
+  getFolderContents(parentId: string | null, token: string): Observable<any> {
+    const url = parentId
+      ? `/storage/folders/${parentId}/contents`
+      : '/storage/folders/root/contents';
+    return this.uploadFilesInfrastructure.proxyRequest('GET', url, null, {
       Authorization: `Bearer ${token}`,
     });
   }

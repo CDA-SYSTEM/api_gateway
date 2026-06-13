@@ -94,11 +94,11 @@ export class UploadFilesController {
   @ApiResponse({ status: 201, description: 'Carpeta creada exitosamente' })
   createFolder(@Req() req: Request) {
     const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
-    const { name } = req.body ?? {};
+    const { name, parent_id } = req.body ?? {};
     if (!name) {
       throw new BadRequestException('El nombre de la carpeta es requerido');
     }
-    return this.uploadFilesService.createFolder(name, token);
+    return this.uploadFilesService.createFolder(name, token, parent_id);
   }
 
   @Delete('storage/folders/:id')
@@ -118,6 +118,22 @@ export class UploadFilesController {
   listFolders(@Query('search') search: string, @Req() req: Request) {
     const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
     return this.uploadFilesService.listFolders(token, search);
+  }
+
+  @Get('storage/folders/root/contents')
+  @ApiOperation({ summary: 'Listar carpetas raíz y archivos sin carpeta' })
+  @ApiResponse({ status: 200, description: 'Contenido de la raíz' })
+  listRootContents(@Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.uploadFilesService.getFolderContents(null, token);
+  }
+
+  @Get('storage/folders/:id/contents')
+  @ApiOperation({ summary: 'Listar subcarpetas y archivos de una carpeta' })
+  @ApiResponse({ status: 200, description: 'Contenido de la carpeta' })
+  listFolderContents(@Param('id') id: string, @Req() req: Request) {
+    const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
+    return this.uploadFilesService.getFolderContents(id, token);
   }
 
   @Get('storage/folders/:id/files')
