@@ -76,16 +76,22 @@ export class InvoiceService implements OnModuleDestroy {
 
   private mapVariables = (invoice: any, vehicle?: any) => {
     const createdAt = new Date(invoice.createdAt || new Date());
+    const items = Array.isArray(invoice.items) ? invoice.items.map((item: any) => ({
+      description: item.description ?? item.concept ?? '',
+      quantity: item.quantity ?? 0,
+      unitPrice: item.unitPrice ?? 0,
+      total: item.total ?? 0,
+    })) : [];
+    const firstItem = items[0] || {};
     return {
       invoice: {
         id: invoice.id ?? '',
         number: invoice.invoice_number ?? '',
-        items: Array.isArray(invoice.items) ? invoice.items.map((item: any) => ({
-          description: item.description ?? item.concept ?? '',
-          quantity: item.quantity ?? 0,
-          unitPrice: item.unitPrice ?? 0,
-          total: item.total ?? 0,
-        })) : [],
+        items,
+        item_description: firstItem.description ?? '',
+        item_quantity: firstItem.quantity ?? 0,
+        item_unitPrice: firstItem.unitPrice ?? 0,
+        item_total: firstItem.total ?? 0,
         subtotal: invoice.subtotal ?? 0,
         tax: invoice.tax ?? 0,
         total: invoice.total ?? 0,
