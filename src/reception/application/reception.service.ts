@@ -16,6 +16,7 @@ import { InspectionsResponse } from './dtos/inspections-response.interface';
 import { CreateInspectionDto } from './dtos/create-inspection.dto';
 import { UpdateInspectionDto } from './dtos/update-inspection.dto';
 import { mapInspectionItem, mapInspectionsResponse } from './mappers/inspection.mapper';
+import { isValidUUID } from '../../../common/utils/uuid.util';
 
 @Injectable()
 export class ReceptionService {
@@ -522,7 +523,7 @@ export class ReceptionService {
           : of(null);
 
         const operatorId = item.operator_id || item.responsible_id || item.customer_id;
-        const operatorRequest = operatorId
+        const operatorRequest = operatorId && isValidUUID(operatorId)
           ? this.authService.getUserById(operatorId, token).pipe(catchError(() => of(null)))
           : of(null);
 
@@ -563,7 +564,7 @@ export class ReceptionService {
         const vehicleIds = [...new Set(items.map(item => item.vehicle_id).filter(Boolean))] as string[];
         const operatorIds = [...new Set(
           items.flatMap(item => [item.operator_id, item.responsible_id, item.customer_id])
-            .filter(Boolean),
+            .filter((id): id is string => Boolean(id) && isValidUUID(id)),
         )] as string[];
 
         const clientRequests = clientIds.map(clientId =>

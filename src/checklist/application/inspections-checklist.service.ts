@@ -5,6 +5,7 @@ import { ChecklistInfrastructureService } from '../infrastructure/checklist.serv
 import { ClientsApplicationService } from '../../clients/application/clients.service';
 import { VehicleService } from '../../vehicle/application/vehicle.service';
 import { AuthApplicationService } from '../../auth/application/auth.service';
+import { isValidUUID } from '../../common/utils/uuid.util';
 
 @Injectable()
 export class InspectionsChecklistService {
@@ -26,7 +27,7 @@ export class InspectionsChecklistService {
       ? this.vehicleService.getVehicleById(String(item.vehicle_id), token).pipe(catchError(() => of(null)))
       : of(null);
 
-    const inspectorReq = item.inspector_id
+    const inspectorReq = item.inspector_id && isValidUUID(String(item.inspector_id))
       ? this.authService.getUserById(String(item.inspector_id), token).pipe(catchError(() => of(null)))
       : of(null);
 
