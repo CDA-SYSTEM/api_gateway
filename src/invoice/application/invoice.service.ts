@@ -81,7 +81,7 @@ export class InvoiceService implements OnModuleDestroy {
         id: invoice.id ?? '',
         number: invoice.invoice_number ?? '',
         items: Array.isArray(invoice.items) ? invoice.items.map((item: any) => ({
-          description: item.description ?? '',
+          description: item.description ?? item.concept ?? '',
           quantity: item.quantity ?? 0,
           unitPrice: item.unitPrice ?? 0,
           total: item.total ?? 0,
@@ -96,11 +96,11 @@ export class InvoiceService implements OnModuleDestroy {
         document: invoice.client?.document || 'N/A',
       },
       vehicle: vehicle ? {
-        plate: vehicle.plate ?? '',
-        brand: vehicle.brand ?? '',
-        model: vehicle.model ?? '',
-        line: vehicle.line ?? '',
-        color: vehicle.color ?? '',
+        plate: vehicle.plate ?? vehicle.placa ?? '',
+        brand: vehicle.brand ?? vehicle.marca?.nombre ?? '',
+        model: vehicle.model ?? vehicle.modelo ?? '',
+        line: vehicle.line ?? vehicle.linea?.nombre ?? '',
+        color: vehicle.color ?? vehicle.color?.nombre ?? '',
       } : null,
       date: {
         day: createdAt.getDate().toString().padStart(2, '0'),
