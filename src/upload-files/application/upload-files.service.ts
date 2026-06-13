@@ -78,8 +78,9 @@ export class UploadFilesService {
     });
   }
 
-  listFolders(token: string): Observable<any> {
-    return this.uploadFilesInfrastructure.proxyRequest('GET', '/storage/folders', null, {
+  listFolders(token: string, search?: string): Observable<any> {
+    const url = search ? `/storage/folders?search=${encodeURIComponent(search)}` : '/storage/folders';
+    return this.uploadFilesInfrastructure.proxyRequest('GET', url, null, {
       Authorization: `Bearer ${token}`,
     });
   }

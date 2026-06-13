@@ -103,10 +103,11 @@ export class UploadFilesController {
 
   @Get('storage/folders')
   @ApiOperation({ summary: 'Listar todas las carpetas' })
+  @ApiQuery({ name: 'search', required: false, type: String, description: 'Filtrar por nombre de carpeta' })
   @ApiResponse({ status: 200, description: 'Listado de carpetas' })
-  listFolders(@Req() req: Request) {
+  listFolders(@Query('search') search: string, @Req() req: Request) {
     const token = (req.headers['authorization'] as string)?.replace('Bearer ', '') ?? '';
-    return this.uploadFilesService.listFolders(token);
+    return this.uploadFilesService.listFolders(token, search);
   }
 
   @Get('storage/folders/:id/files')
