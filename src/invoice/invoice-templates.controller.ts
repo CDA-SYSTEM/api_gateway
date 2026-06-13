@@ -1,10 +1,11 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Req } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiSecurity, ApiBearerAuth } from '@nestjs/swagger';
 import { InvoiceInfrastructureService } from '../invoice/infrastructure/invoice.service';
 import type { Request } from 'express';
 
 @ApiTags('invoice-templates')
 @Controller('api/v1/invoice-templates')
+@ApiSecurity('x-api-key')
 @ApiBearerAuth()
 export class InvoiceTemplatesController {
   constructor(private readonly infrastructure: InvoiceInfrastructureService) {}
