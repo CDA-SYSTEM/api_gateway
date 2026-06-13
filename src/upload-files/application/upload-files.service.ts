@@ -59,12 +59,33 @@ export class UploadFilesService {
     );
   }
 
-  uploadFile(file: Express.Multer.File, token: string): Observable<any> {
+  uploadFile(file: Express.Multer.File, token: string, folderId?: string): Observable<any> {
     const formData = new FormData();
     const blob = new Blob([file.buffer as any], { type: file.mimetype });
     formData.append('file', blob, file.originalname);
+    if (folderId) {
+      formData.append('folder_id', folderId);
+    }
 
     return this.uploadFilesInfrastructure.proxyRequest('POST', '/storage/upload', formData, {
+      Authorization: `Bearer ${token}`,
+    });
+  }
+
+  createFolder(name: string, token: string): Observable<any> {
+    return this.uploadFilesInfrastructure.proxyRequest('POST', '/storage/folders', { name }, {
+      Authorization: `Bearer ${token}`,
+    });
+  }
+
+  listFolders(token: string): Observable<any> {
+    return this.uploadFilesInfrastructure.proxyRequest('GET', '/storage/folders', null, {
+      Authorization: `Bearer ${token}`,
+    });
+  }
+
+  listFilesByFolder(folderId: string, token: string): Observable<any> {
+    return this.uploadFilesInfrastructure.proxyRequest('GET', `/storage/folders/${folderId}/files`, null, {
       Authorization: `Bearer ${token}`,
     });
   }
