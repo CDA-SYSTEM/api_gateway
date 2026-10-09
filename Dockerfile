@@ -1,4 +1,5 @@
-FROM node:25.6.0 AS builder
+#FROM node:25.6.0 AS builder
+FROM public.ecr.aws/docker/library/node:25.6.0 AS builder
 
 WORKDIR /app
 
@@ -10,7 +11,8 @@ COPY . .
 
 RUN npm run build
 
-FROM node:25.6.0-slim
+#FROM node:25.6.0-slim
+FROM public.ecr.aws/docker/library/node:25.6.0-slim
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     chromium \
