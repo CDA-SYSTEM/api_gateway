@@ -15,7 +15,10 @@ import { InspectionItem } from './dtos/inspection-item.interface';
 import { InspectionsResponse } from './dtos/inspections-response.interface';
 import { CreateInspectionDto } from './dtos/create-inspection.dto';
 import { UpdateInspectionDto } from './dtos/update-inspection.dto';
-import { mapInspectionItem, mapInspectionsResponse } from './mappers/inspection.mapper';
+import {
+  mapInspectionItem,
+  mapInspectionsResponse,
+} from './mappers/inspection.mapper';
 import { isValidUUID } from '../../common/utils/uuid.util';
 
 @Injectable()
@@ -35,9 +38,14 @@ export class ReceptionService {
   ) {}
 
   deleteInspectionById(id: string, token: string): Observable<any> {
-    return this.infrastructure.proxyRequest('DELETE', `/api/inspections/${id}`, null, {
-      Authorization: `Bearer ${token}`,
-    });
+    return this.infrastructure.proxyRequest(
+      'DELETE',
+      `/api/inspections/${id}`,
+      null,
+      {
+        Authorization: `Bearer ${token}`,
+      },
+    );
   }
 
   createInspection(
@@ -50,15 +58,22 @@ export class ReceptionService {
 
     const signatureUpload$ = signatureFile
       ? this.uploadFilesService.uploadFile(signatureFile, token).pipe(
-          map(res => `${baseUrl}/api/v1/storage/files/${res.file.id}`),
+          map((res) => `${baseUrl}/api/v1/storage/files/${res.file.id}`),
           catchError(() => of(null)),
         )
       : of(null);
 
-    const photoUpload$ = this.uploadFilesService.uploadFile(photoFile, token).pipe(
-      map(res => `${baseUrl}/api/v1/storage/files/${res.file.id}`),
-      catchError(() => throwError(() => new BadRequestException('Error al subir la foto de recepción'))),
-    );
+    const photoUpload$ = this.uploadFilesService
+      .uploadFile(photoFile, token)
+      .pipe(
+        map((res) => `${baseUrl}/api/v1/storage/files/${res.file.id}`),
+        catchError(() =>
+          throwError(
+            () =>
+              new BadRequestException('Error al subir la foto de recepción'),
+          ),
+        ),
+      );
 
     return forkJoin([signatureUpload$, photoUpload$]).pipe(
       switchMap(([signatureUrl, photoUrl]) => {
@@ -87,43 +102,60 @@ export class ReceptionService {
           tires: dto.tires,
         };
 
-        return this.infrastructure.proxyRequest('POST', '/api/inspections', payload, {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        }).pipe(
-          switchMap((created) => {
-            this.logger.log('[DEBUG] POST /api/inspections response:', JSON.stringify(created));
-            const inspectionData = created?.data ?? created;
-            const inspectionId = inspectionData?.id;
-            const vehicleId = dto.vehicle_id;
-            this.logger.log('[DEBUG] inspectionId:', inspectionId, 'vehicleId:', vehicleId);
+        return this.infrastructure
+          .proxyRequest('POST', '/api/inspections', payload, {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          })
+          .pipe(
+            switchMap((created) => {
+              this.logger.log(
+                '[DEBUG] POST /api/inspections response:',
+                JSON.stringify(created),
+              );
+              const inspectionData = created?.data ?? created;
+              const inspectionId = inspectionData?.id;
+              const vehicleId = dto.vehicle_id;
+              this.logger.log(
+                '[DEBUG] inspectionId:',
+                inspectionId,
+                'vehicleId:',
+                vehicleId,
+              );
 
-            if (inspectionId) {
-              this.autoCreateInvoice(dto, inspectionId, token).pipe(
-                catchError((err) => {
-                  this.logger.error(`Invoice auto-creation failed: ${err.message}`);
-                  return of(null);
-                }),
-                map((invoiceResult) => {
-                  if (invoiceResult) {
-                    const invoiceId = invoiceResult?.id ?? invoiceResult?.data?.id;
-                    this.logger.log(`[DEBUG] Auto-created invoice ${invoiceId} for inspection ${inspectionId}`);
-                  }
-                  return null;
-                }),
-              ).subscribe();
-            }
+              if (inspectionId) {
+                this.autoCreateInvoice(dto, inspectionId, token)
+                  .pipe(
+                    catchError((err) => {
+                      this.logger.error(
+                        `Invoice auto-creation failed: ${err.message}`,
+                      );
+                      return of(null);
+                    }),
+                    map((invoiceResult) => {
+                      if (invoiceResult) {
+                        const invoiceId =
+                          invoiceResult?.id ?? invoiceResult?.data?.id;
+                        this.logger.log(
+                          `[DEBUG] Auto-created invoice ${invoiceId} for inspection ${inspectionId}`,
+                        );
+                      }
+                      return null;
+                    }),
+                  )
+                  .subscribe();
+              }
 
-            // CHECKLIST AHORA SE CREA AL PAGAR LA FACTURA (InvoicePaidHandler)
-            // this.createChecklistForInspection(dto, inspectionId, vehicleId, token, created).pipe(
-            //   catchError((err) => {
-            //     this.logger.error(`Checklist creation failed: ${err.message}`);
-            //     return of(created);
-            //   }),
-            // );
-            return of(created);
-          }),
-        );
+              // CHECKLIST AHORA SE CREA AL PAGAR LA FACTURA (InvoicePaidHandler)
+              // this.createChecklistForInspection(dto, inspectionId, vehicleId, token, created).pipe(
+              //   catchError((err) => {
+              //     this.logger.error(`Checklist creation failed: ${err.message}`);
+              //     return of(created);
+              //   }),
+              // );
+              return of(created);
+            }),
+          );
       }),
     );
   }
@@ -136,22 +168,56 @@ export class ReceptionService {
     created: any,
   ): Observable<any> {
     if (!vehicleId || !inspectionId) {
-      this.logger.log('[DEBUG] SKIP checklist — missing vehicleId or inspectionId');
+      this.logger.log(
+        '[DEBUG] SKIP checklist — missing vehicleId or inspectionId',
+      );
       return of(created);
     }
 
     this.logger.log('[DEBUG] Fetching vehicle + templates in parallel...');
     return forkJoin({
-      vehicle: this.vehicleService.getVehicleById(vehicleId, token).pipe(catchError((err) => { this.logger.log('[DEBUG] vehicle error:', err?.message); return of(null); })),
-      motoTemplate: this.checklistTemplateService.getActiveMotoTemplate(token).pipe(catchError((err) => { this.logger.log('[DEBUG] motoTemplate error:', err?.message); return of(null); })),
-      livianosTemplate: this.checklistTemplateService.getActiveLivianosPesadosTemplate(token).pipe(catchError((err) => { this.logger.log('[DEBUG] livianosTemplate error:', err?.message); return of(null); })),
+      vehicle: this.vehicleService.getVehicleById(vehicleId, token).pipe(
+        catchError((err) => {
+          this.logger.log('[DEBUG] vehicle error:', err?.message);
+          return of(null);
+        }),
+      ),
+      motoTemplate: this.checklistTemplateService
+        .getActiveMotoTemplate(token)
+        .pipe(
+          catchError((err) => {
+            this.logger.log('[DEBUG] motoTemplate error:', err?.message);
+            return of(null);
+          }),
+        ),
+      livianosTemplate: this.checklistTemplateService
+        .getActiveLivianosPesadosTemplate(token)
+        .pipe(
+          catchError((err) => {
+            this.logger.log('[DEBUG] livianosTemplate error:', err?.message);
+            return of(null);
+          }),
+        ),
     }).pipe(
       switchMap(({ vehicle, motoTemplate, livianosTemplate }) => {
-        this.logger.log('[DEBUG] vehicle:', JSON.stringify(vehicle)?.slice(0, 300));
-        this.logger.log('[DEBUG] motoTemplate:', JSON.stringify(motoTemplate)?.slice(0, 200));
-        this.logger.log('[DEBUG] livianosTemplate:', JSON.stringify(livianosTemplate)?.slice(0, 200));
+        this.logger.log(
+          '[DEBUG] vehicle:',
+          JSON.stringify(vehicle)?.slice(0, 300),
+        );
+        this.logger.log(
+          '[DEBUG] motoTemplate:',
+          JSON.stringify(motoTemplate)?.slice(0, 200),
+        );
+        this.logger.log(
+          '[DEBUG] livianosTemplate:',
+          JSON.stringify(livianosTemplate)?.slice(0, 200),
+        );
 
-        const tipo = (vehicle?.tipoVehiculo?.nombre ?? vehicle?.data?.tipoVehiculo?.nombre ?? '').toLowerCase();
+        const tipo = (
+          vehicle?.tipoVehiculo?.nombre ??
+          vehicle?.data?.tipoVehiculo?.nombre ??
+          ''
+        ).toLowerCase();
         const plate = vehicle?.placa ?? vehicle?.data?.placa ?? '';
         this.logger.log('[DEBUG] tipo:', tipo, 'plate:', plate);
 
@@ -165,7 +231,12 @@ export class ReceptionService {
           vehicleType = tipo === 'pesado' ? 'PESADO' : 'LIVIANO';
           templateId = livianosTemplate?.id ?? livianosTemplate?.data?.id ?? '';
         }
-        this.logger.log('[DEBUG] vehicleType:', vehicleType, 'templateId:', templateId);
+        this.logger.log(
+          '[DEBUG] vehicleType:',
+          vehicleType,
+          'templateId:',
+          templateId,
+        );
 
         if (!templateId || !plate) {
           this.logger.log('[DEBUG] SKIP checklist — no templateId or plate');
@@ -182,34 +253,60 @@ export class ReceptionService {
           inspector_id: dto.operator_id,
           observations: dto.observations ?? '',
         };
-        this.logger.log('[DEBUG] Creating checklist inspection:', JSON.stringify(checklistPayload));
-
-        return this.checklistInfrastructure.createInspection(checklistPayload, token).pipe(
-          switchMap((checklistResult) => {
-            this.logger.log('[DEBUG] checklist create response:', JSON.stringify(checklistResult)?.slice(0, 200));
-            const checklistId = checklistResult?.id ?? checklistResult?.data?.id;
-            if (!checklistId) {
-              this.logger.log('[DEBUG] SKIP PATCH — no checklistId in response');
-              return of(created);
-            }
-
-            this.logger.log('[DEBUG] PATCH checklistId:', checklistId, 'on inspection:', inspectionId);
-            return this.infrastructure.proxyRequest('PATCH', `/api/inspections/${inspectionId}/checklist-id`, { checklistId }, {
-              Authorization: `Bearer ${token}`,
-              'Content-Type': 'application/json',
-            }).pipe(
-              catchError((err) => {
-                this.logger.log('[DEBUG] PATCH error:', err?.message);
-                return of(created);
-              }),
-              map(() => ({ ...created, checklistId })),
-            );
-          }),
-          catchError((err) => {
-            this.logger.log('[DEBUG] createInspection checklist error:', err?.message);
-            return of(created);
-          }),
+        this.logger.log(
+          '[DEBUG] Creating checklist inspection:',
+          JSON.stringify(checklistPayload),
         );
+
+        return this.checklistInfrastructure
+          .createInspection(checklistPayload, token)
+          .pipe(
+            switchMap((checklistResult) => {
+              this.logger.log(
+                '[DEBUG] checklist create response:',
+                JSON.stringify(checklistResult)?.slice(0, 200),
+              );
+              const checklistId =
+                checklistResult?.id ?? checklistResult?.data?.id;
+              if (!checklistId) {
+                this.logger.log(
+                  '[DEBUG] SKIP PATCH — no checklistId in response',
+                );
+                return of(created);
+              }
+
+              this.logger.log(
+                '[DEBUG] PATCH checklistId:',
+                checklistId,
+                'on inspection:',
+                inspectionId,
+              );
+              return this.infrastructure
+                .proxyRequest(
+                  'PATCH',
+                  `/api/inspections/${inspectionId}/checklist-id`,
+                  { checklistId },
+                  {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                  },
+                )
+                .pipe(
+                  catchError((err) => {
+                    this.logger.log('[DEBUG] PATCH error:', err?.message);
+                    return of(created);
+                  }),
+                  map(() => ({ ...created, checklistId })),
+                );
+            }),
+            catchError((err) => {
+              this.logger.log(
+                '[DEBUG] createInspection checklist error:',
+                err?.message,
+              );
+              return of(created);
+            }),
+          );
       }),
     );
   }
@@ -231,11 +328,17 @@ export class ReceptionService {
     }
     return this.vehicleService.getVehicleById(vehicleId, token).pipe(
       map((vehicle) => {
-        const tipo = (vehicle?.tipoVehiculo?.nombre ?? vehicle?.data?.tipoVehiculo?.nombre ?? '').toLowerCase();
+        const tipo = (
+          vehicle?.tipoVehiculo?.nombre ??
+          vehicle?.data?.tipoVehiculo?.nombre ??
+          ''
+        ).toLowerCase();
         return this.mapVehicleTipoToPriceEnum(tipo);
       }),
       catchError(() => {
-        this.logger.log('[DEBUG] Could not resolve vehicle type, skipping invoice');
+        this.logger.log(
+          '[DEBUG] Could not resolve vehicle type, skipping invoice',
+        );
         return of('');
       }),
     );
@@ -253,44 +356,76 @@ export class ReceptionService {
       return of(null);
     }
 
-    return this.resolveVehicleType(dto.vehicle_type, dto.vehicle_id, token).pipe(
+    return this.resolveVehicleType(
+      dto.vehicle_type,
+      dto.vehicle_id,
+      token,
+    ).pipe(
       switchMap((vehicleType) => {
         if (!vehicleType) {
-          this.logger.log('[DEBUG] SKIP auto-invoice — could not resolve vehicle type');
-          this.logger.log('[DEBUG] dto.vehicle_type:', dto.vehicle_type, 'dto.vehicle_id:', dto.vehicle_id);
-          this.logger.log('[Debug] dto complete: ',dto)
+          this.logger.log(
+            '[DEBUG] SKIP auto-invoice — could not resolve vehicle type',
+          );
+          this.logger.log(
+            '[DEBUG] dto.vehicle_type:',
+            dto.vehicle_type,
+            'dto.vehicle_id:',
+            dto.vehicle_id,
+          );
+          this.logger.log('[Debug] dto complete: ', dto);
           return of(null);
         }
 
-        const client$ = this.clientService.getClientById(dto.client_id, token).pipe(
-          catchError(() => of(null)),
-        );
+        const client$ = this.clientService
+          .getClientById(dto.client_id, token)
+          .pipe(catchError(() => of(null)));
 
         const status$ = this.statusService.findAll(token, 'PENDING').pipe(
           map((res) => {
-            const list = Array.isArray(res?.data) ? res.data : (res?.data?.data ?? []);
+            const list = Array.isArray(res?.data)
+              ? res.data
+              : (res?.data?.data ?? []);
             return list?.[0] ?? null;
           }),
           catchError(() => of(null)),
         );
 
-        const price$ = this.priceService.findAll(token, vehicleType, revisionType).pipe(
-          map((res) => {
-            const list = Array.isArray(res?.data) ? res.data : (res?.data?.data ?? []);
-            return list?.[0] ?? null;
-          }),
-          catchError(() => of(null)),
-        );
+        const price$ = this.priceService
+          .findAll(token, vehicleType, revisionType)
+          .pipe(
+            map((res) => {
+              const list = Array.isArray(res?.data)
+                ? res.data
+                : (res?.data?.data ?? []);
+              return list?.[0] ?? null;
+            }),
+            catchError(() => of(null)),
+          );
 
-        return forkJoin({ client: client$, status: status$, price: price$ }).pipe(
+        return forkJoin({
+          client: client$,
+          status: status$,
+          price: price$,
+        }).pipe(
           switchMap(({ client, status, price }) => {
             if (!client || !status || !price) {
-              this.logger.log('[DEBUG] SKIP auto-invoice — missing client, status or price data');
+              this.logger.log(
+                '[DEBUG] SKIP auto-invoice — missing client, status or price data',
+              );
+              this.logger.log(
+                '[DEBUG] dto.vehicle_type:',
+                dto.vehicle_type,
+                'dto.vehicle_id:',
+                dto.vehicle_id,
+              );
+              this.logger.log('[Debug] dto complete: ', dto);
               return of(null);
             }
 
             const clientData = client?.data ?? client;
-            const clientName = [clientData?.nombre, clientData?.apellido].filter(Boolean).join(' ');
+            const clientName = [clientData?.nombre, clientData?.apellido]
+              .filter(Boolean)
+              .join(' ');
 
             const payload = {
               inspection_id: inspectionId,
@@ -312,7 +447,9 @@ export class ReceptionService {
               observations: dto.observations,
             };
 
-            this.logger.log(`[DEBUG] Auto-creating invoice for inspection ${inspectionId}`);
+            this.logger.log(
+              `[DEBUG] Auto-creating invoice for inspection ${inspectionId}`,
+            );
             return this.invoiceService.create(payload, token);
           }),
         );
@@ -320,97 +457,128 @@ export class ReceptionService {
     );
   }
 
-  generateInvoiceFromInspection(inspectionId: string, token: string): Observable<any> {
-    return this.infrastructure.proxyRequest('GET', `/api/inspections/${inspectionId}`, null, {
-      Authorization: `Bearer ${token}`,
-    }).pipe(
-      switchMap((response: any) => {
-        const inspection = response?.data ?? response;
+  generateInvoiceFromInspection(
+    inspectionId: string,
+    token: string,
+  ): Observable<any> {
+    return this.infrastructure
+      .proxyRequest('GET', `/api/inspections/${inspectionId}`, null, {
+        Authorization: `Bearer ${token}`,
+      })
+      .pipe(
+        switchMap((response: any) => {
+          const inspection = response?.data ?? response;
 
-        if (!inspection) {
-          throw new BadRequestException(`Inspection ${inspectionId} not found`);
-        }
+          if (!inspection) {
+            throw new BadRequestException(
+              `Inspection ${inspectionId} not found`,
+            );
+          }
 
-        const revisionType = inspection.revision_type;
-        const clientId = inspection.client_id;
-        const vehicleId = inspection.vehicle_id;
+          const revisionType = inspection.revision_type;
+          const clientId = inspection.client_id;
+          const vehicleId = inspection.vehicle_id;
 
-        if (!revisionType) {
-          throw new BadRequestException('Inspection missing revision_type');
-        }
-        if (!clientId) {
-          throw new BadRequestException('Inspection missing client_id');
-        }
+          if (!revisionType) {
+            throw new BadRequestException('Inspection missing revision_type');
+          }
+          if (!clientId) {
+            throw new BadRequestException('Inspection missing client_id');
+          }
 
-        const vehicleType$ = this.resolveVehicleType(inspection.vehicle_type, vehicleId, token);
+          const vehicleType$ = this.resolveVehicleType(
+            inspection.vehicle_type,
+            vehicleId,
+            token,
+          );
 
-        const client$ = this.clientService.getClientById(clientId, token).pipe(
-          catchError(() => {
-            throw new BadRequestException(`Client ${clientId} not found`);
-          }),
-        );
-
-        const status$ = this.statusService.findAll(token, 'PENDING').pipe(
-          map((res) => {
-            const list = Array.isArray(res?.data) ? res.data : (res?.data?.data ?? []);
-            return list?.[0] ?? null;
-          }),
-          switchMap((status) => {
-            if (!status) throw new BadRequestException('PENDING status not found');
-            return of(status);
-          }),
-        );
-
-        return forkJoin({ vehicleType: vehicleType$, client: client$, status: status$ }).pipe(
-          switchMap(({ vehicleType, client, status }) => {
-            if (!vehicleType) {
-              throw new BadRequestException('Could not resolve vehicle type');
-            }
-
-            const price$ = this.priceService.findAll(token, vehicleType, revisionType).pipe(
-              map((res) => {
-                const list = Array.isArray(res?.data) ? res.data : (res?.data?.data ?? []);
-                return list?.[0] ?? null;
-              }),
-              switchMap((price) => {
-                if (!price) throw new BadRequestException(`Price not found for ${vehicleType}/${revisionType}`);
-                return of(price);
+          const client$ = this.clientService
+            .getClientById(clientId, token)
+            .pipe(
+              catchError(() => {
+                throw new BadRequestException(`Client ${clientId} not found`);
               }),
             );
 
-            return price$.pipe(
-              switchMap((price) => {
-                const clientData = client?.data ?? client;
-                const clientName = [clientData?.nombre, clientData?.apellido].filter(Boolean).join(' ');
+          const status$ = this.statusService.findAll(token, 'PENDING').pipe(
+            map((res) => {
+              const list = Array.isArray(res?.data)
+                ? res.data
+                : (res?.data?.data ?? []);
+              return list?.[0] ?? null;
+            }),
+            switchMap((status) => {
+              if (!status)
+                throw new BadRequestException('PENDING status not found');
+              return of(status);
+            }),
+          );
 
-                const payload = {
-                  inspection_id: inspectionId,
-                  client: {
-                    document: clientData?.identity ?? '',
-                    name: clientName || 'Cliente',
-                    address: clientData?.direccion,
-                    phone: clientData?.celular,
-                    email: clientData?.email,
-                  },
-                  items: [
-                    {
-                      concept: `Revisión ${revisionType} - ${vehicleType}`,
-                      quantity: 1,
-                      unitPrice: price?.amount ?? 0,
+          return forkJoin({
+            vehicleType: vehicleType$,
+            client: client$,
+            status: status$,
+          }).pipe(
+            switchMap(({ vehicleType, client, status }) => {
+              if (!vehicleType) {
+                throw new BadRequestException('Could not resolve vehicle type');
+              }
+
+              const price$ = this.priceService
+                .findAll(token, vehicleType, revisionType)
+                .pipe(
+                  map((res) => {
+                    const list = Array.isArray(res?.data)
+                      ? res.data
+                      : (res?.data?.data ?? []);
+                    return list?.[0] ?? null;
+                  }),
+                  switchMap((price) => {
+                    if (!price)
+                      throw new BadRequestException(
+                        `Price not found for ${vehicleType}/${revisionType}`,
+                      );
+                    return of(price);
+                  }),
+                );
+
+              return price$.pipe(
+                switchMap((price) => {
+                  const clientData = client?.data ?? client;
+                  const clientName = [clientData?.nombre, clientData?.apellido]
+                    .filter(Boolean)
+                    .join(' ');
+
+                  const payload = {
+                    inspection_id: inspectionId,
+                    client: {
+                      document: clientData?.identity ?? '',
+                      name: clientName || 'Cliente',
+                      address: clientData?.direccion,
+                      phone: clientData?.celular,
+                      email: clientData?.email,
                     },
-                  ],
-                  statusId: status?.id ?? '',
-                  observations: inspection.observations,
-                };
+                    items: [
+                      {
+                        concept: `Revisión ${revisionType} - ${vehicleType}`,
+                        quantity: 1,
+                        unitPrice: price?.amount ?? 0,
+                      },
+                    ],
+                    statusId: status?.id ?? '',
+                    observations: inspection.observations,
+                  };
 
-                this.logger.log(`[DEBUG] Generating invoice for inspection ${inspectionId}`);
-                return this.invoiceService.create(payload, token);
-              }),
-            );
-          }),
-        );
-      }),
-    );
+                  this.logger.log(
+                    `[DEBUG] Generating invoice for inspection ${inspectionId}`,
+                  );
+                  return this.invoiceService.create(payload, token);
+                }),
+              );
+            }),
+          );
+        }),
+      );
   }
 
   updateInspection(
@@ -424,14 +592,14 @@ export class ReceptionService {
 
     const signatureUpload$ = signatureFile
       ? this.uploadFilesService.uploadFile(signatureFile, token).pipe(
-          map(res => `${baseUrl}/api/v1/storage/files/${res.file.id}`),
+          map((res) => `${baseUrl}/api/v1/storage/files/${res.file.id}`),
           catchError(() => of(null)),
         )
       : of(null);
 
     const photoUpload$ = photoFile
       ? this.uploadFilesService.uploadFile(photoFile, token).pipe(
-          map(res => `${baseUrl}/api/v1/storage/files/${res.file.id}`),
+          map((res) => `${baseUrl}/api/v1/storage/files/${res.file.id}`),
           catchError(() => of(null)),
         )
       : of(null);
@@ -441,7 +609,10 @@ export class ReceptionService {
         const defined = (obj: Record<string, any>) =>
           Object.entries(obj)
             .filter(([_, v]) => v !== undefined)
-            .reduce((acc, [k, v]) => ({ ...acc, [k]: v }), {} as Record<string, any>);
+            .reduce(
+              (acc, [k, v]) => ({ ...acc, [k]: v }),
+              {} as Record<string, any>,
+            );
 
         const payload = defined({
           mileage: dto.mileage,
@@ -481,10 +652,15 @@ export class ReceptionService {
           payload.photo_reception_url = dto.photo_reception_url;
         }
 
-        return this.infrastructure.proxyRequest('PATCH', `/api/inspections/${id}`, payload, {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        });
+        return this.infrastructure.proxyRequest(
+          'PATCH',
+          `/api/inspections/${id}`,
+          payload,
+          {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        );
       }),
     );
   }
@@ -495,47 +671,79 @@ export class ReceptionService {
     });
   }
 
-  updateInspectionStatus(id: string, statusId: string, token: string): Observable<any> {
-    return this.infrastructure.proxyRequest('PATCH', `/api/inspections/${id}/status`, { statusId }, {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    });
+  updateInspectionStatus(
+    id: string,
+    statusId: string,
+    token: string,
+  ): Observable<any> {
+    return this.infrastructure.proxyRequest(
+      'PATCH',
+      `/api/inspections/${id}/status`,
+      { statusId },
+      {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    );
   }
 
-  updateChecklistId(id: string, checklistId: string, token: string): Observable<any> {
-    return this.infrastructure.proxyRequest('PATCH', `/api/inspections/${id}/checklist-id`, { checklistId }, {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    });
+  updateChecklistId(
+    id: string,
+    checklistId: string,
+    token: string,
+  ): Observable<any> {
+    return this.infrastructure.proxyRequest(
+      'PATCH',
+      `/api/inspections/${id}/checklist-id`,
+      { checklistId },
+      {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    );
   }
 
   getInspectionById(id: string, token: string): Observable<InspectionItem> {
-    return this.infrastructure.proxyRequest('GET', `/api/inspections/${id}`, null, {
-      Authorization: `Bearer ${token}`,
-    }).pipe(
-      switchMap((response: any) => {
-        const item = response?.data ?? response;
+    return this.infrastructure
+      .proxyRequest('GET', `/api/inspections/${id}`, null, {
+        Authorization: `Bearer ${token}`,
+      })
+      .pipe(
+        switchMap((response: any) => {
+          const item = response?.data ?? response;
 
-        const clientRequest = item.client_id
-          ? this.clientService.getClientById(item.client_id, token).pipe(catchError(() => of(null)))
-          : of(null);
+          const clientRequest = item.client_id
+            ? this.clientService
+                .getClientById(item.client_id, token)
+                .pipe(catchError(() => of(null)))
+            : of(null);
 
-        const vehicleRequest = item.vehicle_id
-          ? this.vehicleService.getVehicleById(item.vehicle_id, token).pipe(catchError(() => of(null)))
-          : of(null);
+          const vehicleRequest = item.vehicle_id
+            ? this.vehicleService
+                .getVehicleById(item.vehicle_id, token)
+                .pipe(catchError(() => of(null)))
+            : of(null);
 
-        const operatorId = item.operator_id || item.responsible_id || item.customer_id;
-        const operatorRequest = operatorId && isValidUUID(operatorId)
-          ? this.authService.getUserById(operatorId, token).pipe(catchError(() => of(null)))
-          : of(null);
+          const operatorId =
+            item.operator_id || item.responsible_id || item.customer_id;
+          const operatorRequest =
+            operatorId && isValidUUID(operatorId)
+              ? this.authService
+                  .getUserById(operatorId, token)
+                  .pipe(catchError(() => of(null)))
+              : of(null);
 
-        return forkJoin([clientRequest, vehicleRequest, operatorRequest]).pipe(
-          map(([clientData, vehicleData, userData]) =>
-            mapInspectionItem(item, clientData, vehicleData, userData),
-          ),
-        );
-      }),
-    );
+          return forkJoin([
+            clientRequest,
+            vehicleRequest,
+            operatorRequest,
+          ]).pipe(
+            map(([clientData, vehicleData, userData]) =>
+              mapInspectionItem(item, clientData, vehicleData, userData),
+            ),
+          );
+        }),
+      );
   }
 
   listInspections(
@@ -547,67 +755,105 @@ export class ReceptionService {
     size?: number,
   ): Observable<InspectionsResponse> {
     const params = new URLSearchParams();
-    if (includeDeleted !== undefined) params.append('includeDeleted', includeDeleted);
+    if (includeDeleted !== undefined)
+      params.append('includeDeleted', includeDeleted);
     if (inspectionNumber) params.append('inspection_number', inspectionNumber);
     if (vehicleId) params.append('vehicle_id', vehicleId);
     if (page !== undefined) params.append('page', page.toString());
     if (size !== undefined) params.append('size', size.toString());
     const queryString = params.toString();
     const url = `/api/inspections${queryString ? '?' + queryString : ''}`;
-    return this.infrastructure.proxyRequest('GET', url, null, {
-      Authorization: `Bearer ${token}`,
-    }).pipe(
-      switchMap((response: any) => {
-        const items: any[] = Array.isArray(response?.data)
-          ? response.data
-          : (response?.data?.data ?? []);
+    return this.infrastructure
+      .proxyRequest('GET', url, null, {
+        Authorization: `Bearer ${token}`,
+      })
+      .pipe(
+        switchMap((response: any) => {
+          const items: any[] = Array.isArray(response?.data)
+            ? response.data
+            : (response?.data?.data ?? []);
 
-        const clientIds = [...new Set(items.map(item => item.client_id).filter(Boolean))] as string[];
-        const vehicleIds = [...new Set(items.map(item => item.vehicle_id).filter(Boolean))] as string[];
-        const operatorIds = [...new Set(
-          items.flatMap(item => [item.operator_id, item.responsible_id, item.customer_id])
-            .filter((id): id is string => Boolean(id) && isValidUUID(id)),
-        )] as string[];
+          const clientIds = [
+            ...new Set(items.map((item) => item.client_id).filter(Boolean)),
+          ] as string[];
+          const vehicleIds = [
+            ...new Set(items.map((item) => item.vehicle_id).filter(Boolean)),
+          ] as string[];
+          const operatorIds = [
+            ...new Set(
+              items
+                .flatMap((item) => [
+                  item.operator_id,
+                  item.responsible_id,
+                  item.customer_id,
+                ])
+                .filter((id): id is string => Boolean(id) && isValidUUID(id)),
+            ),
+          ] as string[];
 
-        const clientRequests = clientIds.map(clientId =>
-          this.clientService.getClientById(clientId, token).pipe(
-            catchError(() => of(null)),
-            map(clientData => ({ clientId, clientData })),
-          ),
-        );
+          const clientRequests = clientIds.map((clientId) =>
+            this.clientService.getClientById(clientId, token).pipe(
+              catchError(() => of(null)),
+              map((clientData) => ({ clientId, clientData })),
+            ),
+          );
 
-        const vehicleRequests = vehicleIds.map(vehicleId =>
-          this.vehicleService.getVehicleById(vehicleId, token).pipe(
-            catchError(() => of(null)),
-            map(vehicleData => ({ vehicleId, vehicleData })),
-          ),
-        );
+          const vehicleRequests = vehicleIds.map((vehicleId) =>
+            this.vehicleService.getVehicleById(vehicleId, token).pipe(
+              catchError(() => of(null)),
+              map((vehicleData) => ({ vehicleId, vehicleData })),
+            ),
+          );
 
-        const operatorRequests = operatorIds.map(operatorId =>
-          this.authService.getUserById(operatorId, token).pipe(
-            catchError(() => of(null)),
-            map(userData => ({ operatorId, userData })),
-          ),
-        );
+          const operatorRequests = operatorIds.map((operatorId) =>
+            this.authService.getUserById(operatorId, token).pipe(
+              catchError(() => of(null)),
+              map((userData) => ({ operatorId, userData })),
+            ),
+          );
 
-        const allRequests = [...clientRequests, ...vehicleRequests, ...operatorRequests];
+          const allRequests = [
+            ...clientRequests,
+            ...vehicleRequests,
+            ...operatorRequests,
+          ];
 
-        if (!allRequests.length) {
-          return of(mapInspectionsResponse(response, new Map()));
-        }
+          if (!allRequests.length) {
+            return of(mapInspectionsResponse(response, new Map()));
+          }
 
-        return forkJoin(allRequests).pipe(
-          map((results: any[]) => {
-            const clientResults = results.slice(0, clientRequests.length).filter(r => r?.clientId);
-            const vehicleResults = results.slice(clientRequests.length, clientRequests.length + vehicleRequests.length).filter(r => r?.vehicleId);
-            const operatorResults = results.slice(clientRequests.length + vehicleRequests.length).filter(r => r?.operatorId);
-            const clientMap = new Map(clientResults.map(r => [r.clientId, r.clientData]));
-            const vehicleMap = new Map(vehicleResults.map(r => [r.vehicleId, r.vehicleData]));
-            const operatorMap = new Map(operatorResults.map(r => [r.operatorId, r.userData]));
-            return mapInspectionsResponse(response, clientMap, vehicleMap, operatorMap);
-          }),
-        );
-      }),
-    );
+          return forkJoin(allRequests).pipe(
+            map((results: any[]) => {
+              const clientResults = results
+                .slice(0, clientRequests.length)
+                .filter((r) => r?.clientId);
+              const vehicleResults = results
+                .slice(
+                  clientRequests.length,
+                  clientRequests.length + vehicleRequests.length,
+                )
+                .filter((r) => r?.vehicleId);
+              const operatorResults = results
+                .slice(clientRequests.length + vehicleRequests.length)
+                .filter((r) => r?.operatorId);
+              const clientMap = new Map(
+                clientResults.map((r) => [r.clientId, r.clientData]),
+              );
+              const vehicleMap = new Map(
+                vehicleResults.map((r) => [r.vehicleId, r.vehicleData]),
+              );
+              const operatorMap = new Map(
+                operatorResults.map((r) => [r.operatorId, r.userData]),
+              );
+              return mapInspectionsResponse(
+                response,
+                clientMap,
+                vehicleMap,
+                operatorMap,
+              );
+            }),
+          );
+        }),
+      );
   }
 }
