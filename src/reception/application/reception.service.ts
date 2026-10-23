@@ -257,6 +257,8 @@ export class ReceptionService {
       switchMap((vehicleType) => {
         if (!vehicleType) {
           this.logger.log('[DEBUG] SKIP auto-invoice — could not resolve vehicle type');
+          this.logger.log('[DEBUG] dto.vehicle_type:', dto.vehicle_type, 'dto.vehicle_id:', dto.vehicle_id);
+          this.logger.log('[Debug] dto complete: ',dto)
           return of(null);
         }
 
